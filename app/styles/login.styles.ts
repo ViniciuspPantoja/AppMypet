@@ -7,19 +7,22 @@ const colors = {
   wineMedium: "#5A1520",
   wineLight: "#9B2E42",
   cardBg: "#8B2535",
+
   cream: "#F5ECD7",
   creamDark: "#EAD9BC",
+
   terracotta: "#D4623A",
   terracottaDark: "#C05020",
+
   textHint: "#B08860",
   white: "#FFFFFF",
+
   statusError: "#FF6B6B",
   statusSuccess: "#6BCB77",
 };
 
 export const loginStyles = StyleSheet.create({
-
-  // ── Tela ────────────────────────────────────────────────────
+  // ── Tela base ──────────────────────────────────────────────
   container: {
     flex: 1,
     backgroundColor: colors.wine,
@@ -28,7 +31,7 @@ export const loginStyles = StyleSheet.create({
     paddingHorizontal: 24,
   },
 
-  // ── Card central ────────────────────────────────────────────
+  // ── Card principal ─────────────────────────────────────────
   card: {
     width: "100%",
     backgroundColor: colors.cardBg,
@@ -37,39 +40,57 @@ export const loginStyles = StyleSheet.create({
     paddingHorizontal: 24,
     borderWidth: 1.5,
     borderColor: colors.wineLight,
+
     shadowColor: colors.wineDark,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowRadius: 18,
+    elevation: 12,
+
     alignItems: "center",
   },
 
-  // ── Títulos ─────────────────────────────────────────────────
-  title: {
+  // ── Ícone topo ─────────────────────────────────────────────
+  appIconWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.cream,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+
+  appIcon: {
+    fontSize: 34,
+  },
+
+  // ── Nome do app ────────────────────────────────────────────
+  appName: {
     fontSize: 28,
     fontWeight: "900",
     color: colors.cream,
+    letterSpacing: -0.6,
     marginBottom: 6,
-    letterSpacing: -0.5,
   },
 
+  // ── Subtítulo / contexto ──────────────────────────────────
   subtitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: colors.cream,
-    opacity: 0.65,
+    opacity: 0.7,
     textAlign: "center",
-    lineHeight: 19,
-    marginBottom: 24,
-    paddingHorizontal: 8,
+    lineHeight: 20,
+    marginBottom: 26,
+    paddingHorizontal: 10,
   },
 
-  // ── Seletor Usuário / Empresa ────────────────────────────────
+  // ── Seletor de tipo de conta ──────────────────────────────
   typeSelectorRow: {
     flexDirection: "row",
     gap: 10,
-    marginBottom: 22,
     width: "100%",
+    marginBottom: 22,
   },
 
   typeButton: {
@@ -99,7 +120,7 @@ export const loginStyles = StyleSheet.create({
     color: colors.white,
   },
 
-  // ── Inputs ──────────────────────────────────────────────────
+  // ── Inputs ────────────────────────────────────────────────
   input: {
     width: "100%",
     height: 52,
@@ -113,13 +134,22 @@ export const loginStyles = StyleSheet.create({
     borderColor: colors.creamDark,
   },
 
-  // ── Botões principais ────────────────────────────────────────
+  // ── Esqueci senha ─────────────────────────────────────────
+  forgotPassword: {
+    alignSelf: "flex-end",
+    fontSize: 13,
+    color: colors.cream,
+    opacity: 0.7,
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+
+  // ── Botões principais ─────────────────────────────────────
   buttonsRow: {
     flexDirection: "row",
     gap: 10,
     width: "100%",
-    marginTop: 4,
-    marginBottom: 12,
+    marginBottom: 14,
   },
 
   primaryButton: {
@@ -129,6 +159,7 @@ export const loginStyles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
+
     shadowColor: colors.wineDark,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -140,7 +171,7 @@ export const loginStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "900",
     color: colors.wine,
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
 
   secondaryButton: {
@@ -161,7 +192,7 @@ export const loginStyles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  // ── Botão visitante ──────────────────────────────────────────
+  // ── Visitante ─────────────────────────────────────────────
   guestButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -175,7 +206,7 @@ export const loginStyles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // ── Status / feedback ────────────────────────────────────────
+  // ── Status / feedback ─────────────────────────────────────
   statusText: {
     marginTop: 14,
     fontSize: 12,

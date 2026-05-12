@@ -1,8 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo, useState } from "react";
 import {
     ActivityIndicator,
@@ -65,33 +62,8 @@ export default function LoginScreen() {
     }
   }
 
-  async function handleCreateAccount() {
-    if (!ensureAccountTypeSelected()) {
-      return;
-    }
-
-    if (!email || !password) {
-      setStatus("Preencha e-mail e senha.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setStatus("Criando conta...");
-      const credential = await createUserWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password,
-      );
-      setStatus(`Conta ${accountType} criada: ${credential.user.email}`);
-      router.replace("/(tabs)");
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Erro ao criar conta.";
-      setStatus(`Falha ao criar conta: ${message}`);
-    } finally {
-      setLoading(false);
-    }
+  function handleSignup() {
+    router.push("/signup-type");
   }
 
   function handleGuestAccess() {
@@ -102,11 +74,21 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={loginStyles.container}>
       <View style={loginStyles.card}>
-        <Text style={loginStyles.title}>Login Firebase</Text>
+        {/* ── Ícone topo ───────────────────────── */}
+        <View style={loginStyles.appIconWrapper}>
+          <Text style={loginStyles.appIcon}>🐾</Text>
+        </View>
+
+        {/* ── Nome do app ───────────────────────── */}
+        <Text style={loginStyles.appName}>my petZone</Text>
+
+        {/* ── Título / contexto ────────────────── */}
         <Text style={loginStyles.subtitle}>
-          Escolha o tipo de acesso antes de entrar ou criar conta.
+          Escolha como deseja acessar para encontrar lugares pet‑friendly perto
+          de você.
         </Text>
 
+        {/* ── Seletor tipo conta ───────────────── */}
         <View style={loginStyles.typeSelectorRow}>
           <Pressable
             style={[
@@ -122,7 +104,7 @@ export default function LoginScreen() {
                 accountType === "usuario" && loginStyles.typeButtonTextActive,
               ]}
             >
-              Usuario
+              Usuário
             </Text>
           </Pressable>
 
@@ -145,6 +127,7 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
+        {/* ── Inputs ───────────────────────────── */}
         <TextInput
           style={loginStyles.input}
           placeholder="E-mail"
@@ -164,6 +147,12 @@ export default function LoginScreen() {
           editable={!loading}
         />
 
+        {/* ── Esqueci senha ────────────────────── */}
+        <Pressable disabled={loading}>
+          <Text style={loginStyles.forgotPassword}>Esqueci minha senha</Text>
+        </Pressable>
+
+        {/* ── Botões principais ───────────────── */}
         <View style={loginStyles.buttonsRow}>
           <Pressable
             style={loginStyles.primaryButton}
@@ -171,7 +160,7 @@ export default function LoginScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color="#7B1E2E" />
             ) : (
               <Text style={loginStyles.primaryButtonText}>Entrar</Text>
             )}
@@ -179,13 +168,14 @@ export default function LoginScreen() {
 
           <Pressable
             style={loginStyles.secondaryButton}
-            onPress={handleCreateAccount}
+            onPress={handleSignup}
             disabled={loading}
           >
             <Text style={loginStyles.secondaryButtonText}>Criar conta</Text>
           </Pressable>
         </View>
 
+        {/* ── Visitante ───────────────────────── */}
         <Pressable
           style={loginStyles.guestButton}
           onPress={handleGuestAccess}
@@ -194,6 +184,7 @@ export default function LoginScreen() {
           <Text style={loginStyles.guestButtonText}>Entrar como visitante</Text>
         </Pressable>
 
+        {/* ── Status / feedback ───────────────── */}
         {!!status && <Text style={loginStyles.statusText}>{status}</Text>}
       </View>
     </SafeAreaView>
