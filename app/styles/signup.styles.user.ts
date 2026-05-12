@@ -1,28 +1,9 @@
 import { StyleSheet } from "react-native";
-
-// ── Paleta MyPetZone ──────────────────────────────────────────
-const colors = {
-  wine: "#7B1E2E",
-  wineDark: "#4A1020",
-  wineMedium: "#5A1520",
-  wineLight: "#9B2E42",
-  cardBg: "#8B2535",
-
-  cream: "#F5ECD7",
-  creamDark: "#EAD9BC",
-
-  terracotta: "#D4623A",
-  terracottaDark: "#C05020",
-
-  textHint: "#B08860",
-  white: "#FFFFFF",
-
-  statusError: "#FF6B6B",
-  statusSuccess: "#6BCB77",
-};
+import { colors, spacing, radius, typography } from "../styles/tokens/tokens";
 
 export const signupStyles = StyleSheet.create({
-  // ── Tela base ──────────────────────────────────────────────
+
+  // ── Tela ────────────────────────────────────────────────────
   container: {
     flex: 1,
     backgroundColor: colors.wine,
@@ -30,90 +11,98 @@ export const signupStyles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+    alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
 
-  // ── Card principal ─────────────────────────────────────────
+  // ── Card ────────────────────────────────────────────────────
   card: {
+    width: "100%",
     backgroundColor: colors.cardBg,
-    borderRadius: 28,
-    paddingVertical: 36,
-    paddingHorizontal: 24,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
     borderWidth: 1.5,
     borderColor: colors.wineLight,
-
     shadowColor: colors.wineDark,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.45,
-    shadowRadius: 18,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 10,
+    alignItems: "center",
   },
 
-  // ── Ícone topo ─────────────────────────────────────────────
+  // ── Ícone topo ──────────────────────────────────────────────
   appIconWrapper: {
     width: 72,
     height: 72,
-    borderRadius: 36,
+    borderRadius: radius.pill,
     backgroundColor: colors.cream,
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "center",
-    marginBottom: 14,
+    marginBottom: spacing.md,
+    borderWidth: 3,
+    borderColor: colors.terracotta,
   },
 
   appIcon: {
-    fontSize: 32,
+    fontSize: 34,
   },
 
-  // ── Título e subtítulo ────────────────────────────────────
+  // ── Títulos ─────────────────────────────────────────────────
   title: {
-    fontSize: 26,
-    fontWeight: "900",
+    ...typography.title,
     color: colors.cream,
     textAlign: "center",
-    marginBottom: 6,
-    letterSpacing: -0.4,
+    marginBottom: spacing.sm,
   },
 
   subtitle: {
-    fontSize: 14,
+    ...typography.body,
     color: colors.cream,
-    opacity: 0.7,
+    opacity: 0.65,
     textAlign: "center",
     lineHeight: 20,
-    marginBottom: 22,
-    paddingHorizontal: 10,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.sm,
   },
 
-  // ── Seções do formulário ──────────────────────────────────
+  // ── Seções do formulário ─────────────────────────────────────
   formSection: {
-    marginBottom: 24,
+    width: "100%",
+    backgroundColor: colors.wineMedium,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.wineLight,
   },
 
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: "800",
+    ...typography.label,
     color: colors.cream,
-    marginBottom: 10,
-    opacity: 0.9,
-    letterSpacing: 0.3,
+    opacity: 0.55,
+    textTransform: "uppercase",
+    marginBottom: spacing.sm,
   },
 
-  // ── Área de botões ────────────────────────────────────────
+  // ── Botões ──────────────────────────────────────────────────
   buttonRow: {
-    marginTop: 8,
-    gap: 12,
+    flexDirection: "row",
+    gap: spacing.sm,
+    width: "100%",
+    marginTop: spacing.sm,
   },
 
   primaryButton: {
-    height: 54,
+    flex: 1,
+    height: 52,
     backgroundColor: colors.cream,
-    borderRadius: 50,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
-
     shadowColor: colors.wineDark,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -122,19 +111,19 @@ export const signupStyles = StyleSheet.create({
   },
 
   primaryButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
 
   primaryButtonText: {
-    fontSize: 15,
-    fontWeight: "900",
+    ...typography.subtitle,
     color: colors.wine,
-    letterSpacing: 0.3,
   },
 
   secondaryButton: {
-    height: 48,
-    borderRadius: 50,
+    flex: 1,
+    height: 52,
+    backgroundColor: "transparent",
+    borderRadius: radius.pill,
     borderWidth: 2,
     borderColor: colors.cream,
     alignItems: "center",
@@ -142,9 +131,7 @@ export const signupStyles = StyleSheet.create({
   },
 
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
+    ...typography.subtitle,
     color: colors.cream,
-    letterSpacing: 0.2,
   },
 });

@@ -282,7 +282,7 @@ export default function SignupCompanyScreen() {
   }
 
   function handleGoBack() {
-    router.back();
+    router.replace("/signup-type");
   }
 
   function handleSelectSegment(segment: string) {

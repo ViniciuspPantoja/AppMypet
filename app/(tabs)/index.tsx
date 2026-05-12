@@ -1,113 +1,131 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
+import { getFirebaseApp } from "@/database/firebase/firebase";
+import { getAuth } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { homeStyles } from "../styles/home.styles";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/login">
-          <ThemedText type="subtitle">Teste de Login Firebase</ThemedText>
-        </Link>
-        <ThemedText>{`Use esta tela para validar autenticação com e-mail e senha.`}</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title="Action"
-              icon="cube"
-              onPress={() => alert("Action pressed")}
-            />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">
-            npm run reset-project
-          </ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useEffect(() => {
+    const auth = getAuth(getFirebaseApp());
+    if (auth.currentUser) {
+      setDisplayName(auth.currentUser.displayName || auth.currentUser.email);
+    }
+  }, []);
+
+  return (
+    <SafeAreaView style={homeStyles.container}>
+      <ScrollView
+        contentContainerStyle={homeStyles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+
+        {/* ── Header ── */}
+        <View style={homeStyles.header}>
+          <View style={homeStyles.headerLeft}>
+            <Text style={homeStyles.headerTitle}>MyPetZone</Text>
+            <Text style={homeStyles.headerGreeting}>
+              Olá, {displayName || "Usuário"} 🐾
+            </Text>
+          </View>
+          <Pressable style={homeStyles.notifButton} onPress={() => {}}>
+            <Text style={homeStyles.notifIcon}>🔔</Text>
+          </Pressable>
+        </View>
+
+        {/* ── Hero Banner ── */}
+        <View style={homeStyles.heroBanner}>
+          <View style={homeStyles.heroIconWrapper}>
+            <Text style={homeStyles.heroIcon}>🗺️</Text>
+          </View>
+          <View style={homeStyles.heroContent}>
+            <Text style={homeStyles.heroTitle}>Seu pet merece passear!</Text>
+            <Text style={homeStyles.heroDescription}>
+              Encontre locais pet friendly perto de você
+            </Text>
+            <Pressable style={homeStyles.heroButton} onPress={() => {}}>
+              <Text style={homeStyles.heroButtonText}>Explorar agora →</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* ── Section Cards ── */}
+        <View style={homeStyles.section}>
+          <Text style={homeStyles.sectionLabel}>O que quer fazer?</Text>
+
+          <View style={homeStyles.gridRow}>
+            <Pressable style={homeStyles.cardCream} onPress={() => {}}>
+              <View style={homeStyles.cardIconWrapperWine}>
+                <Text style={homeStyles.cardIcon}>🗺️</Text>
+              </View>
+              <Text style={homeStyles.cardLabelDark}>Pet Map</Text>
+              <Text style={homeStyles.cardDescDark}>Locais pet friendly</Text>
+            </Pressable>
+
+            <Pressable style={homeStyles.cardWine} onPress={() => {}}>
+              <View style={homeStyles.cardIconWrapperTerracotta}>
+                <Text style={homeStyles.cardIcon}>🐾</Text>
+              </View>
+              <Text style={homeStyles.cardLabelLight}>Meu Pet</Text>
+              <Text style={homeStyles.cardDescLight}>Perfil do animal</Text>
+            </Pressable>
+          </View>
+
+          <View style={homeStyles.gridRow}>
+            <Pressable style={homeStyles.cardWine} onPress={() => {}}>
+              <View style={homeStyles.cardIconWrapperDark}>
+                <Text style={homeStyles.cardIcon}>⭐</Text>
+              </View>
+              <Text style={homeStyles.cardLabelLight}>Planos</Text>
+              <Text style={homeStyles.cardDescLight}>Pet e Pet Star</Text>
+            </Pressable>
+
+            <Pressable style={homeStyles.cardTerracotta} onPress={() => {}}>
+              <View style={homeStyles.cardIconWrapperTerracottaDark}>
+                <Text style={homeStyles.cardIcon}>🤝</Text>
+              </View>
+              <Text style={homeStyles.cardLabelLight}>Parceiros</Text>
+              <Text style={homeStyles.cardDescLight}>Clínicas e shops</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* ── Divisor ── */}
+        <View style={homeStyles.divider}>
+          <View style={homeStyles.dividerLine} />
+          <Text style={homeStyles.dividerIcon}>🐾</Text>
+          <View style={homeStyles.dividerLine} />
+        </View>
+
+        {/* ── Section Quick Shortcuts ── */}
+        <View style={homeStyles.section}>
+          <Text style={homeStyles.sectionLabel}>Atalhos rápidos</Text>
+
+          <View style={homeStyles.quickRow}>
+            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+              <Text style={homeStyles.quickIcon}>📅</Text>
+              <Text style={homeStyles.quickLabel}>Consulta</Text>
+            </Pressable>
+
+            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+              <Text style={homeStyles.quickIcon}>💉</Text>
+              <Text style={homeStyles.quickLabel}>Vacinas</Text>
+            </Pressable>
+
+            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+              <Text style={homeStyles.quickIcon}>📍</Text>
+              <Text style={homeStyles.quickLabel}>Perto</Text>
+            </Pressable>
+
+            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+              <Text style={homeStyles.quickIcon}>🛒</Text>
+              <Text style={homeStyles.quickLabel}>Pet Shop</Text>
+            </Pressable>
+          </View>
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-});

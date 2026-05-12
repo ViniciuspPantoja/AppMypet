@@ -18,7 +18,7 @@ export default function SignupTypeScreen() {
   }
 
   function handleGoBack() {
-    router.back();
+    router.replace("/login");
   }
 
   return (

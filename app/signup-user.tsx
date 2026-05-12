@@ -6,7 +6,7 @@ import {
     formatDate,
     isValidEmail,
     isValidPassword,
-    validateBirthDate
+    validateBirthDate,
 } from "@/utils/validators";
 import { useRouter } from "expo-router";
 import {
@@ -26,224 +26,176 @@ import {
 } from "react-native";
 import { signupStyles } from "./styles/signup.styles.user";
 
+// ── Tipos ────────────────────────────────────────────────────
+type FormErrors = Record<string, string>;
+type FormTouched = Record<string, boolean>;
+
+// ── Constantes ───────────────────────────────────────────────
+const REDIRECT_DELAY = 2000;
+const SUCCESS_CLEAR_DELAY = 2000;
+
+// ── Validadores por campo ────────────────────────────────────
+function validateEmailField(email: string): string {
+  if (!email) return "Email é obrigatório";
+  if (!isValidEmail(email)) return "Email inválido";
+  return "";
+}
+
+function validateBirthDateField(birthDate: string): string {
+  const result = validateBirthDate(birthDate);
+  return result.isValid ? "" : (result.error ?? "Data inválida");
+}
+
+function validatePasswordField(password: string): string {
+  if (!password) return "Senha é obrigatória";
+  if (!isValidPassword(password))
+    return "Senha deve ter no mínimo 6 caracteres";
+  return "";
+}
+
+// ── Componente ───────────────────────────────────────────────
 export default function SignupUserScreen() {
   const router = useRouter();
   const auth = useMemo(() => getAuth(getFirebaseApp()), []);
   const db = useMemo(() => getFirestoreDb(), []);
 
-  // Estado do formulário
   const [formData, setFormData] = useState<UserSignupData>({
     email: "",
     birthDate: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<FormTouched>({});
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
-  const [statusType, setStatusType] = useState<StatusType>("success");
+  const [status, setStatus] = useState({
+    message: "",
+    type: "success" as StatusType,
+  });
 
-  // Limpar mensagem de status após alguns segundos
+  // Limpa status de sucesso automaticamente
   useEffect(() => {
-    if (statusMessage && statusType === "success") {
-      const timer = setTimeout(() => {
-        setStatusMessage("");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [statusMessage, statusType]);
+    if (!status.message || status.type !== "success") return;
+    const timer = setTimeout(
+      () => setStatus({ message: "", type: "success" }),
+      SUCCESS_CLEAR_DELAY,
+    );
+    return () => clearTimeout(timer);
+  }, [status]);
 
-  function handleFieldChange(field: keyof UserSignupData, value: string) {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Limpar erro do campo quando começar a digitar
+  // ── Handlers de campo ────────────────────────────────────────
+  function updateField(field: keyof UserSignupData, value: string) {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   }
 
-  function handleFieldBlur(field: keyof UserSignupData) {
-    setTouched((prev) => ({
-      ...prev,
-      [field]: true,
-    }));
-
-    // Validar campo ao sair do foco
-    validateField(field);
+  function blurField(field: keyof UserSignupData) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const error = getFieldError(field);
+    setErrors((prev) => ({ ...prev, [field]: error }));
   }
 
-  function validateField(field: keyof UserSignupData): boolean {
-    const newErrors = { ...errors };
-    let isValid = true;
-
-    if (field === "email") {
-      if (!formData.email) {
-        newErrors.email = "Email é obrigatório";
-        isValid = false;
-      } else if (!isValidEmail(formData.email)) {
-        newErrors.email = "Email inválido";
-        isValid = false;
-      } else {
-        delete newErrors.email;
-      }
-    }
-
-    if (field === "birthDate") {
-      const validation = validateBirthDate(formData.birthDate);
-      if (!validation.isValid) {
-        newErrors.birthDate = validation.error || "Data inválida";
-        isValid = false;
-      } else {
-        delete newErrors.birthDate;
-      }
-    }
-
-    if (field === "password") {
-      if (!formData.password) {
-        newErrors.password = "Senha é obrigatória";
-        isValid = false;
-      } else if (!isValidPassword(formData.password)) {
-        newErrors.password = "Senha deve ter no mínimo 6 caracteres";
-        isValid = false;
-      } else {
-        delete newErrors.password;
-      }
-    }
-
-    setErrors(newErrors);
-    return isValid;
+  function getFieldError(field: keyof UserSignupData): string {
+    if (field === "email") return validateEmailField(formData.email);
+    if (field === "birthDate")
+      return validateBirthDateField(formData.birthDate);
+    if (field === "password") return validatePasswordField(formData.password);
+    return "";
   }
 
-  function validateForm(): boolean {
-    let isFormValid = true;
-    const newErrors: Record<string, string> = {};
+  // ── Validação do formulário completo ─────────────────────────
+  function validateAll(): boolean {
+    const newErrors: FormErrors = {
+      email: validateEmailField(formData.email),
+      birthDate: validateBirthDateField(formData.birthDate),
+      password: validatePasswordField(formData.password),
+    };
 
-    // Validar email
-    if (!formData.email) {
-      newErrors.email = "Email é obrigatório";
-      isFormValid = false;
-    } else if (!isValidEmail(formData.email)) {
-      newErrors.email = "Email inválido";
-      isFormValid = false;
-    }
-
-    // Validar data de nascimento
-    const birthDateValidation = validateBirthDate(formData.birthDate);
-    if (!birthDateValidation.isValid) {
-      newErrors.birthDate = birthDateValidation.error || "Data inválida";
-      isFormValid = false;
-    }
-
-    // Validar senha
-    if (!formData.password) {
-      newErrors.password = "Senha é obrigatória";
-      isFormValid = false;
-    } else if (!isValidPassword(formData.password)) {
-      newErrors.password = "Senha deve ter no mínimo 6 caracteres";
-      isFormValid = false;
-    }
-
-    setErrors(newErrors);
-    setTouched({
-      email: true,
-      birthDate: true,
-      password: true,
+    // Remove campos sem erro
+    Object.keys(newErrors).forEach((key) => {
+      if (!newErrors[key]) delete newErrors[key];
     });
 
-    return isFormValid;
+    setErrors(newErrors);
+    setTouched({ email: true, birthDate: true, password: true });
+    return Object.keys(newErrors).length === 0;
   }
 
+  // ── Submit ───────────────────────────────────────────────────
   async function handleSignup() {
-    if (!validateForm()) {
-      setStatusMessage("Por favor, preencha todos os campos corretamente.");
-      setStatusType("error");
+    if (!validateAll()) {
+      setStatus({
+        message: "Preencha todos os campos corretamente.",
+        type: "error",
+      });
       return;
     }
 
     try {
       setLoading(true);
-      setStatusMessage("Criando sua conta...");
-      setStatusType("success");
+      setStatus({ message: "Criando sua conta...", type: "success" });
 
-      // Criar usuário no Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
+      const credential = await createUserWithEmailAndPassword(
         auth,
         formData.email.trim(),
         formData.password,
       );
 
-      // Atualizar perfil com nome exibível
-      await updateProfile(userCredential.user, {
-        displayName: "User",
-      });
+      await updateProfile(credential.user, { displayName: "User" });
 
-      // Salvar dados adicionais no Firestore
-      await setDoc(doc(db, "users", userCredential.user.uid), {
+      await setDoc(doc(db, "users", credential.user.uid), {
         email: formData.email,
         birthDate: formData.birthDate,
         accountType: "user",
         createdAt: new Date().toISOString(),
       });
 
-      setStatusMessage("✓ Conta criada com sucesso! Redirecionando...");
-      setStatusType("success");
-
-      // Aguardar 2 segundos antes de redirecionar
-      setTimeout(() => {
-        router.replace("/login");
-      }, 2000);
+      setStatus({
+        message: "✓ Conta criada! Redirecionando...",
+        type: "success",
+      });
+      setTimeout(() => router.replace("/login"), REDIRECT_DELAY);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Erro ao criar conta.";
-      setStatusMessage(`Erro: ${message}`);
-      setStatusType("error");
+      setStatus({ message: `Erro: ${message}`, type: "error" });
     } finally {
       setLoading(false);
     }
   }
 
-  function handleGoBack() {
-    router.back();
-  }
-
+  // ── Render ───────────────────────────────────────────────────
   return (
     <SafeAreaView style={signupStyles.container}>
       <ScrollView
         contentContainerStyle={signupStyles.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={signupStyles.card}>
-          {/* ── Ícone topo ───────────────────────────────────────── */}
+          {/* Ícone */}
           <View style={signupStyles.appIconWrapper}>
-            <Text style={signupStyles.appIcon}>👤</Text>
+            <Text style={signupStyles.appIcon}>🐾</Text>
           </View>
 
-          {/* ── Título ────────────────────────────────────────────── */}
-          <Text style={signupStyles.title}>Criar conta de Usuário</Text>
-
-          {/* ── Subtítulo ──────────────────────────────────────────── */}
+          {/* Cabeçalho */}
+          <Text style={signupStyles.title}>Criar conta</Text>
           <Text style={signupStyles.subtitle}>
-            Preencha os dados abaixo para criar sua conta e começar a explorar
-            lugares pet-friendly.
+            Preencha os dados abaixo e comece a explorar lugares pet-friendly.
           </Text>
 
-          {/* ── Status message ────────────────────────────────────── */}
-          {statusMessage && (
+          {/* Status */}
+          {!!status.message && (
             <StatusMessage
-              type={statusType}
-              message={statusMessage}
-              visible={!!statusMessage}
+              type={status.type}
+              message={status.message}
+              visible={!!status.message}
             />
           )}
 
-          {/* ── Seção de campos pessoais ──────────────────────────── */}
+          {/* Seção: Informações Pessoais */}
           <View style={signupStyles.formSection}>
             <Text style={signupStyles.sectionTitle}>Informações Pessoais</Text>
 
@@ -253,8 +205,8 @@ export default function SignupUserScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               value={formData.email}
-              onChangeText={(value) => handleFieldChange("email", value)}
-              onBlur={() => handleFieldBlur("email")}
+              onChangeText={(v) => updateField("email", v)}
+              onBlur={() => blurField("email")}
               error={errors.email}
               touched={touched.email}
               editable={!loading}
@@ -262,13 +214,11 @@ export default function SignupUserScreen() {
 
             <FormInput
               label="Data de Nascimento"
-              placeholder="DD/MM/YYYY"
+              placeholder="DD/MM/AAAA"
               keyboardType="numeric"
               value={formData.birthDate}
-              onChangeText={(value) =>
-                handleFieldChange("birthDate", formatDate(value))
-              }
-              onBlur={() => handleFieldBlur("birthDate")}
+              onChangeText={(v) => updateField("birthDate", formatDate(v))}
+              onBlur={() => blurField("birthDate")}
               error={errors.birthDate}
               touched={touched.birthDate}
               hint="Você deve ter pelo menos 18 anos"
@@ -277,7 +227,7 @@ export default function SignupUserScreen() {
             />
           </View>
 
-          {/* ── Seção de senha ────────────────────────────────────── */}
+          {/* Seção: Segurança */}
           <View style={signupStyles.formSection}>
             <Text style={signupStyles.sectionTitle}>Segurança</Text>
 
@@ -286,16 +236,16 @@ export default function SignupUserScreen() {
               placeholder="Mínimo 6 caracteres"
               secureTextEntry
               value={formData.password}
-              onChangeText={(value) => handleFieldChange("password", value)}
-              onBlur={() => handleFieldBlur("password")}
+              onChangeText={(v) => updateField("password", v)}
+              onBlur={() => blurField("password")}
               error={errors.password}
               touched={touched.password}
+              hint="Use números e caracteres especiais"
               editable={!loading}
-              hint="Use uma senha forte com números e caracteres especiais"
             />
           </View>
 
-          {/* ── Botões ────────────────────────────────────────────── */}
+          {/* Botões */}
           <View style={signupStyles.buttonRow}>
             <Pressable
               style={[
@@ -317,7 +267,7 @@ export default function SignupUserScreen() {
                 signupStyles.secondaryButton,
                 loading && signupStyles.primaryButtonDisabled,
               ]}
-              onPress={handleGoBack}
+              onPress={() => router.replace("/signup-type")}
               disabled={loading}
             >
               <Text style={signupStyles.secondaryButtonText}>Voltar</Text>

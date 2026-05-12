@@ -1,222 +1,288 @@
 import { StyleSheet } from "react-native";
 
-// ── Paleta MyPetZone ──────────────────────────────────────────
-const colors = {
+const COLORS = {
+  // Identidade
   wine: "#7B1E2E",
   wineDark: "#4A1020",
-  wineMedium: "#5A1520",
   wineLight: "#9B2E42",
-  cardBg: "#8B2535",
 
+  // Conforto (surfaces)
   cream: "#F5ECD7",
   creamDark: "#EAD9BC",
 
+  // Ação
   terracotta: "#D4623A",
   terracottaDark: "#C05020",
 
-  white: "#FFFFFF",
+  // Estados
   error: "#FF6B6B",
+  success: "#6BCB77",
+
+  // Neutros “suavizados”
+  textOnWine: "#F8F1E3",
+  textMutedOnWine: "rgba(248, 241, 227, 0.78)",
+  overlay: "rgba(18, 5, 9, 0.68)", // vinho bem escuro, sem “preto puro”
+};
+
+const RADIUS = {
+  card: 28,
+  input: 18,
+  pill: 999,
+};
+
+const SPACING = {
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 28,
+  xxl: 36,
+};
+
+const SHADOWS = {
+  card: {
+    shadowColor: "#120509",
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  floating: {
+    shadowColor: "#120509",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    elevation: 8,
+  },
 };
 
 export const signupStyles = StyleSheet.create({
-  // ── Tela base ──────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Base
+  // ─────────────────────────────────────────────────────────────
   container: {
     flex: 1,
-    backgroundColor: colors.wine,
+    backgroundColor: COLORS.wineDark,
   },
 
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-    justifyContent: "center",
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    paddingBottom: SPACING.xxl,
   },
 
-  // ── Card principal ─────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Card principal (marca + contexto)
+  // ─────────────────────────────────────────────────────────────
   card: {
-    backgroundColor: colors.cardBg,
-    borderRadius: 28,
-    paddingVertical: 36,
-    paddingHorizontal: 24,
-    borderWidth: 1.5,
-    borderColor: colors.wineLight,
+    backgroundColor: COLORS.wine,
+    borderRadius: RADIUS.card,
+    padding: SPACING.xl,
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)", // wineLight suavizado
+    ...SHADOWS.card,
 
-    shadowColor: colors.wineDark,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.45,
-    shadowRadius: 18,
-    elevation: 12,
+    // Em telas grandes (tablet), mantém “premium” centralizado
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
   },
 
-  // ── Ícone topo ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Ícone topo
+  // ─────────────────────────────────────────────────────────────
   appIconWrapper: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.cream,
+    width: 64,
+    height: 64,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
-    marginBottom: 14,
+    marginBottom: SPACING.md,
+    backgroundColor: "rgba(245, 236, 215, 0.16)", // cream com opacidade (sem agressividade)
+    borderWidth: 1,
+    borderColor: "rgba(245, 236, 215, 0.22)",
   },
 
   appIcon: {
-    fontSize: 32,
+    fontSize: 30,
   },
 
-  // ── Título e subtítulo ────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Título / subtítulo
+  // ─────────────────────────────────────────────────────────────
   title: {
-    fontSize: 26,
-    fontWeight: "900",
-    color: colors.cream,
+    fontSize: 22,
+    lineHeight: 28,
+    color: COLORS.textOnWine,
+    fontWeight: "800",
     textAlign: "center",
-    marginBottom: 6,
-    letterSpacing: -0.4,
+    letterSpacing: 0.2,
+    marginBottom: SPACING.xs,
   },
 
   subtitle: {
-    fontSize: 14,
-    color: colors.cream,
-    opacity: 0.75,
+    fontSize: 14.5,
+    lineHeight: 21,
+    color: COLORS.textMutedOnWine,
     textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 24,
-    paddingHorizontal: 10,
+    marginBottom: SPACING.lg,
   },
 
-  // ── Seções do formulário ──────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Seções
+  // ─────────────────────────────────────────────────────────────
   formSection: {
-    marginBottom: 24,
+    marginTop: SPACING.lg,
   },
 
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: "800",
-    color: colors.cream,
-    marginBottom: 10,
-    letterSpacing: 0.3,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+    color: "rgba(245, 236, 215, 0.92)", // cream levemente menos “estourado”
+    marginBottom: SPACING.sm,
   },
 
-  // ── Label manual (select) ─────────────────────────────────
+  // Labels do seletor (para harmonizar com FormInput)
   label: {
-    fontSize: 13,
+    fontSize: 13.5,
     fontWeight: "700",
-    color: colors.cream,
-    marginBottom: 6,
-    opacity: 0.9,
+    color: "rgba(245, 236, 215, 0.92)",
+    marginBottom: SPACING.xs,
   },
 
-  // ── Select custom (ramo de atuação) ───────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Select (ramo de atuação) — input surface creme
+  // ─────────────────────────────────────────────────────────────
   selectWrapper: {
-    height: 52,
-    borderRadius: 50,
-    backgroundColor: colors.cream,
-    borderWidth: 2,
-    borderColor: colors.creamDark,
-    paddingHorizontal: 22,
+    minHeight: 54,
+    borderRadius: RADIUS.input,
+    paddingHorizontal: SPACING.md,
+    alignItems: "center",
     justifyContent: "center",
+    backgroundColor: COLORS.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.95)", // creamDark
+    ...SHADOWS.floating,
   },
 
   selectText: {
+    width: "100%",
+    color: COLORS.wineDark,
     fontSize: 15,
-    color: colors.wine,
+    lineHeight: 20,
+    fontWeight: "700",
   },
 
   selectPlaceholder: {
-    color: colors.wine,
-    opacity: 0.5,
+    color: "rgba(74, 16, 32, 0.55)", // wineDark suavizado
+    fontWeight: "600",
   },
 
+  // Erro no seletor: borda suave (sem agressividade)
   inputWithError: {
-    borderColor: colors.error,
+    borderColor: "rgba(255, 107, 107, 0.75)",
   },
 
   fieldError: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: 6,
-    marginLeft: 4,
+    marginTop: SPACING.xs,
+    color: "rgba(255, 107, 107, 0.92)",
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontWeight: "700",
   },
 
-  // ── Área de botões ────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Botões
+  // ─────────────────────────────────────────────────────────────
   buttonRow: {
-    marginTop: 10,
-    gap: 12,
+    marginTop: SPACING.xl,
+    gap: SPACING.sm,
   },
 
   primaryButton: {
     height: 54,
-    backgroundColor: colors.cream,
-    borderRadius: 50,
+    borderRadius: RADIUS.input,
+    backgroundColor: COLORS.cream,
     alignItems: "center",
     justifyContent: "center",
-
-    shadowColor: colors.wineDark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.95)",
+    ...SHADOWS.floating,
   },
 
   primaryButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.62,
   },
 
   primaryButtonText: {
-    fontSize: 15,
+    color: COLORS.wine,
+    fontSize: 15.5,
     fontWeight: "900",
-    color: colors.wine,
     letterSpacing: 0.3,
   },
 
   secondaryButton: {
-    height: 48,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: colors.cream,
+    height: 54,
+    borderRadius: RADIUS.input,
+    backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(245, 236, 215, 0.55)",
   },
 
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.cream,
+    color: "rgba(245, 236, 215, 0.92)",
+    fontSize: 15,
+    fontWeight: "800",
     letterSpacing: 0.2,
   },
 
-  // ── Modal de segmentos ────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  // Modal — seleção de ramo
+  // ─────────────────────────────────────────────────────────────
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.55)",
+    backgroundColor: COLORS.overlay,
     justifyContent: "flex-end",
   },
 
   modalContent: {
-    backgroundColor: colors.cardBg,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: COLORS.wine,
+    borderTopLeftRadius: RADIUS.card,
+    borderTopRightRadius: RADIUS.card,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xl,
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.45)",
+    ...SHADOWS.card,
   },
 
   modalItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.wineLight,
+    minHeight: 52,
+    borderRadius: 18,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.sm,
+    backgroundColor: COLORS.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.95)",
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
   },
 
   modalItemSelected: {
-    backgroundColor: colors.terracotta,
+    backgroundColor: COLORS.creamDark,
+    borderColor: "rgba(212, 98, 58, 0.75)", // terracotta
   },
 
   modalItemText: {
-    fontSize: 15,
-    color: colors.cream,
-    fontWeight: "600",
+    color: COLORS.wineDark,
+    fontSize: 14.5,
+    fontWeight: "800",
   },
 });
