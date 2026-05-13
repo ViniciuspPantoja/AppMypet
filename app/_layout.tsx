@@ -25,6 +25,15 @@ export default function RootLayout() {
         <Stack.Screen name="signup-user" />
         <Stack.Screen name="signup-company" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        <Stack.Screen name="petmap" />
+        <Stack.Screen name="my-pet" />
+        <Stack.Screen name="plans" />
+        <Stack.Screen name="partners" />
+        <Stack.Screen name="appointment" />
+        <Stack.Screen name="vaccines" />
+        <Stack.Screen name="nearby" />
+        <Stack.Screen name="pet-shop" />
+        <Stack.Screen name="notifications" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

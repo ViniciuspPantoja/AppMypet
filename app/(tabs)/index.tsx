@@ -1,4 +1,5 @@
 import { getFirebaseApp } from "@/database/firebase/firebase";
+import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
@@ -6,6 +7,7 @@ import { homeStyles } from "../styles/home.styles";
 
 export default function HomeScreen() {
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const auth = getAuth(getFirebaseApp());
@@ -20,7 +22,6 @@ export default function HomeScreen() {
         contentContainerStyle={homeStyles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-
         {/* ── Header ── */}
         <View style={homeStyles.header}>
           <View style={homeStyles.headerLeft}>
@@ -29,7 +30,10 @@ export default function HomeScreen() {
               Olá, {displayName || "Usuário"} 🐾
             </Text>
           </View>
-          <Pressable style={homeStyles.notifButton} onPress={() => {}}>
+          <Pressable
+            style={homeStyles.notifButton}
+            onPress={() => router.push("/notifications")}
+          >
             <Text style={homeStyles.notifIcon}>🔔</Text>
           </Pressable>
         </View>
@@ -44,7 +48,10 @@ export default function HomeScreen() {
             <Text style={homeStyles.heroDescription}>
               Encontre locais pet friendly perto de você
             </Text>
-            <Pressable style={homeStyles.heroButton} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.heroButton}
+              onPress={() => router.push("/petmap")}
+            >
               <Text style={homeStyles.heroButtonText}>Explorar agora →</Text>
             </Pressable>
           </View>
@@ -55,7 +62,10 @@ export default function HomeScreen() {
           <Text style={homeStyles.sectionLabel}>O que quer fazer?</Text>
 
           <View style={homeStyles.gridRow}>
-            <Pressable style={homeStyles.cardCream} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.cardCream}
+              onPress={() => router.push("/petmap")}
+            >
               <View style={homeStyles.cardIconWrapperWine}>
                 <Text style={homeStyles.cardIcon}>🗺️</Text>
               </View>
@@ -63,7 +73,10 @@ export default function HomeScreen() {
               <Text style={homeStyles.cardDescDark}>Locais pet friendly</Text>
             </Pressable>
 
-            <Pressable style={homeStyles.cardWine} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.cardWine}
+              onPress={() => router.push("/my-pet")}
+            >
               <View style={homeStyles.cardIconWrapperTerracotta}>
                 <Text style={homeStyles.cardIcon}>🐾</Text>
               </View>
@@ -73,7 +86,10 @@ export default function HomeScreen() {
           </View>
 
           <View style={homeStyles.gridRow}>
-            <Pressable style={homeStyles.cardWine} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.cardWine}
+              onPress={() => router.push("/plans")}
+            >
               <View style={homeStyles.cardIconWrapperDark}>
                 <Text style={homeStyles.cardIcon}>⭐</Text>
               </View>
@@ -81,7 +97,10 @@ export default function HomeScreen() {
               <Text style={homeStyles.cardDescLight}>Pet e Pet Star</Text>
             </Pressable>
 
-            <Pressable style={homeStyles.cardTerracotta} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.cardTerracotta}
+              onPress={() => router.push("/partners")}
+            >
               <View style={homeStyles.cardIconWrapperTerracottaDark}>
                 <Text style={homeStyles.cardIcon}>🤝</Text>
               </View>
@@ -103,28 +122,39 @@ export default function HomeScreen() {
           <Text style={homeStyles.sectionLabel}>Atalhos rápidos</Text>
 
           <View style={homeStyles.quickRow}>
-            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.quickPill}
+              onPress={() => router.push("/appointment")}
+            >
               <Text style={homeStyles.quickIcon}>📅</Text>
               <Text style={homeStyles.quickLabel}>Consulta</Text>
             </Pressable>
 
-            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.quickPill}
+              onPress={() => router.push("/vaccines")}
+            >
               <Text style={homeStyles.quickIcon}>💉</Text>
               <Text style={homeStyles.quickLabel}>Vacinas</Text>
             </Pressable>
 
-            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.quickPill}
+              onPress={() => router.push("/nearby")}
+            >
               <Text style={homeStyles.quickIcon}>📍</Text>
               <Text style={homeStyles.quickLabel}>Perto</Text>
             </Pressable>
 
-            <Pressable style={homeStyles.quickPill} onPress={() => {}}>
+            <Pressable
+              style={homeStyles.quickPill}
+              onPress={() => router.push("/pet-shop")}
+            >
               <Text style={homeStyles.quickIcon}>🛒</Text>
               <Text style={homeStyles.quickLabel}>Pet Shop</Text>
             </Pressable>
           </View>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
