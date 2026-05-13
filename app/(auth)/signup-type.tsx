@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { signupStyles } from "./styles/signup.styles.type";
+import { signupStyles } from "../styles/signup.styles.type";
 
 export default function SignupTypeScreen() {
   const router = useRouter();

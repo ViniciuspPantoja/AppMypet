@@ -10,8 +10,8 @@ import {
     View,
 } from "react-native";
 
-import { getFirebaseAuth } from "../database/firebase/firebase";
-import { loginStyles } from "./styles/login.styles";
+import { getFirebaseAuth } from "../../database/firebase/firebase";
+import { loginStyles } from "../styles/login.styles";
 
 type AccountType = "usuario" | "empresa";
 

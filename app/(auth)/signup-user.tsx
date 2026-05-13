@@ -24,7 +24,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { signupStyles } from "./styles/signup.styles.user";
+import { signupStyles } from "../styles/signup.styles.user";
 
 // ── Tipos ────────────────────────────────────────────────────
 type FormErrors = Record<string, string>;
@@ -258,15 +258,12 @@ export default function SignupUserScreen() {
               {loading ? (
                 <ActivityIndicator color="#7B1E2E" />
               ) : (
-                <Text style={signupStyles.primaryButtonText}>Criar Conta</Text>
+                <Text style={signupStyles.primaryButtonText}>Criar conta</Text>
               )}
             </Pressable>
 
             <Pressable
-              style={[
-                signupStyles.secondaryButton,
-                loading && signupStyles.primaryButtonDisabled,
-              ]}
+              style={signupStyles.secondaryButton}
               onPress={() => router.replace("/signup-type")}
               disabled={loading}
             >

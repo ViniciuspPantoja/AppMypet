@@ -78,10 +78,10 @@ export default function HomeScreen() {
               onPress={() => router.push("/my-pet")}
             >
               <View style={homeStyles.cardIconWrapperTerracotta}>
-                <Text style={homeStyles.cardIcon}>🐾</Text>
+                <Text style={homeStyles.cardIcon}>�</Text>
               </View>
-              <Text style={homeStyles.cardLabelLight}>Meu Pet</Text>
-              <Text style={homeStyles.cardDescLight}>Perfil do animal</Text>
+              <Text style={homeStyles.cardLabelLight}>Meu perfil</Text>
+              <Text style={homeStyles.cardDescLight}>Seu perfil e pets</Text>
             </Pressable>
           </View>
 

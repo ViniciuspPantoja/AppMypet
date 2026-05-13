@@ -26,7 +26,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { signupStyles } from "./styles/signup.styles.company";
+import { signupStyles } from "../styles/signup.styles.company";
 
 const BUSINESS_SEGMENTS = [
   "Clínica Veterinária",
@@ -264,13 +264,9 @@ export default function SignupCompanyScreen() {
         createdAt: new Date().toISOString(),
       });
 
-      setStatusMessage("✓ Conta criada com sucesso! Redirecionando...");
+      setStatusMessage("Conta criada com sucesso!");
       setStatusType("success");
-
-      // Aguardar 2 segundos antes de redirecionar
-      setTimeout(() => {
-        router.replace("/login");
-      }, 2000);
+      router.replace("/login");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Erro ao criar conta.";
@@ -281,20 +277,6 @@ export default function SignupCompanyScreen() {
     }
   }
 
-  function handleGoBack() {
-    router.replace("/signup-type");
-  }
-
-  function handleSelectSegment(segment: string) {
-    handleFieldChange("businessSegment", segment);
-    setShowSegmentModal(false);
-    setTouched((prev) => ({
-      ...prev,
-      businessSegment: true,
-    }));
-    validateField("businessSegment");
-  }
-
   return (
     <SafeAreaView style={signupStyles.container}>
       <ScrollView
@@ -302,22 +284,16 @@ export default function SignupCompanyScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={signupStyles.card}>
-          {/* ── Ícone topo ───────────────────────────────────────── */}
           <View style={signupStyles.appIconWrapper}>
-            <Text style={signupStyles.appIcon}>🏢</Text>
+            <Text style={signupStyles.appIcon}>🐾</Text>
           </View>
 
-          {/* ── Título ────────────────────────────────────────────── */}
-          <Text style={signupStyles.title}>Criar conta de Empresa</Text>
-
-          {/* ── Subtítulo ──────────────────────────────────────────── */}
+          <Text style={signupStyles.title}>Cadastro de Empresa</Text>
           <Text style={signupStyles.subtitle}>
-            Cadastre seu negócio e comece a ser descoberto por amantes de
-            animais.
+            Complete os dados da sua empresa para criar sua conta.
           </Text>
 
-          {/* ── Status message ────────────────────────────────────── */}
-          {statusMessage && (
+          {!!statusMessage && (
             <StatusMessage
               type={statusType}
               message={statusMessage}
@@ -325,101 +301,83 @@ export default function SignupCompanyScreen() {
             />
           )}
 
-          {/* ── Seção de dados empresariais ────────────────────────── */}
           <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Dados Empresariais</Text>
+            <Text style={signupStyles.sectionTitle}>Dados da Empresa</Text>
 
             <FormInput
-              label="CNPJ"
-              placeholder="00.000.000/0000-00"
-              keyboardType="numeric"
-              value={formData.cnpj}
-              onChangeText={(value) => handleFieldChange("cnpj", value)}
-              onBlur={() => handleFieldBlur("cnpj")}
-              error={errors.cnpj}
-              touched={touched.cnpj}
-              editable={!loading}
-              maxLength={18}
-            />
-
-            <FormInput
-              label="Nome Fantasia"
-              placeholder="Nome do seu negócio"
+              label="Nome fantasia"
+              placeholder="Nome da empresa"
               value={formData.businessName}
-              onChangeText={(value) => handleFieldChange("businessName", value)}
+              onChangeText={(v) => handleFieldChange("businessName", v)}
               onBlur={() => handleFieldBlur("businessName")}
               error={errors.businessName}
               touched={touched.businessName}
               editable={!loading}
             />
 
-            {/* ── Seletor de ramo de atuação ────────────────────── */}
-            <View>
-              <Text style={signupStyles.label}>Ramo de Atuação</Text>
-              <Pressable
-                style={[
-                  signupStyles.selectWrapper,
-                  touched.businessSegment &&
-                    errors.businessSegment &&
-                    signupStyles.inputWithError,
-                ]}
-                onPress={() => !loading && setShowSegmentModal(true)}
-                disabled={loading}
-              >
-                <Text
-                  style={[
-                    signupStyles.selectText,
-                    !formData.businessSegment && signupStyles.selectPlaceholder,
-                  ]}
-                >
-                  {formData.businessSegment || "Selecione o ramo"}
-                </Text>
-              </Pressable>
-              {touched.businessSegment && errors.businessSegment && (
-                <Text style={signupStyles.fieldError}>
-                  {errors.businessSegment}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          {/* ── Seção de contato ──────────────────────────────────── */}
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Contato</Text>
-
             <FormInput
               label="Email"
-              placeholder="contato@empresa.com.br"
+              placeholder="contato@empresa.com"
               autoCapitalize="none"
               keyboardType="email-address"
               value={formData.email}
-              onChangeText={(value) => handleFieldChange("email", value)}
+              onChangeText={(v) => handleFieldChange("email", v)}
               onBlur={() => handleFieldBlur("email")}
               error={errors.email}
               touched={touched.email}
               editable={!loading}
             />
+
+            <FormInput
+              label="CNPJ"
+              placeholder="00.000.000/0000-00"
+              keyboardType="numeric"
+              value={formData.cnpj}
+              onChangeText={(v) => handleFieldChange("cnpj", v)}
+              onBlur={() => handleFieldBlur("cnpj")}
+              error={errors.cnpj}
+              touched={touched.cnpj}
+              editable={!loading}
+              maxLength={18}
+            />
           </View>
 
-          {/* ── Seção de senha ────────────────────────────────────── */}
+          <View style={signupStyles.formSection}>
+            <Text style={signupStyles.sectionTitle}>Ramo de Atuação</Text>
+
+            <Pressable
+              onPress={() => setShowSegmentModal(true)}
+              style={signupStyles.inputLikeButton}
+              disabled={loading}
+            >
+              <Text style={signupStyles.inputLikeButtonText}>
+                {formData.businessSegment || "Selecione o ramo"}
+              </Text>
+            </Pressable>
+
+            {errors.businessSegment && touched.businessSegment && (
+              <Text style={signupStyles.errorText}>
+                {errors.businessSegment}
+              </Text>
+            )}
+          </View>
+
           <View style={signupStyles.formSection}>
             <Text style={signupStyles.sectionTitle}>Segurança</Text>
 
             <FormInput
               label="Senha"
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Crie uma senha"
               secureTextEntry
               value={formData.password}
-              onChangeText={(value) => handleFieldChange("password", value)}
+              onChangeText={(v) => handleFieldChange("password", v)}
               onBlur={() => handleFieldBlur("password")}
               error={errors.password}
               touched={touched.password}
               editable={!loading}
-              hint="Use uma senha forte com números e caracteres especiais"
             />
           </View>
 
-          {/* ── Botões ────────────────────────────────────────────── */}
           <View style={signupStyles.buttonRow}>
             <Pressable
               style={[
@@ -430,61 +388,54 @@ export default function SignupCompanyScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#7B1E2E" />
+                <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={signupStyles.primaryButtonText}>Criar Conta</Text>
+                <Text style={signupStyles.primaryButtonText}>Criar conta</Text>
               )}
             </Pressable>
 
             <Pressable
-              style={[
-                signupStyles.secondaryButton,
-                loading && signupStyles.primaryButtonDisabled,
-              ]}
-              onPress={handleGoBack}
+              style={signupStyles.secondaryButton}
+              onPress={() => router.replace("/signup-type")}
               disabled={loading}
             >
               <Text style={signupStyles.secondaryButtonText}>Voltar</Text>
             </Pressable>
           </View>
+
+          <Modal
+            visible={showSegmentModal}
+            animationType="slide"
+            transparent={false}
+            onRequestClose={() => setShowSegmentModal(false)}
+          >
+            <SafeAreaView style={signupStyles.modalContainer}>
+              <View style={signupStyles.modalHeader}>
+                <Text style={signupStyles.modalTitle}>Selecione o ramo</Text>
+                <Pressable onPress={() => setShowSegmentModal(false)}>
+                  <Text style={signupStyles.modalCloseText}>Fechar</Text>
+                </Pressable>
+              </View>
+
+              <FlatList
+                data={BUSINESS_SEGMENTS}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => {
+                      handleFieldChange("businessSegment", item);
+                      setShowSegmentModal(false);
+                    }}
+                    style={signupStyles.modalItem}
+                  >
+                    <Text style={signupStyles.modalItemText}>{item}</Text>
+                  </Pressable>
+                )}
+              />
+            </SafeAreaView>
+          </Modal>
         </View>
       </ScrollView>
-
-      {/* ── Modal de seleção de ramo ───────────────────────────── */}
-      <Modal
-        visible={showSegmentModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowSegmentModal(false)}
-      >
-        <Pressable
-          style={signupStyles.modalOverlay}
-          onPress={() => setShowSegmentModal(false)}
-        >
-          <View style={signupStyles.modalContent}>
-            <FlatList
-              data={BUSINESS_SEGMENTS}
-              keyExtractor={(item) => item}
-              scrollEnabled={false}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={[
-                    signupStyles.modalItem,
-                    item === formData.businessSegment &&
-                      signupStyles.modalItemSelected,
-                  ]}
-                  onPress={() => handleSelectSegment(item)}
-                >
-                  <Text style={signupStyles.modalItemText}>{item}</Text>
-                  {item === formData.businessSegment && (
-                    <Text style={signupStyles.modalItemText}>✓</Text>
-                  )}
-                </Pressable>
-              )}
-            />
-          </View>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 }
