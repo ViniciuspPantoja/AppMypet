@@ -1,9 +1,11 @@
 import { getFirebaseApp } from "@/database/firebase/firebase";
 import { Pet, UserProfile } from "@/types/pet.types";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import {
+    Alert,
     Image,
     Pressable,
     SafeAreaView,
@@ -22,6 +24,62 @@ export default function MyPetScreen() {
   useEffect(() => {
     loadUserData();
   }, []);
+
+  async function pickImageFromLibrary() {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permissão necessária",
+          "Precisamos de acesso às suas fotos para selecionar uma imagem de perfil.",
+        );
+        return null;
+      }
+
+      const result: any = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (result.cancelled === true) return null;
+
+      // Newer Expo returns result.assets; support both shapes
+      const uri = result.assets?.[0]?.uri ?? result.uri;
+      return uri ?? null;
+    } catch (err) {
+      console.warn("Image pick error", err);
+      return null;
+    }
+  }
+
+  async function handleAddPhoto() {
+    const uri = await pickImageFromLibrary();
+    if (!uri) return;
+    setUserProfile((prev) => (prev ? { ...prev, photoUrl: uri } : prev));
+  }
+
+  async function handleChangePhoto() {
+    const uri = await pickImageFromLibrary();
+    if (!uri) return;
+    setUserProfile((prev) => (prev ? { ...prev, photoUrl: uri } : prev));
+  }
+
+  function handleDeletePhoto() {
+    Alert.alert("Remover foto", "Deseja remover a foto de perfil?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Remover",
+        style: "destructive",
+        onPress: () =>
+          setUserProfile((prev) =>
+            prev ? { ...prev, photoUrl: undefined } : prev,
+          ),
+      },
+    ]);
+  }
 
   async function loadUserData() {
     try {
@@ -95,6 +153,31 @@ export default function MyPetScreen() {
               />
             ) : (
               <Text style={myPetStyles.avatarPlaceholder}>👤</Text>
+            )}
+          </View>
+          <View style={myPetStyles.avatarActions}>
+            {!userProfile?.photoUrl ? (
+              <Pressable
+                onPress={handleAddPhoto}
+                style={myPetStyles.avatarActionButton}
+              >
+                <Text style={myPetStyles.avatarActionText}>Adicionar foto</Text>
+              </Pressable>
+            ) : (
+              <>
+                <Pressable
+                  onPress={handleChangePhoto}
+                  style={myPetStyles.avatarActionButton}
+                >
+                  <Text style={myPetStyles.avatarActionText}>Trocar</Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleDeletePhoto}
+                  style={myPetStyles.avatarActionButtonDanger}
+                >
+                  <Text style={myPetStyles.avatarActionText}>Remover</Text>
+                </Pressable>
+              </>
             )}
           </View>
 

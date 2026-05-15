@@ -139,6 +139,39 @@ export const myPetStyles = StyleSheet.create({
     color: colors.textOnWine,
   },
 
+  // Avatar action buttons (adicionar / trocar / remover)
+  avatarActions: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    marginTop: SPACING.sm,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  avatarActionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+  },
+
+  avatarActionButtonDanger: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.error,
+    borderWidth: 1,
+    borderColor: "rgba(255,107,107,0.9)",
+  },
+
+  avatarActionText: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: colors.wineDark,
+  },
+
   // Card do perfil (camada vinho)
   card: {
     width: "100%",
