@@ -55,7 +55,7 @@ export function validateBirthDate(birthDate: string): {
 
   // Verifica idade mínima (18 anos)
   if (age < 18) {
-    return { isValid: false, error: "Você deve ter pelo menos 18 anos" };
+    return { isValid: false, error: "Você deve ter mais de 18 anos" };
   }
 
   return { isValid: true };

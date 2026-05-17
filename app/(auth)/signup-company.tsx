@@ -305,7 +305,6 @@ export default function SignupCompanyScreen() {
             <Text style={signupStyles.sectionTitle}>Dados da Empresa</Text>
 
             <FormInput
-              label="Nome fantasia"
               placeholder="Nome da empresa"
               value={formData.businessName}
               onChangeText={(v) => handleFieldChange("businessName", v)}
@@ -316,7 +315,6 @@ export default function SignupCompanyScreen() {
             />
 
             <FormInput
-              label="Email"
               placeholder="contato@empresa.com"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -329,7 +327,6 @@ export default function SignupCompanyScreen() {
             />
 
             <FormInput
-              label="CNPJ"
               placeholder="00.000.000/0000-00"
               keyboardType="numeric"
               value={formData.cnpj}
@@ -350,7 +347,13 @@ export default function SignupCompanyScreen() {
               style={signupStyles.inputLikeButton}
               disabled={loading}
             >
-              <Text style={signupStyles.inputLikeButtonText}>
+              <Text
+                style={[
+                  signupStyles.inputLikeButtonText,
+                  !formData.businessSegment &&
+                    signupStyles.inputLikeButtonPlaceholder,
+                ]}
+              >
                 {formData.businessSegment || "Selecione o ramo"}
               </Text>
             </Pressable>
@@ -366,8 +369,7 @@ export default function SignupCompanyScreen() {
             <Text style={signupStyles.sectionTitle}>Segurança</Text>
 
             <FormInput
-              label="Senha"
-              placeholder="Crie uma senha"
+              placeholder="Senha (Mínimo de 6 caracteres)"
               secureTextEntry
               value={formData.password}
               onChangeText={(v) => handleFieldChange("password", v)}

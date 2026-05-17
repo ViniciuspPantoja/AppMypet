@@ -41,7 +41,10 @@ function validateEmailField(email: string): string {
   return "";
 }
 
-function validateBirthDateField(birthDate: string): string {
+function validateBirthDateField(birthDate: string, required = true): string {
+  if (!birthDate) {
+    return required ? "Data de nascimento é obrigatória" : "";
+  }
   const result = validateBirthDate(birthDate);
   return result.isValid ? "" : (result.error ?? "Data inválida");
 }
@@ -100,7 +103,7 @@ export default function SignupUserScreen() {
   function getFieldError(field: keyof UserSignupData): string {
     if (field === "email") return validateEmailField(formData.email);
     if (field === "birthDate")
-      return validateBirthDateField(formData.birthDate);
+      return validateBirthDateField(formData.birthDate, false);
     if (field === "password") return validatePasswordField(formData.password);
     return "";
   }
@@ -197,10 +200,7 @@ export default function SignupUserScreen() {
 
           {/* Seção: Informações Pessoais */}
           <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Informações Pessoais</Text>
-
             <FormInput
-              label="Email"
               placeholder="seu.email@exemplo.com"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -213,7 +213,6 @@ export default function SignupUserScreen() {
             />
 
             <FormInput
-              label="Data de Nascimento"
               placeholder="DD/MM/AAAA"
               keyboardType="numeric"
               value={formData.birthDate}
@@ -221,7 +220,6 @@ export default function SignupUserScreen() {
               onBlur={() => blurField("birthDate")}
               error={errors.birthDate}
               touched={touched.birthDate}
-              hint="Você deve ter pelo menos 18 anos"
               editable={!loading}
               maxLength={10}
             />
@@ -229,18 +227,14 @@ export default function SignupUserScreen() {
 
           {/* Seção: Segurança */}
           <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Segurança</Text>
-
             <FormInput
-              label="Senha"
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Senha (Mínimo de 6 caracteres)"
               secureTextEntry
               value={formData.password}
               onChangeText={(v) => updateField("password", v)}
               onBlur={() => blurField("password")}
               error={errors.password}
               touched={touched.password}
-              hint="Use números e caracteres especiais"
               editable={!loading}
             />
           </View>
