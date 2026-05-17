@@ -1,0 +1,399 @@
+import { StyleSheet } from "react-native";
+
+// ── Paleta MyPetZone ──────────────────────────────────────────
+const colors = {
+  // Identidade
+  wine: "#7B1E2E",
+  wineDark: "#4A1020",
+  wineLight: "#9B2E42",
+  cardBg: "#8B2535",
+
+  // Conforto (surfaces)
+  cream: "#F5ECD7",
+  creamDark: "#EAD9BC",
+
+  // Ação
+  terracotta: "#D4623A",
+  terracottaDark: "#C05020",
+
+  // Estados
+  error: "#FF6B6B",
+  success: "#6BCB77",
+
+  // Textos
+  textOnWine: "#F8F1E3",
+  textMutedOnWine: "rgba(248, 241, 227, 0.75)",
+  inkOnCream: "#4A1020",
+  inkMutedOnCream: "rgba(74, 16, 32, 0.70)",
+};
+
+// ── Tokens ───────────────────────────────────────────────────
+const RADIUS = {
+  card: 28,
+  inner: 22,
+  input: 18,
+  pill: 999,
+};
+
+const SPACING = {
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 28,
+  xxl: 36,
+};
+
+const SHADOWS = {
+  card: {
+    shadowColor: "#120509",
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.32,
+    shadowRadius: 18,
+    elevation: 12,
+  },
+  floating: {
+    shadowColor: "#120509",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.26,
+    shadowRadius: 14,
+    elevation: 10,
+  },
+};
+
+export const myPetStyles = StyleSheet.create({
+  // ───────────────────────────────────────────────────────────
+  // Base
+  // ───────────────────────────────────────────────────────────
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.wineDark,
+  },
+
+  scrollContent: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.xxl,
+  },
+
+  // ───────────────────────────────────────────────────────────
+  // Header (faixa topo + volta)
+  // ───────────────────────────────────────────────────────────
+  header: {
+    backgroundColor: colors.wine,
+    borderRadius: RADIUS.card,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)",
+    ...SHADOWS.card,
+    marginBottom: SPACING.xl,
+  },
+
+  backButton: {
+    alignSelf: "flex-start",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+    backgroundColor: "rgba(245, 236, 215, 0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(245, 236, 215, 0.18)",
+  },
+
+  backButtonText: {
+    color: colors.textOnWine,
+    fontSize: 14.5,
+    fontWeight: "800",
+    letterSpacing: 0.2,
+  },
+
+  // ───────────────────────────────────────────────────────────
+  // Hero (avatar + card de perfil)
+  // ───────────────────────────────────────────────────────────
+  hero: {
+    alignItems: "center",
+    marginTop: -SPACING.lg, // aproxima do header sem “quebrar” o respiro
+    marginBottom: SPACING.xl,
+  },
+
+  avatarWrap: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(245, 236, 215, 0.18)",
+    borderWidth: 4,
+    borderColor: colors.cardBg, // “anel” vinho do card para dar unidade
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: SPACING.md,
+    ...SHADOWS.floating,
+  },
+
+  avatarImage: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+  },
+
+  avatarPlaceholder: {
+    fontSize: 46,
+    color: colors.textOnWine,
+  },
+
+  // Avatar action buttons (adicionar / trocar / remover)
+  avatarActions: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    marginTop: SPACING.sm,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  avatarActionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+  },
+
+  avatarActionButtonDanger: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.error,
+    borderWidth: 1,
+    borderColor: "rgba(255,107,107,0.9)",
+  },
+
+  avatarActionText: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: colors.wineDark,
+  },
+
+  // Card do perfil (camada vinho)
+  card: {
+    width: "100%",
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS.card,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)",
+    ...SHADOWS.card,
+  },
+
+  name: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: "900",
+    color: colors.textOnWine,
+    letterSpacing: -0.2,
+    marginBottom: 4,
+  },
+
+  email: {
+    fontSize: 14.5,
+    lineHeight: 20,
+    color: colors.textMutedOnWine,
+    marginBottom: SPACING.lg,
+  },
+
+  infoGrid: {
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+
+  infoItem: {
+    backgroundColor: "rgba(245, 236, 215, 0.10)",
+    borderRadius: RADIUS.inner,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderWidth: 1,
+    borderColor: "rgba(245, 236, 215, 0.12)",
+  },
+
+  infoLabel: {
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+    color: "rgba(245, 236, 215, 0.72)",
+    marginBottom: 4,
+  },
+
+  infoValue: {
+    fontSize: 15.5,
+    fontWeight: "800",
+    color: colors.textOnWine,
+  },
+
+  // CTA de perfil (surface creme)
+  actionButton: {
+    marginTop: SPACING.sm,
+    height: 50,
+    borderRadius: RADIUS.input,
+    backgroundColor: colors.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+    alignItems: "center",
+    justifyContent: "center",
+    ...SHADOWS.floating,
+  },
+
+  actionButtonText: {
+    color: colors.wine,
+    fontSize: 14.5,
+    fontWeight: "900",
+    letterSpacing: 0.2,
+  },
+
+  // ───────────────────────────────────────────────────────────
+  // Seção Pets
+  // ───────────────────────────────────────────────────────────
+  section: {
+    marginTop: SPACING.lg,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: SPACING.md,
+  },
+
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 0.7,
+    textTransform: "uppercase",
+    color: "rgba(245, 236, 215, 0.92)",
+  },
+
+  sectionAction: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: RADIUS.input,
+    backgroundColor: colors.terracotta,
+    borderWidth: 1,
+    borderColor: "rgba(192, 80, 32, 0.75)",
+  },
+
+  sectionActionText: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 13.5,
+    letterSpacing: 0.2,
+  },
+
+  // ───────────────────────────────────────────────────────────
+  // Empty state (quando não há pets)
+  // ───────────────────────────────────────────────────────────
+  emptyState: {
+    backgroundColor: colors.cardBg,
+    borderRadius: RADIUS.card,
+    padding: SPACING.xl,
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)",
+    alignItems: "center",
+    ...SHADOWS.card,
+  },
+
+  emptyEmoji: {
+    fontSize: 44,
+    marginBottom: SPACING.sm,
+  },
+
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: colors.textOnWine,
+    marginBottom: 6,
+    textAlign: "center",
+  },
+
+  emptyText: {
+    fontSize: 14.5,
+    lineHeight: 21,
+    color: colors.textMutedOnWine,
+    textAlign: "center",
+  },
+
+  // ───────────────────────────────────────────────────────────
+  // Lista de pets
+  // ───────────────────────────────────────────────────────────
+  petList: {
+    gap: SPACING.md,
+  },
+
+  petCard: {
+    backgroundColor: colors.cream,
+    borderRadius: RADIUS.card,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+    flexDirection: "row",
+    alignItems: "center",
+    ...SHADOWS.floating,
+  },
+
+  petAvatarWrap: {
+    width: 74,
+    height: 74,
+    borderRadius: RADIUS.inner,
+    backgroundColor: colors.creamDark,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: SPACING.md,
+    borderWidth: 1,
+    borderColor: "rgba(74, 16, 32, 0.08)",
+  },
+
+  petAvatarImage: {
+    width: 74,
+    height: 74,
+    borderRadius: RADIUS.inner,
+  },
+
+  petAvatarEmoji: {
+    fontSize: 34,
+  },
+
+  petContent: {
+    flex: 1,
+    justifyContent: "center",
+  },
+
+  petName: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: colors.inkOnCream,
+    marginBottom: 4,
+    letterSpacing: -0.1,
+  },
+
+  petMeta: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.inkMutedOnCream,
+    marginBottom: 6,
+  },
+
+  petInfoRow: {
+    flexDirection: "row",
+    gap: 16,
+  },
+
+  petInfoText: {
+    fontSize: 13,
+    color: "rgba(74, 16, 32, 0.60)",
+    fontWeight: "700",
+  },
+
+  petChevron: {
+    fontSize: 20,
+    color: colors.terracotta,
+    marginLeft: SPACING.sm,
+    fontWeight: "900",
+  },
+});

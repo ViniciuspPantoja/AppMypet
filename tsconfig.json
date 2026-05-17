@@ -1,0 +1,63 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    /* ============================
+       STRICTNESS & SAFETY
+    ============================ */
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+
+    /* ============================
+       MODULE & RESOLUTION
+       (crítico para evitar seus erros)
+    ============================ */
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": false,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+
+    /* ============================
+       COMPATIBILIDADE EXPO / RN
+    ============================ */
+    "jsx": "react-jsx",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+
+    /* ============================
+       ALIAS DE PATH (@/)
+    ============================ */
+    "paths": {
+      "@/*": ["./*"]
+    },
+
+    /* ============================
+       QUALIDADE / DX
+    ============================ */
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+
+    /* ============================
+       INTEROP (Node / Firebase)
+    ============================ */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "database/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+
+  "exclude": [
+    "node_modules"
+  ]
+}
