@@ -1,11 +1,10 @@
 import { Dimensions, StyleSheet } from "react-native";
-import { colors, spacing, radius, typography } from "./tokens/tokens";
+import { colors, radius, spacing, typography } from "./tokens/tokens";
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = (width - spacing.lg * 2 - spacing.sm * 3) / 2;
 
 export const homeStyles = StyleSheet.create({
-
   // ── Tela ────────────────────────────────────────────────────
   container: {
     flex: 1,
@@ -281,27 +280,33 @@ export const homeStyles = StyleSheet.create({
   // ── Atalhos Rápidos ──────────────────────────────────────────
   quickRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
 
   quickPill: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "31%",
     backgroundColor: colors.cardBg,
     borderRadius: radius.md,
-    paddingVertical: spacing.md,
+    minHeight: 78,
+    paddingVertical: spacing.sm,
     alignItems: "center",
     gap: spacing.xs,
     borderWidth: 2,
     borderColor: colors.wineLight,
+    justifyContent: "center",
   },
 
   quickIcon: {
-    fontSize: 20,
+    fontSize: 18,
+    textAlign: "center",
   },
 
   quickLabel: {
     ...typography.label,
     color: colors.cream,
-    fontSize: 9,
+    fontSize: 8.5,
+    textAlign: "center",
   },
 });

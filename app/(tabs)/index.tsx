@@ -153,6 +153,14 @@ export default function HomeScreen() {
               <Text style={homeStyles.quickIcon}>🛒</Text>
               <Text style={homeStyles.quickLabel}>Pet Shop</Text>
             </Pressable>
+
+            <Pressable
+              style={homeStyles.quickPill}
+              onPress={() => router.push("/settings")}
+            >
+              <Text style={homeStyles.quickIcon}>⚙️</Text>
+              <Text style={homeStyles.quickLabel}>Config.</Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>

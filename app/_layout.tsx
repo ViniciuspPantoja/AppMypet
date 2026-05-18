@@ -39,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="pet-register" />
         <Stack.Screen name="plans" />
         <Stack.Screen name="partners" />
+        <Stack.Screen name="settings" />
         <Stack.Screen name="appointment" />
         <Stack.Screen name="vaccines" />
         <Stack.Screen name="nearby" />

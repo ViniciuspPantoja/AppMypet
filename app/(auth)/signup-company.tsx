@@ -298,6 +298,7 @@ export default function SignupCompanyScreen() {
               type={statusType}
               message={statusMessage}
               visible={!!statusMessage}
+              onDismiss={() => setStatusMessage("")}
             />
           )}
 

@@ -10,6 +10,7 @@ import {
     View,
 } from "react-native";
 
+import { StatusMessage, StatusType } from "@/components/status-message";
 import { getFirebaseAuth } from "../../database/firebase/firebase";
 import { loginStyles } from "../styles/login.styles";
 
@@ -22,11 +23,17 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState({
+    message: "",
+    type: "error" as StatusType,
+  });
 
   function ensureAccountTypeSelected() {
     if (!accountType) {
-      setStatus("Selecione se deseja entrar como usuario ou empresa.");
+      setStatus({
+        message: "Selecione se deseja entrar como usuario ou empresa.",
+        type: "error",
+      });
       return false;
     }
 
@@ -39,24 +46,22 @@ export default function LoginScreen() {
     }
 
     if (!email || !password) {
-      setStatus("Preencha e-mail e senha.");
+      setStatus({ message: "Preencha e-mail e senha.", type: "error" });
       return;
     }
 
     try {
       setLoading(true);
-      setStatus("Conectando...");
       const credential = await signInWithEmailAndPassword(
         auth,
         email.trim(),
         password,
       );
-      setStatus(`Login OK (${accountType}): ${credential.user.email}`);
       router.replace("/(tabs)");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Erro ao fazer login.";
-      setStatus(`Falha no login: ${message}`);
+      setStatus({ message: `Falha no login: ${message}`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -67,7 +72,6 @@ export default function LoginScreen() {
   }
 
   function handleGuestAccess() {
-    setStatus("Entrando como visitante...");
     router.replace("/(tabs)");
   }
 
@@ -184,8 +188,12 @@ export default function LoginScreen() {
           <Text style={loginStyles.guestButtonText}>Entrar como visitante</Text>
         </Pressable>
 
-        {/* ── Status / feedback ───────────────── */}
-        {!!status && <Text style={loginStyles.statusText}>{status}</Text>}
+        <StatusMessage
+          type={status.type}
+          message={status.message}
+          visible={!!status.message}
+          onDismiss={() => setStatus({ message: "", type: "error" })}
+        />
       </View>
     </SafeAreaView>
   );

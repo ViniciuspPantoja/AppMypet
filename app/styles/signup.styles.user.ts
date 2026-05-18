@@ -257,4 +257,78 @@ export const signupStyles = StyleSheet.create({
     maxWidth: width * 0.7,
     lineHeight: 16,
   },
+
+  // ── Modal de feedback ──────────────────────────────────────
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.lg,
+  },
+
+  modalCard: {
+    width: "100%",
+    maxWidth: 340,
+    borderRadius: radius.xl,
+    backgroundColor: colors.cardBg,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: colors.wineLight,
+  },
+
+  feedbackIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.pill,
+    color: colors.cream,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 56,
+    fontSize: 28,
+    fontWeight: "900",
+    marginBottom: spacing.md,
+    overflow: "hidden",
+  },
+
+  feedbackIconSuccess: {
+    backgroundColor: "rgba(107, 203, 119, 0.16)",
+  },
+
+  feedbackIconError: {
+    backgroundColor: "rgba(255, 107, 107, 0.16)",
+  },
+
+  feedbackTitle: {
+    ...typography.subtitle,
+    color: colors.wine,
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: spacing.xs,
+  },
+
+  feedbackMessage: {
+    ...typography.body,
+    color: colors.wineDark,
+    textAlign: "center",
+    lineHeight: 21,
+  },
+
+  feedbackButton: {
+    marginTop: spacing.lg,
+    minWidth: 120,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: radius.pill,
+    backgroundColor: colors.wine,
+    alignItems: "center",
+  },
+
+  feedbackButtonText: {
+    ...typography.subtitle,
+    color: colors.cream,
+    fontSize: 15,
+  },
 });

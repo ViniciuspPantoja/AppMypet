@@ -22,7 +22,6 @@ import {
     Pressable,
     SafeAreaView,
     ScrollView,
-    StyleSheet,
     Text,
     View,
 } from "react-native";
@@ -36,6 +35,8 @@ interface VaccineRecord {
   petName: string;
   createdAt?: string;
 }
+
+const styles = vaccinesStyles;
 
 export default function VaccinesScreen() {
   const router = useRouter();
@@ -629,164 +630,3 @@ export default function VaccinesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 20,
-  },
-  modalCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    maxHeight: "90%",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    fontWeight: "800",
-    marginTop: 8,
-    marginBottom: 6,
-  },
-  petList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 8,
-  },
-  petItem: {
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginRight: 8,
-  },
-  petItemActive: {
-    backgroundColor: "#eee",
-    borderColor: "#bbb",
-  },
-  petName: { fontWeight: "700" },
-  petMeta: { fontSize: 12, opacity: 0.7 },
-  noPets: { color: "#666", paddingVertical: 8 },
-  modalButtons: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 12,
-    alignItems: "center",
-  },
-  deleteButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "#c8b0b4",
-    backgroundColor: "rgba(91, 33, 50, 0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteButtonText: {
-    fontSize: 18,
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: "#5b2132",
-    padding: 12,
-    borderRadius: 999,
-    alignItems: "center",
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "800" },
-  secondaryButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 999,
-    borderWidth: 2,
-    borderColor: "#5b2132",
-    alignItems: "center",
-  },
-  secondaryButtonText: { color: "#5b2132", fontWeight: "800" },
-  confirmDeleteButtons: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 20,
-    width: "100%",
-  },
-  deleteConfirmButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 999,
-    backgroundColor: "#b3261e",
-    alignItems: "center",
-  },
-  deleteConfirmButtonText: {
-    color: "#fff",
-    fontWeight: "900",
-    fontSize: 16,
-  },
-  feedbackBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.45)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  feedbackCard: {
-    width: "100%",
-    maxWidth: 340,
-    borderRadius: 24,
-    backgroundColor: "#fff",
-    paddingVertical: 28,
-    paddingHorizontal: 22,
-    alignItems: "center",
-  },
-  feedbackIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 999,
-    textAlign: "center",
-    textAlignVertical: "center",
-    fontSize: 28,
-    fontWeight: "900",
-    marginBottom: 14,
-    overflow: "hidden",
-  },
-  feedbackIconSuccess: {
-    color: "#2e7d32",
-    backgroundColor: "rgba(46, 125, 50, 0.12)",
-  },
-  feedbackIconError: {
-    color: "#b3261e",
-    backgroundColor: "rgba(179, 38, 30, 0.12)",
-  },
-  feedbackTitle: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: "#2a1f24",
-    marginBottom: 8,
-  },
-  feedbackMessage: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#5c5360",
-    textAlign: "center",
-  },
-  feedbackButton: {
-    marginTop: 20,
-    minWidth: 120,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 999,
-    backgroundColor: "#5b2132",
-    alignItems: "center",
-  },
-  feedbackButtonText: {
-    color: "#fff",
-    fontWeight: "900",
-    fontSize: 16,
-  },
-});

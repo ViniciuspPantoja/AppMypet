@@ -206,6 +206,7 @@ export default function MyPetScreen() {
                 type={status.type}
                 message={status.message}
                 visible={!!status.message}
+                onDismiss={() => setStatus({ message: "", type: "success" })}
               />
             )}
 
