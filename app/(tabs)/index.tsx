@@ -88,13 +88,13 @@ export default function HomeScreen() {
           <View style={homeStyles.gridRow}>
             <Pressable
               style={homeStyles.cardWine}
-              onPress={() => router.push("/plans")}
+              onPress={() => router.push("/vaccines")}
             >
               <View style={homeStyles.cardIconWrapperDark}>
-                <Text style={homeStyles.cardIcon}>⭐</Text>
+                <Text style={homeStyles.cardIcon}>💉</Text>
               </View>
-              <Text style={homeStyles.cardLabelLight}>Planos</Text>
-              <Text style={homeStyles.cardDescLight}>Pet e Pet Star</Text>
+              <Text style={homeStyles.cardLabelLight}>Vacinas</Text>
+              <Text style={homeStyles.cardDescLight}>Carteirinha do pet</Text>
             </Pressable>
 
             <Pressable
@@ -132,10 +132,10 @@ export default function HomeScreen() {
 
             <Pressable
               style={homeStyles.quickPill}
-              onPress={() => router.push("/vaccines")}
+              onPress={() => router.push("/plans")}
             >
-              <Text style={homeStyles.quickIcon}>💉</Text>
-              <Text style={homeStyles.quickLabel}>Vacinas</Text>
+              <Text style={homeStyles.quickIcon}>⭐</Text>
+              <Text style={homeStyles.quickLabel}>Planos</Text>
             </Pressable>
 
             <Pressable
