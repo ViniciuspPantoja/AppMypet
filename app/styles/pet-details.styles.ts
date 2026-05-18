@@ -1,0 +1,237 @@
+import { Dimensions, StyleSheet } from "react-native";
+import { colors, radius, spacing, typography } from "./tokens/tokens";
+
+const { width } = Dimensions.get("window");
+
+const detailColors = {
+  bg: "#0F2D23",
+  bgCard: "#F5ECD7",
+  bgHeader: "#1A3D2E",
+  bgSection: "#163325",
+  bgBorder: "#2D7A4F",
+  accent: "#D4623A",
+  textDark: "#1A3D2E",
+  textMuted: "#5A8A6A",
+};
+
+export const petDetailsStyles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: detailColors.bg,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xxl,
+  },
+  header: {
+    backgroundColor: detailColors.bgHeader,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backButtonText: {
+    fontSize: 18,
+    color: detailColors.bgCard,
+    fontWeight: "700",
+  },
+  headerTitle: {
+    ...typography.title,
+    color: detailColors.bgCard,
+    fontSize: 22,
+    flex: 1,
+  },
+  hero: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
+  heroCard: {
+    backgroundColor: detailColors.bgCard,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: "rgba(26,61,46,0.08)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  avatarWrap: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: detailColors.bgSection,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+  },
+  avatarEmoji: {
+    fontSize: 44,
+  },
+  petName: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: detailColors.textDark,
+    textAlign: "center",
+  },
+  petSubtitle: {
+    fontSize: 14,
+    color: detailColors.textMuted,
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: spacing.md,
+  },
+  quickStats: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "rgba(26,61,46,0.06)",
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(26,61,46,0.08)",
+  },
+  statLabel: {
+    ...typography.label,
+    color: detailColors.textMuted,
+    fontSize: 10,
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 14,
+    fontWeight: "900",
+    color: detailColors.textDark,
+  },
+  section: {
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  sectionTitle: {
+    ...typography.label,
+    color: detailColors.bgCard,
+    opacity: 0.72,
+    textTransform: "uppercase",
+    letterSpacing: 0.9,
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
+  },
+  sectionCard: {
+    backgroundColor: detailColors.bgCard,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+  },
+  infoGrid: {
+    gap: spacing.sm,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+  },
+  infoLabel: {
+    ...typography.caption,
+    color: detailColors.textMuted,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+  },
+  infoValue: {
+    ...typography.caption,
+    color: detailColors.textDark,
+    fontSize: 12,
+    fontWeight: "800",
+    textAlign: "right",
+    flex: 1,
+  },
+  vaccineCard: {
+    backgroundColor: "rgba(245,236,215,0.95)",
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(26,61,46,0.08)",
+    marginBottom: spacing.sm,
+  },
+  vaccineHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
+  },
+  vaccineName: {
+    fontSize: 15,
+    fontWeight: "900",
+    color: detailColors.textDark,
+  },
+  vaccineStatus: {
+    fontSize: 11,
+    fontWeight: "900",
+    color: detailColors.accent,
+    backgroundColor: "rgba(212,98,58,0.12)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+  },
+  vaccineMeta: {
+    fontSize: 13,
+    color: detailColors.textMuted,
+    marginBottom: 2,
+  },
+  vaccineDates: {
+    fontSize: 13,
+    color: detailColors.textDark,
+    fontWeight: "700",
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.xl,
+  },
+  emptyEmoji: {
+    fontSize: 42,
+    marginBottom: spacing.sm,
+  },
+  emptyText: {
+    color: detailColors.textDark,
+    fontSize: 15,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    color: detailColors.textMuted,
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 19,
+    paddingHorizontal: spacing.md,
+  },
+  sectionAction: {
+    marginTop: spacing.md,
+    backgroundColor: detailColors.accent,
+    borderRadius: radius.pill,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+  sectionActionText: {
+    color: colors.white,
+    fontWeight: "900",
+    fontSize: 14,
+  },
+  footerSpacer: {
+    height: width * 0.08,
+  },
+});

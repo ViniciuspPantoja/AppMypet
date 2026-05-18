@@ -13,7 +13,6 @@ interface Vaccine {
 export default function VaccinesScreen() {
   const router = useRouter();
 
-  // Mock data
   const vaccines: Vaccine[] = [
     {
       id: "1",
@@ -46,38 +45,47 @@ export default function VaccinesScreen() {
   return (
     <SafeAreaView style={vaccinesStyles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
+        {/* ── Header ── */}
         <View style={vaccinesStyles.header}>
           <Pressable
             onPress={() => router.back()}
             style={vaccinesStyles.backButton}
           >
-            <Text style={vaccinesStyles.backButtonText}>← Voltar</Text>
+            <Text style={vaccinesStyles.backButtonText}>‹</Text>
           </Pressable>
-          <Text style={vaccinesStyles.headerTitle}>Vacinas</Text>
+          <Text style={vaccinesStyles.headerTitle}>Carteirinha de Vacinas</Text>
         </View>
 
-        {/* Upcoming Vaccines Alert */}
+        {/* ── Patinhas decorativas ── */}
+        <Text style={[vaccinesStyles.pawDecor, { top: 60, right: 16 }]}>
+          🐾
+        </Text>
+        <Text style={[vaccinesStyles.pawDecor, { top: 160, left: -8 }]}>
+          🐾
+        </Text>
+
+        {/* ── Alerta vacinas próximas ── */}
         {upcomingVaccines.length > 0 && (
           <View style={vaccinesStyles.alertSection}>
-            <Text style={vaccinesStyles.alertTitle}>⚠️ Vacinas Próximas</Text>
+            <Text style={vaccinesStyles.alertTitle}>
+              ⚠️ {upcomingVaccines.length} vacinação(ões) vencendo em breve
+            </Text>
             <Text style={vaccinesStyles.alertDescription}>
-              Você tem {upcomingVaccines.length} vacinação(ões) vencendo nos
-              próximos 30 dias
+              Fique em dia com a saúde do seu pet nos próximos 30 dias
             </Text>
           </View>
         )}
 
-        {/* Add New Vaccine Button */}
+        {/* ── Botão adicionar ── */}
         <View style={vaccinesStyles.actionSection}>
-          <Pressable style={vaccinesStyles.addButton}>
+          <Pressable style={vaccinesStyles.addButton} onPress={() => {}}>
             <Text style={vaccinesStyles.addButtonText}>
               + Adicionar Vacinação
             </Text>
           </Pressable>
         </View>
 
-        {/* Vaccines List Section */}
+        {/* ── Histórico ── */}
         <View style={vaccinesStyles.section}>
           <Text style={vaccinesStyles.sectionTitle}>
             Histórico de Vacinações
@@ -86,27 +94,27 @@ export default function VaccinesScreen() {
           {vaccines.length > 0 ? (
             vaccines.map((vaccine) => (
               <View key={vaccine.id} style={vaccinesStyles.vaccineCard}>
+                {/* Nome + status */}
                 <View style={vaccinesStyles.vaccineCardHeader}>
                   <Text style={vaccinesStyles.vaccineName}>{vaccine.name}</Text>
                   <Text style={vaccinesStyles.vaccineStatus}>✓ Aplicada</Text>
                 </View>
 
+                {/* Infos em linha */}
                 <View style={vaccinesStyles.vaccineCardInfo}>
                   <View style={vaccinesStyles.infoRow}>
-                    <Text style={vaccinesStyles.infoLabel}>Pet:</Text>
+                    <Text style={vaccinesStyles.infoLabel}>Pet</Text>
                     <Text style={vaccinesStyles.infoValue}>
                       {vaccine.petName}
                     </Text>
                   </View>
                   <View style={vaccinesStyles.infoRow}>
-                    <Text style={vaccinesStyles.infoLabel}>
-                      Data aplicação:
-                    </Text>
+                    <Text style={vaccinesStyles.infoLabel}>Data aplicação</Text>
                     <Text style={vaccinesStyles.infoValue}>{vaccine.date}</Text>
                   </View>
                   <View style={vaccinesStyles.infoRow}>
                     <Text style={vaccinesStyles.infoLabel}>
-                      Próximo reforço:
+                      Próximo reforço
                     </Text>
                     <Text style={vaccinesStyles.infoValue}>
                       {vaccine.nextDue}
@@ -114,7 +122,8 @@ export default function VaccinesScreen() {
                   </View>
                 </View>
 
-                <Pressable style={vaccinesStyles.editButton}>
+                {/* Botão editar */}
+                <Pressable style={vaccinesStyles.editButton} onPress={() => {}}>
                   <Text style={vaccinesStyles.editButtonText}>Editar</Text>
                 </Pressable>
               </View>
@@ -126,7 +135,7 @@ export default function VaccinesScreen() {
                 Nenhuma vacinação registrada
               </Text>
               <Text style={vaccinesStyles.emptyStateSubtext}>
-                Comece adicionando uma vacinação do seu pet
+                Comece adicionando a primeira vacinação do seu pet
               </Text>
             </View>
           )}

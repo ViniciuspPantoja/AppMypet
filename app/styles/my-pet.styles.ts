@@ -116,9 +116,9 @@ export const myPetStyles = StyleSheet.create({
   },
 
   avatarWrap: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     backgroundColor: "rgba(245, 236, 215, 0.18)",
     borderWidth: 4,
     borderColor: colors.cardBg, // “anel” vinho do card para dar unidade
@@ -126,17 +126,37 @@ export const myPetStyles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: SPACING.md,
     ...SHADOWS.floating,
+    position: "relative",
   },
 
   avatarImage: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
+    width: 132,
+    height: 132,
+    borderRadius: 66,
   },
 
   avatarPlaceholder: {
-    fontSize: 46,
+    fontSize: 58,
     color: colors.textOnWine,
+  },
+
+  avatarEditButton: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cream,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+    ...SHADOWS.floating,
+  },
+
+  avatarEditIcon: {
+    fontSize: 18,
   },
 
   // Avatar action buttons (adicionar / trocar / remover)
@@ -393,7 +413,60 @@ export const myPetStyles = StyleSheet.create({
   petChevron: {
     fontSize: 20,
     color: colors.terracotta,
-    marginLeft: SPACING.sm,
     fontWeight: "900",
+  },
+  petChevronButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(212, 98, 58, 0.10)",
+    marginLeft: SPACING.sm,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modalContent: {
+    width: "80%",
+    backgroundColor: colors.cardBg,
+    borderRadius: 14,
+    padding: SPACING.lg,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)",
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: colors.textOnWine,
+    marginBottom: SPACING.sm,
+  },
+
+  modalMessage: {
+    fontSize: 14,
+    color: colors.textMutedOnWine,
+    textAlign: "center",
+    marginBottom: SPACING.md,
+  },
+
+  modalButton: {
+    backgroundColor: colors.cream,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+  },
+
+  modalButtonText: {
+    color: colors.wine,
+    fontWeight: "900",
+    fontSize: 14,
   },
 });

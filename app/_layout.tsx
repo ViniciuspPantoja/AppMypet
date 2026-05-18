@@ -35,6 +35,8 @@ export default function RootLayout() {
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen name="petmap" />
         <Stack.Screen name="my-pet" />
+        <Stack.Screen name="pet-details/[petId]" />
+        <Stack.Screen name="pet-register" />
         <Stack.Screen name="plans" />
         <Stack.Screen name="partners" />
         <Stack.Screen name="appointment" />

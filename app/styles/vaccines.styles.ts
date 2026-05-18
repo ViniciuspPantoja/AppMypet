@@ -1,379 +1,264 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+import { colors, radius, spacing, typography } from "./tokens/tokens";
 
-// ── Paleta oficial (MyPetZone) ────────────────────────────────
-const colors = {
-  wine: "#7B1E2E",
-  wineDark: "#4A1020",
-  wineMedium: "#5A1520",
-  wineLight: "#9B2E42",
-  cardBg: "#8B2535",
+const { width } = Dimensions.get("window");
 
-  cream: "#F5ECD7",
-  creamDark: "#EAD9BC",
-
-  terracotta: "#D4623A",
-  terracottaDark: "#C05020",
-
-  success: "#6BCB77",
-  error: "#FF6B6B",
-
-  textOnWine: "#F8F1E3",
-  textMutedOnWine: "rgba(248, 241, 227, 0.60)",
-
-  inkOnCream: "#4A1020",
-  inkMutedOnCream: "rgba(74, 16, 32, 0.72)",
-};
-
-const RADIUS = {
-  card: 20,       // XML usa 20dp nos cards principais
-  big: 28,        // linguagem do app (premium)
-  pill: 999,
-};
-
-const SPACING = {
-  xs: 6,
-  sm: 10,
-  md: 12,  // XML usa muito 12dp
-  lg: 16,
-  xl: 18,  // XML header: 18dp horizontal
-  xxl: 24,
-};
-
-const SHADOWS = {
-  soft: {
-    shadowColor: "#120509",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.22,
-    shadowRadius: 14,
-    elevation: 10,
-  },
-  card: {
-    shadowColor: "#120509",
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.30,
-    shadowRadius: 18,
-    elevation: 12,
-  },
+// ── Paleta temática da tela de vacinas ───────────────────────
+const vaccineColors = {
+  bg: "#0F2D23",
+  bgCard: "#F5ECD7",
+  bgHeader: "#1A3D2E",
+  bgAlert: "#1F4A35",
+  bgAlertBorder: "#2D7A4F",
+  bgTable: "#163325",
+  accent: "#4CAF7D",
+  accentWarm: "#D4623A",
+  pawTint: "rgba(255,255,255,0.06)",
+  textDark: "#1A3D2E",
+  textMuted: "#5A8A6A",
 };
 
 export const vaccinesStyles = StyleSheet.create({
-  // ───────────────────────────────────────────────────────────
-  // Base
-  // ───────────────────────────────────────────────────────────
+
+  // ── Tela ────────────────────────────────────────────────────
   safeArea: {
     flex: 1,
-    backgroundColor: colors.wine, // XML: background wine
+    backgroundColor: vaccineColors.bg,
   },
 
-  // ───────────────────────────────────────────────────────────
-  // Header (igual ao XML: wine_medium + back "‹")
-  // ───────────────────────────────────────────────────────────
+  // ── Header ──────────────────────────────────────────────────
   header: {
-    backgroundColor: colors.wineMedium,
-    paddingHorizontal: SPACING.xl,
-    paddingTop: 14,
-    paddingBottom: 14,
+    backgroundColor: vaccineColors.bgHeader,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: spacing.md,
   },
 
   backButton: {
-    paddingVertical: 6,
-    paddingRight: 12,
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   backButtonText: {
-    color: colors.cream,
-    fontSize: 20,
-    fontWeight: "900",
-    letterSpacing: 0.2,
-  },
-
-  headerTitle: {
-    color: colors.cream,
-    fontSize: 17,
-    fontWeight: "900",
-    letterSpacing: -0.1,
-  },
-
-  // ───────────────────────────────────────────────────────────
-  // Alert (suave, estilo “aviso” do XML — sem agressividade)
-  // ───────────────────────────────────────────────────────────
-  alertSection: {
-    marginTop: 14,
-    marginHorizontal: 12,
-    backgroundColor: "rgba(212, 98, 58, 0.16)", // terracotta suave
-    borderRadius: RADIUS.card,
-    borderWidth: 1,
-    borderColor: "rgba(212, 98, 58, 0.30)",
-    padding: SPACING.lg,
-  },
-
-  alertTitle: {
-    color: colors.cream,
-    fontSize: 13.5,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
-
-  alertDescription: {
-    color: "rgba(245, 236, 215, 0.78)",
-    fontSize: 12.5,
-    lineHeight: 18,
+    fontSize: 18,
+    color: vaccineColors.bgCard,
     fontWeight: "700",
   },
 
-  // ───────────────────────────────────────────────────────────
-  // CTA (no XML o “+ Adicionar Vacina” é um hero button no fim;
-  // aqui você já tem um botão: vamos dar cara de hero)
-  // ───────────────────────────────────────────────────────────
+  headerTitle: {
+    ...typography.title,
+    color: vaccineColors.bgCard,
+    fontSize: 22,
+  },
+
+  // ── Alerta vacinas próximas ──────────────────────────────────
+  alertSection: {
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    backgroundColor: vaccineColors.bgAlert,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1.5,
+    borderColor: vaccineColors.bgAlertBorder,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+
+  alertTitle: {
+    ...typography.subtitle,
+    color: vaccineColors.bgCard,
+    fontSize: 13,
+    marginBottom: 2,
+  },
+
+  alertDescription: {
+    ...typography.body,
+    color: vaccineColors.bgCard,
+    opacity: 0.75,
+    fontSize: 12,
+    flex: 1,
+    lineHeight: 17,
+  },
+
+  // ── Botão adicionar ──────────────────────────────────────────
   actionSection: {
-    marginTop: 12,
-    marginHorizontal: 12,
-    marginBottom: 8,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
   },
 
   addButton: {
-    backgroundColor: colors.terracotta,
-    borderRadius: RADIUS.card,
+    backgroundColor: vaccineColors.accentWarm,
+    borderRadius: radius.pill,
     paddingVertical: 14,
     alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(192, 80, 32, 0.70)",
-    ...SHADOWS.soft,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   addButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "900",
-    letterSpacing: 0.2,
+    ...typography.subtitle,
+    color: colors.white,
+    fontSize: 15,
   },
 
-  // ───────────────────────────────────────────────────────────
-  // Seção / label (XML: “HISTÓRICO DE VACINAS” small caps, alpha)
-  // ───────────────────────────────────────────────────────────
+  // ── Seção histórico ──────────────────────────────────────────
   section: {
-    marginTop: 10,
-    paddingBottom: 18,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
 
   sectionTitle: {
-    marginLeft: 18,
-    marginTop: 10,
-    marginBottom: 8,
-    color: "rgba(245, 236, 215, 0.55)",
-    fontSize: 10.5,
-    fontWeight: "900",
-    letterSpacing: 1.0,
+    ...typography.label,
+    color: vaccineColors.bgCard,
+    opacity: 0.55,
     textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
   },
 
-  // ───────────────────────────────────────────────────────────
-  // Card/linha de vacina (XML: shape_card_wine + row + badge)
-  // ───────────────────────────────────────────────────────────
+  // ── Tabela header ────────────────────────────────────────────
+  tableHeader: {
+    flexDirection: "row",
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+
+  tableHeaderCell: {
+    flex: 1,
+    ...typography.label,
+    color: vaccineColors.bgCard,
+    opacity: 0.6,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    textAlign: "center",
+    fontSize: 10,
+  },
+
+  // ── Card de vacina ───────────────────────────────────────────
   vaccineCard: {
-    marginHorizontal: 12,
-    marginBottom: 8,
-    backgroundColor: colors.cardBg, // “shape_card_wine”
-    borderRadius: RADIUS.card,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: "rgba(155, 46, 66, 0.45)",
-    ...SHADOWS.soft,
+    backgroundColor: vaccineColors.bgCard,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   vaccineCardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: spacing.sm,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(26,61,46,0.12)",
   },
 
   vaccineName: {
-    color: colors.cream,
-    fontSize: 13.5,
-    fontWeight: "900",
-    letterSpacing: -0.1,
+    ...typography.subtitle,
+    color: vaccineColors.textDark,
+    fontSize: 15,
   },
 
-  // pill status (em vez de só texto “✓ Aplicada”, vira badge)
   vaccineStatus: {
-    color: "#FFFFFF",
-    fontSize: 10.5,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    backgroundColor: "rgba(107, 203, 119, 0.90)", // green soft
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: RADIUS.pill,
-    overflow: "hidden",
+    ...typography.caption,
+    color: vaccineColors.accent,
+    fontWeight: "800",
+    fontSize: 12,
+    backgroundColor: "rgba(76,175,125,0.15)",
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
   },
 
   vaccineCardInfo: {
-    gap: 6,
-    marginBottom: 10,
+    gap: spacing.xs,
   },
 
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    justifyContent: "space-between",
   },
 
   infoLabel: {
-    color: "rgba(245, 236, 215, 0.65)",
-    fontSize: 10.5,
-    fontWeight: "900",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    ...typography.caption,
+    color: vaccineColors.textMuted,
+    fontSize: 11,
   },
 
   infoValue: {
-    color: "rgba(245, 236, 215, 0.92)",
+    ...typography.caption,
+    color: vaccineColors.textDark,
+    fontWeight: "700",
     fontSize: 12,
-    fontWeight: "800",
   },
 
-  // botão editar (sutil, sem competir com o CTA)
+  // ── Botão editar ─────────────────────────────────────────────
   editButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(245, 236, 215, 0.12)",
-    borderRadius: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "rgba(245, 236, 215, 0.18)",
+    marginTop: spacing.sm,
+    alignSelf: "flex-end",
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    backgroundColor: vaccineColors.bgHeader,
+    borderRadius: radius.pill,
   },
 
   editButtonText: {
-    color: colors.cream,
-    fontSize: 12.5,
-    fontWeight: "900",
-    letterSpacing: 0.2,
+    ...typography.caption,
+    color: vaccineColors.bgCard,
+    fontWeight: "700",
+    fontSize: 11,
   },
 
-  // ───────────────────────────────────────────────────────────
-  // Empty State
-  // ───────────────────────────────────────────────────────────
+  // ── Patinhas decorativas ─────────────────────────────────────
+  pawDecor: {
+    position: "absolute",
+    fontSize: 48,
+    opacity: 0.06,
+  },
+
+  // ── Estado vazio ─────────────────────────────────────────────
   emptyState: {
-    marginHorizontal: 12,
-    backgroundColor: colors.cardBg,
-    borderRadius: RADIUS.big,
-    padding: 26,
-    borderWidth: 1,
-    borderColor: "rgba(155, 46, 66, 0.55)",
     alignItems: "center",
-    ...SHADOWS.card,
+    justifyContent: "center",
+    paddingVertical: spacing.xxl,
+    gap: spacing.sm,
   },
 
   emptyStateEmoji: {
-    fontSize: 44,
-    marginBottom: 10,
-    opacity: 0.95,
+    fontSize: 52,
+    marginBottom: spacing.sm,
   },
 
   emptyStateText: {
-    color: colors.cream,
-    fontSize: 15,
-    fontWeight: "900",
-    marginBottom: 6,
+    ...typography.subtitle,
+    color: vaccineColors.bgCard,
     textAlign: "center",
   },
 
   emptyStateSubtext: {
-    color: "rgba(245, 236, 215, 0.75)",
-    fontSize: 13.5,
-    lineHeight: 19,
+    ...typography.body,
+    color: vaccineColors.bgCard,
+    opacity: 0.5,
     textAlign: "center",
-    fontWeight: "700",
-  },
-
-  // ───────────────────────────────────────────────────────────
-  // (Opcional) Styles do “CARD DO PET” do XML
-  // Se você decidir renderizar esse bloco depois, já está pronto.
-  // ───────────────────────────────────────────────────────────
-  petCard: {
-    marginHorizontal: 12,
-    marginTop: 14,
-    backgroundColor: colors.cream,
-    borderRadius: RADIUS.card,
-    borderWidth: 2,
-    borderColor: colors.creamDark,
-    padding: 16,
-  },
-
-  petHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-
-  petIconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: colors.wineMedium,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  petIconEmoji: {
-    fontSize: 26,
-  },
-
-  petTextCol: {
-    marginLeft: 12,
-    flex: 1,
-  },
-
-  petName: {
-    color: colors.wineMedium,
-    fontSize: 17,
-    fontWeight: "900",
-  },
-
-  petMeta: {
-    marginTop: 2,
-    color: "rgba(74, 16, 32, 0.55)",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-
-  petDivider: {
-    height: 1,
-    backgroundColor: colors.creamDark,
-    marginBottom: 10,
-  },
-
-  petChipsRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-
-  petChip: {
-    flex: 1,
-    backgroundColor: colors.creamDark,
-    borderRadius: 16,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "rgba(74, 16, 32, 0.06)",
-  },
-
-  petChipLabel: {
-    fontSize: 8,
-    fontWeight: "900",
-    letterSpacing: 0.8,
-    color: "rgba(74, 16, 32, 0.55)",
-  },
-
-  petChipValue: {
-    marginTop: 2,
-    fontSize: 12,
-    fontWeight: "900",
-    color: colors.wineMedium,
+    lineHeight: 20,
+    paddingHorizontal: spacing.lg,
   },
 });
