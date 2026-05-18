@@ -116,9 +116,9 @@ export const myPetStyles = StyleSheet.create({
   },
 
   avatarWrap: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     backgroundColor: "rgba(245, 236, 215, 0.18)",
     borderWidth: 4,
     borderColor: colors.cardBg, // “anel” vinho do card para dar unidade
@@ -126,17 +126,37 @@ export const myPetStyles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: SPACING.md,
     ...SHADOWS.floating,
+    position: "relative",
   },
 
   avatarImage: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
+    width: 132,
+    height: 132,
+    borderRadius: 66,
   },
 
   avatarPlaceholder: {
-    fontSize: 46,
+    fontSize: 58,
     color: colors.textOnWine,
+  },
+
+  avatarEditButton: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 20,
+    backgroundColor: colors.cream,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+    ...SHADOWS.floating,
+  },
+
+  avatarEditIcon: {
+    fontSize: 16,
   },
 
   // Avatar action buttons (adicionar / trocar / remover)
@@ -149,27 +169,34 @@ export const myPetStyles = StyleSheet.create({
   },
 
   avatarActionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    minHeight: 42,
+    minWidth: 100,
+    paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: colors.cream,
     borderWidth: 1,
     borderColor: "rgba(234, 217, 188, 0.98)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   avatarActionButtonDanger: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    minHeight: 42,
+    minWidth: 100,
+    paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: colors.error,
     borderWidth: 1,
     borderColor: "rgba(255,107,107,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   avatarActionText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
     color: colors.wineDark,
+    textAlign: "center",
   },
 
   // Card do perfil (camada vinho)
@@ -231,7 +258,7 @@ export const myPetStyles = StyleSheet.create({
   // CTA de perfil (surface creme)
   actionButton: {
     marginTop: SPACING.sm,
-    height: 50,
+    minHeight: 48,
     borderRadius: RADIUS.input,
     backgroundColor: colors.cream,
     borderWidth: 1,
@@ -243,9 +270,10 @@ export const myPetStyles = StyleSheet.create({
 
   actionButtonText: {
     color: colors.wine,
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: "900",
     letterSpacing: 0.2,
+    textAlign: "center",
   },
 
   // ───────────────────────────────────────────────────────────
@@ -271,19 +299,22 @@ export const myPetStyles = StyleSheet.create({
   },
 
   sectionAction: {
-    paddingVertical: 8,
+    minHeight: 40,
     paddingHorizontal: 12,
     borderRadius: RADIUS.input,
     backgroundColor: colors.terracotta,
     borderWidth: 1,
     borderColor: "rgba(192, 80, 32, 0.75)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   sectionActionText: {
     color: "#fff",
     fontWeight: "900",
-    fontSize: 13.5,
+    fontSize: 12.5,
     letterSpacing: 0.2,
+    textAlign: "center",
   },
 
   // ───────────────────────────────────────────────────────────
@@ -393,7 +424,64 @@ export const myPetStyles = StyleSheet.create({
   petChevron: {
     fontSize: 20,
     color: colors.terracotta,
-    marginLeft: SPACING.sm,
     fontWeight: "900",
+  },
+  petChevronButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(212, 98, 58, 0.10)",
+    marginLeft: SPACING.sm,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modalContent: {
+    width: "84%",
+    backgroundColor: colors.cardBg,
+    borderRadius: 18,
+    padding: SPACING.lg,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(155, 46, 66, 0.55)",
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: colors.textOnWine,
+    marginBottom: SPACING.sm,
+  },
+
+  modalMessage: {
+    fontSize: 14,
+    color: colors.textMutedOnWine,
+    textAlign: "center",
+    marginBottom: SPACING.md,
+  },
+
+  modalButton: {
+    backgroundColor: colors.cream,
+    minHeight: 46,
+    minWidth: 120,
+    paddingHorizontal: 20,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.98)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  modalButtonText: {
+    color: colors.wine,
+    fontWeight: "900",
+    fontSize: 14,
+    textAlign: "center",
   },
 });

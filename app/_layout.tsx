@@ -3,8 +3,9 @@ import {
     DefaultTheme,
     ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -15,6 +16,13 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Defer navigation to the next frame so the navigator mounts first
+    const raf = requestAnimationFrame(() => router.replace("/login"));
+    return () => cancelAnimationFrame(raf);
+  }, [router]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -27,8 +35,11 @@ export default function RootLayout() {
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen name="petmap" />
         <Stack.Screen name="my-pet" />
+        <Stack.Screen name="pet-details/[petId]" />
+        <Stack.Screen name="pet-register" />
         <Stack.Screen name="plans" />
         <Stack.Screen name="partners" />
+        <Stack.Screen name="settings" />
         <Stack.Screen name="appointment" />
         <Stack.Screen name="vaccines" />
         <Stack.Screen name="nearby" />

@@ -1,6 +1,6 @@
-import { signupStyles } from "@/app/styles/signup.styles.user";
+import { statusMessageStyles } from "@/app/styles/status-message.styles";
 import React from "react";
-import { Text, View } from "react-native";
+import { Modal, Pressable, Text, View } from "react-native";
 
 export type StatusType = "success" | "error" | "warning";
 
@@ -8,6 +8,7 @@ interface StatusMessageProps {
   type: StatusType;
   message: string;
   visible?: boolean;
+  onDismiss?: () => void;
 }
 
 /**
@@ -17,28 +18,14 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
   type,
   message,
   visible = true,
+  onDismiss,
 }) => {
   if (!visible || !message) return null;
 
   const statusStyles = {
-    success: [signupStyles.statusContainer, signupStyles.statusSuccess],
-    error: [signupStyles.statusContainer, signupStyles.statusError],
-    warning: [signupStyles.statusContainer, signupStyles.statusWarning],
-  };
-
-  const textStyles = {
-    success: [
-      signupStyles.statusMessageText,
-      signupStyles.statusMessageTextSuccess,
-    ],
-    error: [
-      signupStyles.statusMessageText,
-      signupStyles.statusMessageTextError,
-    ],
-    warning: [
-      signupStyles.statusMessageText,
-      signupStyles.statusMessageTextWarning,
-    ],
+    success: statusMessageStyles.iconSuccess,
+    error: statusMessageStyles.iconError,
+    warning: statusMessageStyles.iconWarning,
   };
 
   const icons = {
@@ -48,9 +35,22 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
   };
 
   return (
-    <View style={statusStyles[type]}>
-      <Text style={textStyles[type]}>{icons[type]}</Text>
-      <Text style={textStyles[type]}>{message}</Text>
-    </View>
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={statusMessageStyles.backdrop}>
+        <View style={statusMessageStyles.card}>
+          <Text style={[statusMessageStyles.icon, statusStyles[type]]}>
+            {icons[type]}
+          </Text>
+          <Text style={statusMessageStyles.message}>{message}</Text>
+          <Pressable
+            style={statusMessageStyles.button}
+            onPress={onDismiss}
+            disabled={!onDismiss}
+          >
+            <Text style={statusMessageStyles.buttonText}>OK</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
   );
 };

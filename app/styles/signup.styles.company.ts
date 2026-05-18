@@ -181,6 +181,32 @@ export const signupStyles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  // Input-like button usado para abrir o modal de seleção
+  inputLikeButton: {
+    minHeight: 54,
+    width: "100%",
+    borderRadius: RADIUS.input,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.95)",
+    justifyContent: "center",
+    ...SHADOWS.floating,
+  },
+
+  inputLikeButtonText: {
+    color: COLORS.wineDark,
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  inputLikeButtonPlaceholder: {
+    color: "rgba(74, 16, 32, 0.5)",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
   // Erro no seletor: borda suave (sem agressividade)
   inputWithError: {
     borderColor: "rgba(255, 107, 107, 0.75)",

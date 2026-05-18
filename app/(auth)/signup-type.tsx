@@ -46,26 +46,22 @@ export default function SignupTypeScreen() {
           <View style={signupStyles.typeSelectorRow}>
             {/* ─ Usuário ─────────────────────────────────────────── */}
             <Pressable
-              style={[signupStyles.typeButton, signupStyles.typeButtonActive]}
+              style={signupStyles.typeButton}
               onPress={handleSelectUser}
               disabled={loading}
             >
-              <Text style={signupStyles.typeButtonText}>
-                <Text style={{ fontSize: 20, marginRight: 4 }}>👤</Text>
-              </Text>
-              <Text style={signupStyles.typeButtonTextActive}>Usuário</Text>
+              <Text style={{ fontSize: 28, marginBottom: 6 }}>👤</Text>
+              <Text style={signupStyles.typeButtonText}>Usuário</Text>
             </Pressable>
 
             {/* ─ Empresa ────────────────────────────────────────── */}
             <Pressable
-              style={[signupStyles.typeButton, signupStyles.typeButtonActive]}
+              style={signupStyles.typeButton}
               onPress={handleSelectCompany}
               disabled={loading}
             >
-              <Text style={signupStyles.typeButtonText}>
-                <Text style={{ fontSize: 20, marginRight: 4 }}>🏢</Text>
-              </Text>
-              <Text style={signupStyles.typeButtonTextActive}>Empresa</Text>
+              <Text style={{ fontSize: 28, marginBottom: 6 }}>🏢</Text>
+              <Text style={signupStyles.typeButtonText}>Empresa</Text>
             </Pressable>
           </View>
 

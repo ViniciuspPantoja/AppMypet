@@ -75,7 +75,7 @@ export const signupStyles = StyleSheet.create({
     backgroundColor: colors.cardBg,
     borderRadius: RADIUS.card,
     paddingVertical: SPACING.xl,
-    paddingHorizontal: 24,
+    paddingHorizontal: SPACING.lg,
     borderWidth: 1.5,
     borderColor: "rgba(155, 46, 66, 0.58)",
 
@@ -128,20 +128,20 @@ export const signupStyles = StyleSheet.create({
   typeSelectorRow: {
     flexDirection: "row",
     gap: 14,
-    marginBottom: 22,
+    marginBottom: 18,
   },
 
   typeButton: {
     flex: 1,
-    minHeight: 92,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: "rgba(155, 46, 66, 0.68)",
-    backgroundColor: "transparent",
+    minHeight: 96,
+    borderRadius: 18,
+    borderWidth: 0,
+    backgroundColor: "rgba(245,236,215,0.12)",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingVertical: 14,
+    paddingVertical: 18,
+    paddingHorizontal: 10,
   },
 
   typeButtonActive: {
@@ -150,9 +150,10 @@ export const signupStyles = StyleSheet.create({
   },
 
   typeButtonText: {
-    color: colors.white,
-    fontSize: 13,
-    opacity: 0.85,
+    color: colors.cream,
+    fontSize: 14,
+    opacity: 0.95,
+    textAlign: "center",
   },
 
   typeButtonTextActive: {

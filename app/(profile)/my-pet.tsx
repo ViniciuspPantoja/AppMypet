@@ -1,12 +1,29 @@
-import { getFirebaseApp } from "@/database/firebase/firebase";
+import { FormInput } from "@/components/form-input";
+import { StatusMessage, StatusType } from "@/components/status-message";
+import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
 import { Pet, UserProfile } from "@/types/pet.types";
+import {
+    formatDate,
+    isValidEmail,
+    validateBirthDate,
+} from "@/utils/validators";
+import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { getAuth, updateEmail, updateProfile } from "firebase/auth";
+import {
+    collection,
+    doc,
+    getDocs,
+    query,
+    setDoc,
+    where,
+} from "firebase/firestore";
+import { useCallback, useState } from "react";
 import {
     Alert,
     Image,
+    Modal,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -20,10 +37,68 @@ export default function MyPetScreen() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    displayName: "",
+    birthDate: "",
+    email: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<{ message: string; type: StatusType }>({
+    message: "",
+    type: "success",
+  });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  useEffect(() => {
-    loadUserData();
+  const loadUserData = useCallback(async () => {
+    try {
+      const auth = getAuth(getFirebaseApp());
+      const db = getFirestoreDb();
+
+      if (auth.currentUser) {
+        const petsQuery = query(
+          collection(db, "pets"),
+          where("tutorUid", "==", auth.currentUser.uid),
+        );
+
+        setUserProfile({
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email || "",
+          displayName: auth.currentUser.displayName || "Usuário",
+          photoUrl: auth.currentUser.photoURL || undefined,
+          createdAt: new Date(
+            auth.currentUser.metadata?.creationTime || Date.now(),
+          ).toLocaleDateString("pt-BR"),
+        });
+
+        const petsSnapshot = await getDocs(petsQuery);
+        setPets(
+          petsSnapshot.docs.map((petDoc) => {
+            const data = petDoc.data() as Omit<Pet, "id">;
+            return {
+              id: petDoc.id,
+              ...data,
+            };
+          }),
+        );
+
+        // Inicializa dados do formulário de edição
+        setEditForm({
+          displayName: auth.currentUser.displayName || "",
+          birthDate: "",
+          email: auth.currentUser.email || "",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [loadUserData]),
+  );
 
   async function pickImageFromLibrary() {
     try {
@@ -81,47 +156,6 @@ export default function MyPetScreen() {
     ]);
   }
 
-  async function loadUserData() {
-    try {
-      const auth = getAuth(getFirebaseApp());
-
-      if (auth.currentUser) {
-        setUserProfile({
-          uid: auth.currentUser.uid,
-          email: auth.currentUser.email || "",
-          displayName: auth.currentUser.displayName || "Usuário",
-          photoUrl: auth.currentUser.photoURL || undefined,
-          createdAt: new Date(
-            auth.currentUser.metadata?.creationTime || Date.now(),
-          ).toLocaleDateString("pt-BR"),
-        });
-
-        setPets([
-          {
-            id: "1",
-            name: "Max",
-            species: "Cachorro",
-            breed: "Golden Retriever",
-            age: 3,
-            weight: 32,
-            registrationDate: "2023-05-15",
-          },
-          {
-            id: "2",
-            name: "Luna",
-            species: "Gato",
-            breed: "Persa",
-            age: 2,
-            weight: 4.5,
-            registrationDate: "2023-08-20",
-          },
-        ]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (loading) {
     return (
       <SafeAreaView style={myPetStyles.safeArea}>
@@ -154,65 +188,259 @@ export default function MyPetScreen() {
             ) : (
               <Text style={myPetStyles.avatarPlaceholder}>👤</Text>
             )}
+
+            <Pressable
+              style={myPetStyles.avatarEditButton}
+              onPress={
+                userProfile?.photoUrl ? handleChangePhoto : handleAddPhoto
+              }
+            >
+              <Text style={myPetStyles.avatarEditIcon}>✏️</Text>
+            </Pressable>
           </View>
-          <View style={myPetStyles.avatarActions}>
-            {!userProfile?.photoUrl ? (
-              <Pressable
-                onPress={handleAddPhoto}
-                style={myPetStyles.avatarActionButton}
-              >
-                <Text style={myPetStyles.avatarActionText}>Adicionar foto</Text>
-              </Pressable>
-            ) : (
-              <>
-                <Pressable
-                  onPress={handleChangePhoto}
-                  style={myPetStyles.avatarActionButton}
-                >
-                  <Text style={myPetStyles.avatarActionText}>Trocar</Text>
-                </Pressable>
-                <Pressable
-                  onPress={handleDeletePhoto}
-                  style={myPetStyles.avatarActionButtonDanger}
-                >
-                  <Text style={myPetStyles.avatarActionText}>Remover</Text>
-                </Pressable>
-              </>
-            )}
-          </View>
+          {/* Avatar edit badge is used instead of separate action buttons */}
 
           <View style={myPetStyles.card}>
-            <Text style={myPetStyles.name}>
-              {userProfile?.displayName || "Usuário"}
-            </Text>
-            <Text style={myPetStyles.email}>{userProfile?.email}</Text>
+            {!!status.message && (
+              <StatusMessage
+                type={status.type}
+                message={status.message}
+                visible={!!status.message}
+                onDismiss={() => setStatus({ message: "", type: "success" })}
+              />
+            )}
 
-            <View style={myPetStyles.infoGrid}>
-              <View style={myPetStyles.infoItem}>
-                <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
-                <Text style={myPetStyles.infoValue}>
-                  {userProfile?.birthDate || "Não informado"}
+            {isEditing ? (
+              <>
+                <FormInput
+                  placeholder="Nome"
+                  value={editForm.displayName}
+                  onChangeText={(v) =>
+                    setEditForm((p) => ({ ...p, displayName: v }))
+                  }
+                  editable={!saving}
+                />
+
+                <FormInput
+                  placeholder="Email"
+                  value={editForm.email}
+                  onChangeText={(v) => setEditForm((p) => ({ ...p, email: v }))}
+                  editable={!saving}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+
+                <FormInput
+                  placeholder="DD/MM/AAAA"
+                  value={editForm.birthDate}
+                  onChangeText={(v) =>
+                    setEditForm((p) => ({ ...p, birthDate: formatDate(v) }))
+                  }
+                  editable={!saving}
+                  maxLength={10}
+                />
+
+                {/* form inputs only; save/cancel rendered below to replace the Edit button */}
+              </>
+            ) : (
+              <>
+                <Text style={myPetStyles.name}>
+                  {userProfile?.displayName || "Usuário"}
                 </Text>
-              </View>
+                <Text style={myPetStyles.email}>{userProfile?.email}</Text>
+              </>
+            )}
 
-              <View style={myPetStyles.infoItem}>
-                <Text style={myPetStyles.infoLabel}>Membro desde</Text>
-                <Text style={myPetStyles.infoValue}>
-                  {userProfile?.createdAt || "Não informado"}
-                </Text>
-              </View>
-            </View>
+            {!isEditing && (
+              <View style={myPetStyles.infoGrid}>
+                <View style={myPetStyles.infoItem}>
+                  <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
+                  <Text style={myPetStyles.infoValue}>
+                    {userProfile?.birthDate || "Não informado"}
+                  </Text>
+                </View>
 
-            <Pressable style={myPetStyles.actionButton}>
-              <Text style={myPetStyles.actionButtonText}>Editar perfil</Text>
-            </Pressable>
+                <View style={myPetStyles.infoItem}>
+                  <Text style={myPetStyles.infoLabel}>Membro desde</Text>
+                  <Text style={myPetStyles.infoValue}>
+                    {userProfile?.createdAt || "Não informado"}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Bottom action: when editing, show Save/Cancel; otherwise show Edit */}
+            {isEditing ? (
+              <View style={{ flexDirection: "row", gap: 12 }}>
+                <Pressable
+                  style={myPetStyles.actionButton}
+                  onPress={async () => {
+                    // Delegate to save handler
+                    const auth = getAuth(getFirebaseApp());
+                    const db = getFirestoreDb();
+                    if (!auth.currentUser) return;
+
+                    // Validate name
+                    if (!editForm.displayName.trim()) {
+                      setStatus({
+                        message: "Nome é obrigatório.",
+                        type: "error",
+                      });
+                      return;
+                    }
+
+                    // Validate birth date if provided
+                    if (editForm.birthDate) {
+                      const res = validateBirthDate(editForm.birthDate);
+                      if (!res.isValid) {
+                        setStatus({
+                          message: res.error || "Data inválida.",
+                          type: "error",
+                        });
+                        return;
+                      }
+                    }
+
+                    // Validate email format
+                    if (editForm.email && !isValidEmail(editForm.email)) {
+                      setStatus({ message: "Email inválido.", type: "error" });
+                      return;
+                    }
+
+                    try {
+                      setSaving(true);
+                      // Update email if changed
+                      if (
+                        editForm.email &&
+                        auth.currentUser.email !== editForm.email
+                      ) {
+                        try {
+                          await updateEmail(auth.currentUser, editForm.email);
+                        } catch (emailErr) {
+                          const msg =
+                            emailErr instanceof Error
+                              ? emailErr.message
+                              : String(emailErr);
+                          setStatus({
+                            message: `Erro ao atualizar email: ${msg}`,
+                            type: "error",
+                          });
+                          setSaving(false);
+                          return;
+                        }
+                      }
+
+                      // Update auth profile
+                      await updateProfile(auth.currentUser, {
+                        displayName: editForm.displayName.trim(),
+                      });
+
+                      // Update firestore user doc
+                      await setDoc(
+                        doc(db, "users", auth.currentUser.uid),
+                        {
+                          displayName: editForm.displayName.trim(),
+                          birthDate: editForm.birthDate || null,
+                          email: editForm.email || null,
+                        },
+                        { merge: true },
+                      );
+
+                      setUserProfile((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              displayName: editForm.displayName.trim(),
+                              birthDate: editForm.birthDate || prev.birthDate,
+                              email: editForm.email || prev.email,
+                            }
+                          : prev,
+                      );
+
+                      setStatus({ message: "", type: "success" });
+                      setShowSuccessModal(true);
+                      setIsEditing(false);
+                    } catch (err) {
+                      const msg =
+                        err instanceof Error
+                          ? err.message
+                          : "Erro ao atualizar perfil.";
+                      setStatus({ message: `Erro: ${msg}`, type: "error" });
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={saving}
+                >
+                  <Text style={myPetStyles.actionButtonText}>
+                    {saving ? "Salvando..." : "Salvar"}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={[myPetStyles.actionButton, { marginLeft: 8 }]}
+                  onPress={() => {
+                    setIsEditing(false);
+                    setEditForm({
+                      displayName: userProfile?.displayName || "",
+                      birthDate: userProfile?.birthDate || "",
+                      email: userProfile?.email || "",
+                    });
+                    setStatus({ message: "", type: "success" });
+                  }}
+                  disabled={saving}
+                >
+                  <Text style={myPetStyles.actionButtonText}>Cancelar</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable
+                style={myPetStyles.actionButton}
+                onPress={() => {
+                  setIsEditing(true);
+                  setEditForm({
+                    displayName: userProfile?.displayName || "",
+                    birthDate: userProfile?.birthDate || "",
+                    email: userProfile?.email || "",
+                  });
+                  setStatus({ message: "", type: "success" });
+                }}
+              >
+                <Text style={myPetStyles.actionButtonText}>Editar perfil</Text>
+              </Pressable>
+            )}
+
+            <Modal
+              visible={showSuccessModal}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowSuccessModal(false)}
+            >
+              <View style={myPetStyles.modalOverlay}>
+                <View style={myPetStyles.modalContent}>
+                  <Text style={myPetStyles.modalTitle}>Perfil atualizado</Text>
+                  <Text style={myPetStyles.modalMessage}>
+                    Seu perfil foi atualizado com sucesso.
+                  </Text>
+                  <Pressable
+                    style={myPetStyles.modalButton}
+                    onPress={() => setShowSuccessModal(false)}
+                  >
+                    <Text style={myPetStyles.modalButtonText}>OK</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Modal>
           </View>
         </View>
 
         <View style={myPetStyles.section}>
           <View style={myPetStyles.sectionHeader}>
             <Text style={myPetStyles.sectionTitle}>Seção dos pets</Text>
-            <Pressable style={myPetStyles.sectionAction}>
+            <Pressable
+              style={myPetStyles.sectionAction}
+              onPress={() => router.push("/pet-register")}
+            >
               <Text style={myPetStyles.sectionActionText}>+ Adicionar</Text>
             </Pressable>
           </View>
@@ -228,7 +456,7 @@ export default function MyPetScreen() {
           ) : (
             <View style={myPetStyles.petList}>
               {pets.map((pet) => (
-                <Pressable key={pet.id} style={myPetStyles.petCard}>
+                <View key={pet.id} style={myPetStyles.petCard}>
                   <View style={myPetStyles.petAvatarWrap}>
                     {pet.photoUrl ? (
                       <Image
@@ -257,8 +485,18 @@ export default function MyPetScreen() {
                     </View>
                   </View>
 
-                  <Text style={myPetStyles.petChevron}>→</Text>
-                </Pressable>
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: "/pet-details/[petId]",
+                        params: { petId: pet.id },
+                      })
+                    }
+                    style={myPetStyles.petChevronButton}
+                  >
+                    <Text style={myPetStyles.petChevron}>→</Text>
+                  </Pressable>
+                </View>
               ))}
             </View>
           )}
