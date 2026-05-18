@@ -209,10 +209,14 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: "rgba(91, 33, 50, 0.08)",
     marginBottom: 12,
+    minHeight: 40,
+    justifyContent: "center",
   },
   backButtonText: {
     color: "#5b2132",
     fontWeight: "800",
+    textAlign: "center",
+    includeFontPadding: false,
   },
   title: {
     fontSize: 28,
@@ -334,14 +338,17 @@ const styles = StyleSheet.create({
   },
   siteButton: {
     alignSelf: "flex-start",
-    paddingVertical: 12,
+    minHeight: 46,
     paddingHorizontal: 18,
     borderRadius: 999,
     backgroundColor: "#5b2132",
+    alignItems: "center",
+    justifyContent: "center",
   },
   siteButtonText: {
     color: "#fff",
     fontWeight: "900",
+    textAlign: "center",
   },
   siteHint: {
     color: "#8a7a80",

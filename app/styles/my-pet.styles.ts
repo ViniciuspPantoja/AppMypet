@@ -144,8 +144,8 @@ export const myPetStyles = StyleSheet.create({
     position: "absolute",
     right: 10,
     bottom: 10,
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
     borderRadius: 20,
     backgroundColor: colors.cream,
     alignItems: "center",
@@ -156,7 +156,7 @@ export const myPetStyles = StyleSheet.create({
   },
 
   avatarEditIcon: {
-    fontSize: 18,
+    fontSize: 16,
   },
 
   // Avatar action buttons (adicionar / trocar / remover)
@@ -169,27 +169,34 @@ export const myPetStyles = StyleSheet.create({
   },
 
   avatarActionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    minHeight: 42,
+    minWidth: 100,
+    paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: colors.cream,
     borderWidth: 1,
     borderColor: "rgba(234, 217, 188, 0.98)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   avatarActionButtonDanger: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    minHeight: 42,
+    minWidth: 100,
+    paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: colors.error,
     borderWidth: 1,
     borderColor: "rgba(255,107,107,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   avatarActionText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
     color: colors.wineDark,
+    textAlign: "center",
   },
 
   // Card do perfil (camada vinho)
@@ -251,7 +258,7 @@ export const myPetStyles = StyleSheet.create({
   // CTA de perfil (surface creme)
   actionButton: {
     marginTop: SPACING.sm,
-    height: 50,
+    minHeight: 48,
     borderRadius: RADIUS.input,
     backgroundColor: colors.cream,
     borderWidth: 1,
@@ -263,9 +270,10 @@ export const myPetStyles = StyleSheet.create({
 
   actionButtonText: {
     color: colors.wine,
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: "900",
     letterSpacing: 0.2,
+    textAlign: "center",
   },
 
   // ───────────────────────────────────────────────────────────
@@ -291,19 +299,22 @@ export const myPetStyles = StyleSheet.create({
   },
 
   sectionAction: {
-    paddingVertical: 8,
+    minHeight: 40,
     paddingHorizontal: 12,
     borderRadius: RADIUS.input,
     backgroundColor: colors.terracotta,
     borderWidth: 1,
     borderColor: "rgba(192, 80, 32, 0.75)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   sectionActionText: {
     color: "#fff",
     fontWeight: "900",
-    fontSize: 13.5,
+    fontSize: 12.5,
     letterSpacing: 0.2,
+    textAlign: "center",
   },
 
   // ───────────────────────────────────────────────────────────
@@ -416,8 +427,8 @@ export const myPetStyles = StyleSheet.create({
     fontWeight: "900",
   },
   petChevronButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
@@ -432,9 +443,9 @@ export const myPetStyles = StyleSheet.create({
   },
 
   modalContent: {
-    width: "80%",
+    width: "84%",
     backgroundColor: colors.cardBg,
-    borderRadius: 14,
+    borderRadius: 18,
     padding: SPACING.lg,
     alignItems: "center",
     borderWidth: 1,
@@ -457,16 +468,20 @@ export const myPetStyles = StyleSheet.create({
 
   modalButton: {
     backgroundColor: colors.cream,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    minHeight: 46,
+    minWidth: 120,
+    paddingHorizontal: 20,
+    borderRadius: RADIUS.pill,
     borderWidth: 1,
     borderColor: "rgba(234, 217, 188, 0.98)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   modalButtonText: {
     color: colors.wine,
     fontWeight: "900",
     fontSize: 14,
+    textAlign: "center",
   },
 });

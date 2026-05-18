@@ -1,19 +1,14 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { colors, radius, spacing, typography } from "./tokens/tokens";
 
-const { width } = Dimensions.get("window");
-
-// ── Paleta temática da tela de vacinas ───────────────────────
 const vaccineColors = {
   bg: "#0F2D23",
   bgCard: "#F5ECD7",
   bgHeader: "#1A3D2E",
   bgAlert: "#1F4A35",
   bgAlertBorder: "#2D7A4F",
-  bgTable: "#163325",
   accent: "#4CAF7D",
   accentWarm: "#D4623A",
-  pawTint: "rgba(255,255,255,0.06)",
   textDark: "#1A3D2E",
   textMuted: "#5A8A6A",
 };
@@ -47,18 +42,19 @@ export const vaccinesStyles = StyleSheet.create({
   },
 
   backButtonText: {
-    fontSize: 18,
+    fontSize: 22,
     color: vaccineColors.bgCard,
     fontWeight: "700",
+    includeFontPadding: false,
   },
 
   headerTitle: {
     ...typography.title,
     color: vaccineColors.bgCard,
-    fontSize: 22,
+    fontSize: 20,
   },
 
-  // ── Alerta vacinas próximas ──────────────────────────────────
+  // ── Alerta ──────────────────────────────────────────────────
   alertSection: {
     marginHorizontal: spacing.md,
     marginTop: spacing.md,
@@ -67,16 +63,13 @@ export const vaccinesStyles = StyleSheet.create({
     padding: spacing.md,
     borderWidth: 1.5,
     borderColor: vaccineColors.bgAlertBorder,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
 
   alertTitle: {
     ...typography.subtitle,
     color: vaccineColors.bgCard,
     fontSize: 13,
-    marginBottom: 2,
   },
 
   alertDescription: {
@@ -84,7 +77,6 @@ export const vaccinesStyles = StyleSheet.create({
     color: vaccineColors.bgCard,
     opacity: 0.75,
     fontSize: 12,
-    flex: 1,
     lineHeight: 17,
   },
 
