@@ -1,6 +1,5 @@
 import { useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
@@ -10,15 +9,14 @@ import {
     View,
 } from "react-native";
 
+import authService from "@/app/services/auth.service";
 import { StatusMessage, StatusType } from "@/components/status-message";
-import { getFirebaseAuth } from "../../database/firebase/firebase";
 import { loginStyles } from "../styles/login.styles";
 
 type AccountType = "usuario" | "empresa";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getFirebaseAuth(), []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
@@ -52,11 +50,7 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password,
-      );
+      await authService.signIn(email, password);
       router.replace("/(tabs)");
     } catch (error) {
       const message =

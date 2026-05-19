@@ -1,5 +1,7 @@
 import { Pressable, SafeAreaView, Text, View } from "react-native";
 
+import routeFeedbackStyles from "./styles/route-feedback.styles";
+
 interface RouteFeedbackProps {
   title: string;
   description: string;
@@ -14,36 +16,16 @@ export function RouteFeedback({
   onBackPress,
 }: RouteFeedbackProps) {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 24,
-        }}
-      >
-        <Text style={{ fontSize: 18, color: "#666", marginBottom: 12 }}>
-          {routeLabel}
-        </Text>
-        <Text style={{ fontSize: 28, fontWeight: "700", marginBottom: 12 }}>
-          {title}
-        </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            color: "#444",
-            textAlign: "center",
-            marginBottom: 24,
-          }}
-        >
-          {description}
-        </Text>
-        <Text style={{ fontSize: 14, color: "#888", marginBottom: 24 }}>
+    <SafeAreaView style={routeFeedbackStyles.safeArea}>
+      <View style={routeFeedbackStyles.container}>
+        <Text style={routeFeedbackStyles.routeLabel}>{routeLabel}</Text>
+        <Text style={routeFeedbackStyles.title}>{title}</Text>
+        <Text style={routeFeedbackStyles.description}>{description}</Text>
+        <Text style={routeFeedbackStyles.hint}>
           Tela carregada com sucesso.
         </Text>
         <Pressable onPress={onBackPress}>
-          <Text style={{ fontSize: 16, fontWeight: "600" }}>Voltar</Text>
+          <Text style={routeFeedbackStyles.backButton}>Voltar</Text>
         </Pressable>
       </View>
     </SafeAreaView>
