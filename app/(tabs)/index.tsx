@@ -1,20 +1,16 @@
-import { getFirebaseApp } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { homeStyles } from "../styles/home.styles";
 
 export default function HomeScreen() {
-  const [displayName, setDisplayName] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const auth = getAuth(getFirebaseApp());
-    if (auth.currentUser) {
-      setDisplayName(auth.currentUser.displayName || auth.currentUser.email);
-    }
-  }, []);
+  const { user } = useAuth();
+  const displayName = useMemo(
+    () => user?.displayName || user?.email || null,
+    [user],
+  );
 
   return (
     <SafeAreaView style={homeStyles.container}>

@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { AuthProvider } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export const unstable_settings = {
@@ -25,7 +26,8 @@ export default function RootLayout() {
   }, [router]);
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="login" />
@@ -34,6 +36,7 @@ export default function RootLayout() {
         <Stack.Screen name="signup-company" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen name="petmap" />
+        <Stack.Screen name="register-pet-store" />
         <Stack.Screen name="my-pet" />
         <Stack.Screen name="pet-details/[petId]" />
         <Stack.Screen name="pet-register" />
@@ -48,5 +51,6 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
+    </AuthProvider>
   );
 }

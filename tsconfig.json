@@ -53,7 +53,8 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "database/**/*.ts",
+    "database/sqlite/**/*.ts",
+    "contexts/**/*.ts",
     "scripts/**/*.ts"
   ],
 

@@ -1,21 +1,18 @@
 import { vaccinesStyles } from "@/app/styles/vaccines.styles";
 import { FormInput } from "@/components/form-input";
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
+import { listPetsByTutor } from "@/database/sqlite/pets";
+import {
+  createVaccine,
+  deleteVaccine,
+  listVaccinesByTutor,
+  updateVaccine,
+  type VaccineRecord,
+} from "@/database/sqlite/vaccines";
 import { Pet } from "@/types/pet.types";
 import { formatDate } from "@/utils/validators";
 import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    query,
-    updateDoc,
-    where,
-} from "firebase/firestore";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Modal,
@@ -26,23 +23,11 @@ import {
     View,
 } from "react-native";
 
-interface VaccineRecord {
-  id: string;
-  name: string;
-  applicationDate: string;
-  nextDue: string;
-  petId: string;
-  petName: string;
-  createdAt?: string;
-}
-
 const styles = vaccinesStyles;
 
 export default function VaccinesScreen() {
   const router = useRouter();
-
-  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
-  const db = useMemo(() => getFirestoreDb(), []);
+  const { user } = useAuth();
 
   const [pets, setPets] = useState<Pet[]>([]);
   const [vaccines, setVaccines] = useState<VaccineRecord[]>([]);
@@ -64,56 +49,35 @@ export default function VaccinesScreen() {
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const loadPets = useCallback(async () => {
-    if (!auth.currentUser) return;
+    if (!user) return;
     try {
-      const q = query(
-        collection(db, "pets"),
-        where("tutorUid", "==", auth.currentUser.uid),
-      );
-      const snap = await getDocs(q);
-      const items: Pet[] = snap.docs.map((d) => ({
-        ...(d.data() as any),
-        id: d.id,
-      }));
+      const items = await listPetsByTutor(user.id);
       setPets(items);
-      if (items.length > 0 && !selectedPetId)
+      if (items.length > 0 && !selectedPetId) {
         setSelectedPetId(items[0]?.id ?? null);
+      }
     } catch {
-      // ignore for now
+      // ignore
     }
-  }, [auth.currentUser, db, selectedPetId]);
+  }, [user, selectedPetId]);
 
   const loadVaccines = useCallback(async () => {
-    if (!auth.currentUser) return;
+    if (!user) return;
     setLoading(true);
     try {
-      const q = query(
-        collection(db, "vaccines"),
-        where("tutorUid", "==", auth.currentUser.uid),
-      );
-      const snap = await getDocs(q);
-      const items: VaccineRecord[] = snap.docs
-        .map((d) => ({
-          ...(d.data() as any),
-          id: d.id,
-        }))
-        .sort((a, b) => {
-          const timeA = new Date(a.createdAt || 0).getTime();
-          const timeB = new Date(b.createdAt || 0).getTime();
-          return timeB - timeA;
-        });
+      const items = await listVaccinesByTutor(user.id);
       setVaccines(items);
     } catch (error) {
       console.warn("Erro ao carregar vacinas:", error);
     } finally {
       setLoading(false);
     }
-  }, [auth.currentUser, db]);
+  }, [user]);
 
   useEffect(() => {
     loadPets();
     loadVaccines();
-  }, [auth.currentUser, loadPets, loadVaccines]);
+  }, [user, loadPets, loadVaccines]);
 
   function clearForm() {
     setSelectedPetId(pets[0]?.id ?? null);
@@ -158,7 +122,7 @@ export default function VaccinesScreen() {
   }
 
   async function handleDeleteVaccine() {
-    if (!auth.currentUser) {
+    if (!user) {
       openFeedbackModal("error", "Você precisa estar logado.");
       return;
     }
@@ -170,7 +134,7 @@ export default function VaccinesScreen() {
 
     try {
       setLoading(true);
-      await deleteDoc(doc(db, "vaccines", editingVaccineId));
+      await deleteVaccine(user.id, editingVaccineId);
       setVaccines((current) =>
         current.filter((item) => item.id !== editingVaccineId),
       );
@@ -188,7 +152,7 @@ export default function VaccinesScreen() {
   }
 
   async function handleSaveVaccine() {
-    if (!auth.currentUser) {
+    if (!user) {
       openFeedbackModal("error", "Você precisa estar logado.");
       return;
     }
@@ -207,33 +171,14 @@ export default function VaccinesScreen() {
       setLoading(true);
 
       const pet = pets.find((p) => p.id === selectedPetId)!;
-      const createdAt = new Date().toISOString();
-
-      const payload = {
+      const created = await createVaccine(user, {
         name: vaccineName.trim(),
-        applicationDate: applicationDate,
-        nextDue: nextDue,
+        applicationDate,
+        nextDue,
         petId: selectedPetId,
         petName: pet?.name || "",
-        tutorUid: auth.currentUser.uid,
-        tutorName: auth.currentUser.displayName || "Usuário",
-        tutorEmail: auth.currentUser.email || "",
-        createdAt,
-      } as any;
-
-      const docRef = await addDoc(collection(db, "vaccines"), payload);
-      setVaccines((current) => [
-        {
-          id: docRef.id,
-          name: payload.name,
-          applicationDate: payload.applicationDate,
-          nextDue: payload.nextDue,
-          petId: payload.petId,
-          petName: payload.petName,
-          createdAt: payload.createdAt,
-        },
-        ...current,
-      ]);
+      });
+      setVaccines((current) => [created, ...current]);
       setShowAddModal(false);
       clearForm();
       openFeedbackModal("success", "Vacina registrada com sucesso.");
@@ -247,7 +192,7 @@ export default function VaccinesScreen() {
   }
 
   async function handleUpdateVaccine() {
-    if (!auth.currentUser) {
+    if (!user) {
       openFeedbackModal("error", "Você precisa estar logado.");
       return;
     }
@@ -277,13 +222,10 @@ export default function VaccinesScreen() {
         nextDue,
         petId: selectedPetId,
         petName: pet?.name || "",
-        tutorUid: auth.currentUser.uid,
-        tutorName: auth.currentUser.displayName || "Usuário",
-        tutorEmail: auth.currentUser.email || "",
         createdAt: editingOriginalCreatedAt || new Date().toISOString(),
       };
 
-      await updateDoc(doc(db, "vaccines", editingVaccineId), payload as any);
+      await updateVaccine(user, editingVaccineId, payload);
       setVaccines((current) =>
         current.map((item) =>
           item.id === editingVaccineId
@@ -296,6 +238,7 @@ export default function VaccinesScreen() {
                 petId: payload.petId,
                 petName: payload.petName,
                 createdAt: payload.createdAt,
+                tutorUid: user.id,
               }
             : item,
         ),

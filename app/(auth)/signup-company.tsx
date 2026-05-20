@@ -1,6 +1,6 @@
 import { FormInput } from "@/components/form-input";
 import { StatusMessage, StatusType } from "@/components/status-message";
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { CompanySignupData } from "@/types/signup.types";
 import {
     formatCNPJ,
@@ -9,13 +9,7 @@ import {
     isValidPassword,
 } from "@/utils/validators";
 import { useRouter } from "expo-router";
-import {
-    createUserWithEmailAndPassword,
-    getAuth,
-    updateProfile,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -45,8 +39,7 @@ const BUSINESS_SEGMENTS = [
 
 export default function SignupCompanyScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
-  const db = useMemo(() => getFirestoreDb(), []);
+  const { signupCompany } = useAuth();
 
   // Estado do formulário
   const [formData, setFormData] = useState<CompanySignupData>({
@@ -243,26 +236,7 @@ export default function SignupCompanyScreen() {
       setStatusType("success");
 
       // Criar usuário no Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email.trim(),
-        formData.password,
-      );
-
-      // Atualizar perfil com nome da empresa
-      await updateProfile(userCredential.user, {
-        displayName: formData.businessName,
-      });
-
-      // Salvar dados adicionais no Firestore
-      await setDoc(doc(db, "companies", userCredential.user.uid), {
-        email: formData.email,
-        cnpj: formData.cnpj.replace(/[^\d]/g, ""),
-        businessName: formData.businessName,
-        businessSegment: formData.businessSegment,
-        accountType: "company",
-        createdAt: new Date().toISOString(),
-      });
+      await signupCompany(formData);
 
       setStatusMessage("Conta criada com sucesso!");
       setStatusType("success");

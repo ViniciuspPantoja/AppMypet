@@ -8,6 +8,15 @@ Resumo rápido
 - **Pasta principal do app:** [app](app/)
 - **Outros recursos e exemplos:** [AppMyPet/app](AppMyPet/app/) (variação do projeto)
 
+Pet Map (lojas da comunidade)
+
+- O ecrã **Pet Map** (`app/(features)/petmap.tsx`) mostra **apenas** documentos da coleção Firestore **`petFriendlyStores`** (lojas registadas por utilizadores na app).
+- **Cadastro:** `app/(features)/register-pet-store.tsx` — nome, morada opcional e coordenadas via **«Usar posição atual»** (deve estar no local da loja).
+- Toque num **pin** → confirmação → abre **Google Maps** com destino às coordenadas da loja.
+- Dados locais em **SQLite** (`database/sqlite/`), coleção de lojas `pet_friendly_stores`.
+- Sessão de login guardada no dispositivo com AsyncStorage (sem Firebase).
+
+
 Como este port para mobile está sendo feito
 
 - O projeto usa **Expo** para facilitar a execução em Android/iOS e acelerar o port do web/React para mobile.

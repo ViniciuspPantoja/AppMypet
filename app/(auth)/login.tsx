@@ -1,24 +1,23 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
-    ActivityIndicator,
-    Pressable,
-    SafeAreaView,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Pressable,
+  SafeAreaView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 import { StatusMessage, StatusType } from "@/components/status-message";
-import { getFirebaseAuth } from "../../database/firebase/firebase";
 import { loginStyles } from "../styles/login.styles";
 
 type AccountType = "usuario" | "empresa";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getFirebaseAuth(), []);
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
@@ -52,10 +51,10 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const credential = await signInWithEmailAndPassword(
-        auth,
+      await login(
         email.trim(),
         password,
+        accountType === "usuario" ? "user" : "company",
       );
       router.replace("/(tabs)");
     } catch (error) {
@@ -78,21 +77,17 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={loginStyles.container}>
       <View style={loginStyles.card}>
-        {/* ── Ícone topo ───────────────────────── */}
         <View style={loginStyles.appIconWrapper}>
           <Text style={loginStyles.appIcon}>🐾</Text>
         </View>
 
-        {/* ── Nome do app ───────────────────────── */}
         <Text style={loginStyles.appName}>my petZone</Text>
 
-        {/* ── Título / contexto ────────────────── */}
         <Text style={loginStyles.subtitle}>
           Escolha como deseja acessar para encontrar lugares pet‑friendly perto
           de você.
         </Text>
 
-        {/* ── Seletor tipo conta ───────────────── */}
         <View style={loginStyles.typeSelectorRow}>
           <Pressable
             style={[
@@ -131,7 +126,6 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
-        {/* ── Inputs ───────────────────────────── */}
         <TextInput
           style={loginStyles.input}
           placeholder="E-mail"
@@ -151,12 +145,10 @@ export default function LoginScreen() {
           editable={!loading}
         />
 
-        {/* ── Esqueci senha ────────────────────── */}
         <Pressable disabled={loading}>
           <Text style={loginStyles.forgotPassword}>Esqueci minha senha</Text>
         </Pressable>
 
-        {/* ── Botões principais ───────────────── */}
         <View style={loginStyles.buttonsRow}>
           <Pressable
             style={loginStyles.primaryButton}
@@ -179,7 +171,6 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
-        {/* ── Visitante ───────────────────────── */}
         <Pressable
           style={loginStyles.guestButton}
           onPress={handleGuestAccess}

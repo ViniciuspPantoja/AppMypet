@@ -1,12 +1,10 @@
 import { colors } from "@/app/styles/tokens/tokens";
 import { FormInput } from "@/components/form-input";
 import { StatusMessage, StatusType } from "@/components/status-message";
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
-import { Pet } from "@/types/pet.types";
+import { useAuth } from "@/contexts/AuthContext";
+import { createPet } from "@/database/sqlite/pets";
 import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
@@ -38,8 +36,7 @@ function parseNumber(value: string): number {
 
 export default function PetRegisterScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
-  const db = useMemo(() => getFirestoreDb(), []);
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState<PetFormState>({
     name: "",
@@ -58,14 +55,14 @@ export default function PetRegisterScreen() {
   });
 
   useEffect(() => {
-    if (!auth.currentUser) {
+    if (!user) {
       setStatus({
         message: "Você precisa estar logado para cadastrar um pet.",
         type: "error",
       });
       return;
     }
-  }, [auth.currentUser]);
+  }, [user]);
 
   function updateField(field: keyof PetFormState, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -132,7 +129,7 @@ export default function PetRegisterScreen() {
   }
 
   async function handleSavePet() {
-    if (!auth.currentUser) {
+    if (!user) {
       setStatus({
         message: "Você precisa estar logado para cadastrar um pet.",
         type: "error",
@@ -152,7 +149,7 @@ export default function PetRegisterScreen() {
       setLoading(true);
       setStatus({ message: "", type: "success" });
 
-      const petPayload: Omit<Pet, "id"> = {
+      await createPet(user, {
         name: formData.name.trim(),
         species: formData.species,
         breed: formData.breed.trim(),
@@ -160,13 +157,7 @@ export default function PetRegisterScreen() {
         age: Number(formData.age),
         weight: parseNumber(formData.weight),
         registrationDate: new Date().toLocaleDateString("pt-BR"),
-        tutorUid: auth.currentUser.uid,
-        tutorName: auth.currentUser.displayName || "Usuário",
-        tutorEmail: auth.currentUser.email || "",
-        createdAt: new Date().toISOString(),
-      };
-
-      await addDoc(collection(db, "pets"), petPayload);
+      });
       router.back();
     } catch (error) {
       const message =

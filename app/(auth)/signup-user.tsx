@@ -1,5 +1,5 @@
 import { FormInput } from "@/components/form-input";
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { UserSignupData } from "@/types/signup.types";
 import {
     formatDate,
@@ -8,13 +8,7 @@ import {
     validateBirthDate,
 } from "@/utils/validators";
 import { useRouter } from "expo-router";
-import {
-    createUserWithEmailAndPassword,
-    getAuth,
-    updateProfile,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Modal,
@@ -59,8 +53,7 @@ function validatePasswordField(password: string): string {
 // ── Componente ───────────────────────────────────────────────
 export default function SignupUserScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
-  const db = useMemo(() => getFirestoreDb(), []);
+  const { signupUser } = useAuth();
 
   const [formData, setFormData] = useState<UserSignupData>({
     email: "",
@@ -129,20 +122,7 @@ export default function SignupUserScreen() {
     try {
       setLoading(true);
 
-      const credential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email.trim(),
-        formData.password,
-      );
-
-      await updateProfile(credential.user, { displayName: "User" });
-
-      await setDoc(doc(db, "users", credential.user.uid), {
-        email: formData.email,
-        birthDate: formData.birthDate,
-        accountType: "user",
-        createdAt: new Date().toISOString(),
-      });
+      await signupUser(formData);
 
       setFeedbackType("success");
       setFeedbackTitle("Conta criada com sucesso");

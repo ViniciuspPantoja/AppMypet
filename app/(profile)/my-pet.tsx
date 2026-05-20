@@ -1,6 +1,8 @@
 import { FormInput } from "@/components/form-input";
 import { StatusMessage, StatusType } from "@/components/status-message";
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
+import { listPetsByTutor } from "@/database/sqlite/pets";
+import { updateUserProfile } from "@/database/sqlite/users";
 import { Pet, UserProfile } from "@/types/pet.types";
 import {
     formatDate,
@@ -10,15 +12,6 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getAuth, updateEmail, updateProfile } from "firebase/auth";
-import {
-    collection,
-    doc,
-    getDocs,
-    query,
-    setDoc,
-    where,
-} from "firebase/firestore";
 import { useCallback, useState } from "react";
 import {
     Alert,
@@ -34,6 +27,7 @@ import { myPetStyles } from "../styles/my-pet.styles";
 
 export default function MyPetScreen() {
   const router = useRouter();
+  const { user, refreshUser } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,47 +46,34 @@ export default function MyPetScreen() {
 
   const loadUserData = useCallback(async () => {
     try {
-      const auth = getAuth(getFirebaseApp());
-      const db = getFirestoreDb();
-
-      if (auth.currentUser) {
-        const petsQuery = query(
-          collection(db, "pets"),
-          where("tutorUid", "==", auth.currentUser.uid),
-        );
-
-        setUserProfile({
-          uid: auth.currentUser.uid,
-          email: auth.currentUser.email || "",
-          displayName: auth.currentUser.displayName || "Usuário",
-          photoUrl: auth.currentUser.photoURL || undefined,
-          createdAt: new Date(
-            auth.currentUser.metadata?.creationTime || Date.now(),
-          ).toLocaleDateString("pt-BR"),
-        });
-
-        const petsSnapshot = await getDocs(petsQuery);
-        setPets(
-          petsSnapshot.docs.map((petDoc) => {
-            const data = petDoc.data() as Omit<Pet, "id">;
-            return {
-              id: petDoc.id,
-              ...data,
-            };
-          }),
-        );
-
-        // Inicializa dados do formulário de edição
-        setEditForm({
-          displayName: auth.currentUser.displayName || "",
-          birthDate: "",
-          email: auth.currentUser.email || "",
-        });
+      if (!user) {
+        setUserProfile(null);
+        setPets([]);
+        return;
       }
+
+      const petsList = await listPetsByTutor(user.id);
+
+      setUserProfile({
+        uid: user.id,
+        email: user.email,
+        displayName: user.displayName || "Usuário",
+        photoUrl: user.photoUrl,
+        birthDate: user.birthDate,
+        createdAt: new Date(user.createdAt).toLocaleDateString("pt-BR"),
+      });
+
+      setPets(petsList);
+
+      setEditForm({
+        displayName: user.displayName || "",
+        birthDate: user.birthDate || "",
+        email: user.email,
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {
@@ -275,12 +256,8 @@ export default function MyPetScreen() {
                 <Pressable
                   style={myPetStyles.actionButton}
                   onPress={async () => {
-                    // Delegate to save handler
-                    const auth = getAuth(getFirebaseApp());
-                    const db = getFirestoreDb();
-                    if (!auth.currentUser) return;
+                    if (!user) return;
 
-                    // Validate name
                     if (!editForm.displayName.trim()) {
                       setStatus({
                         message: "Nome é obrigatório.",
@@ -289,7 +266,6 @@ export default function MyPetScreen() {
                       return;
                     }
 
-                    // Validate birth date if provided
                     if (editForm.birthDate) {
                       const res = validateBirthDate(editForm.birthDate);
                       if (!res.isValid) {
@@ -301,7 +277,6 @@ export default function MyPetScreen() {
                       }
                     }
 
-                    // Validate email format
                     if (editForm.email && !isValidEmail(editForm.email)) {
                       setStatus({ message: "Email inválido.", type: "error" });
                       return;
@@ -309,53 +284,25 @@ export default function MyPetScreen() {
 
                     try {
                       setSaving(true);
-                      // Update email if changed
-                      if (
-                        editForm.email &&
-                        auth.currentUser.email !== editForm.email
-                      ) {
-                        try {
-                          await updateEmail(auth.currentUser, editForm.email);
-                        } catch (emailErr) {
-                          const msg =
-                            emailErr instanceof Error
-                              ? emailErr.message
-                              : String(emailErr);
-                          setStatus({
-                            message: `Erro ao atualizar email: ${msg}`,
-                            type: "error",
-                          });
-                          setSaving(false);
-                          return;
-                        }
-                      }
-
-                      // Update auth profile
-                      await updateProfile(auth.currentUser, {
+                      const updated = await updateUserProfile(user.id, {
                         displayName: editForm.displayName.trim(),
+                        birthDate: editForm.birthDate || undefined,
+                        email: editForm.email.trim(),
+                        photoUrl: userProfile?.photoUrl,
                       });
 
-                      // Update firestore user doc
-                      await setDoc(
-                        doc(db, "users", auth.currentUser.uid),
-                        {
-                          displayName: editForm.displayName.trim(),
-                          birthDate: editForm.birthDate || null,
-                          email: editForm.email || null,
-                        },
-                        { merge: true },
-                      );
+                      await refreshUser();
 
-                      setUserProfile((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              displayName: editForm.displayName.trim(),
-                              birthDate: editForm.birthDate || prev.birthDate,
-                              email: editForm.email || prev.email,
-                            }
-                          : prev,
-                      );
+                      setUserProfile({
+                        uid: updated.id,
+                        email: updated.email,
+                        displayName: updated.displayName,
+                        photoUrl: updated.photoUrl,
+                        birthDate: updated.birthDate,
+                        createdAt: new Date(updated.createdAt).toLocaleDateString(
+                          "pt-BR",
+                        ),
+                      });
 
                       setStatus({ message: "", type: "success" });
                       setShowSuccessModal(true);

@@ -1,9 +1,9 @@
-import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
+import { useAuth } from "@/contexts/AuthContext";
+import { getPetByIdForTutor } from "@/database/sqlite/pets";
+import { listVaccinesByPet } from "@/database/sqlite/vaccines";
 import { Pet } from "@/types/pet.types";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { petDetailsStyles } from "../../styles/pet-details.styles";
@@ -13,13 +13,11 @@ interface VaccineItem {
   name: string;
   date: string;
   nextDue: string;
-  status?: string;
-  petId?: string;
-  tutorUid?: string;
 }
 
 export default function PetDetailsScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const params = useLocalSearchParams<{ petId?: string }>();
   const petId = useMemo(() => String(params.petId || ""), [params.petId]);
 
@@ -29,57 +27,39 @@ export default function PetDetailsScreen() {
 
   const loadPetDetails = useCallback(async () => {
     try {
-      const auth = getAuth(getFirebaseApp());
-      const db = getFirestoreDb();
-
-      if (!auth.currentUser || !petId) {
+      if (!user || !petId) {
         setPet(null);
         setVaccines([]);
         return;
       }
 
-      const petsByTutorSnapshot = await getDocs(
-        query(
-          collection(db, "pets"),
-          where("tutorUid", "==", auth.currentUser.uid),
-        ),
-      );
-
-      const matchedPet = petsByTutorSnapshot.docs.find(
-        (docItem) => docItem.id === petId,
-      );
-
+      const matchedPet = await getPetByIdForTutor(petId, user.id);
       if (!matchedPet) {
         setPet(null);
         setVaccines([]);
         return;
       }
 
-      const petData = matchedPet.data() as Omit<Pet, "id">;
-      setPet({ id: matchedPet.id, ...petData });
+      setPet(matchedPet);
 
-      const vaccinesSnapshot = await getDocs(
-        query(
-          collection(db, "vaccines"),
-          where("tutorUid", "==", auth.currentUser.uid),
-          where("petId", "==", matchedPet.id),
-        ),
-      );
-
+      const vaccineRows = await listVaccinesByPet(user.id, petId);
       setVaccines(
-        vaccinesSnapshot.docs.map((vacDoc) => ({
-          id: vacDoc.id,
-          ...(vacDoc.data() as Omit<VaccineItem, "id">),
+        vaccineRows.map((v) => ({
+          id: v.id,
+          name: v.name,
+          date: v.applicationDate,
+          nextDue: v.nextDue,
         })),
       );
     } finally {
       setLoading(false);
     }
-  }, [petId]);
+  }, [petId, user]);
 
   useFocusEffect(
     useCallback(() => {
-      loadPetDetails();
+      setLoading(true);
+      void loadPetDetails();
     }, [loadPetDetails]),
   );
 
@@ -177,89 +157,32 @@ export default function PetDetailsScreen() {
         </View>
 
         <View style={petDetailsStyles.section}>
-          <Text style={petDetailsStyles.sectionTitle}>Informações do pet</Text>
-          <View style={petDetailsStyles.sectionCard}>
-            <View style={petDetailsStyles.infoGrid}>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Nome</Text>
-                <Text style={petDetailsStyles.infoValue}>{pet.name}</Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Espécie</Text>
-                <Text style={petDetailsStyles.infoValue}>{pet.species}</Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Raça</Text>
-                <Text style={petDetailsStyles.infoValue}>{pet.breed}</Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Sexo</Text>
-                <Text style={petDetailsStyles.infoValue}>
-                  {pet.sex || "Não informado"}
-                </Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Idade</Text>
-                <Text style={petDetailsStyles.infoValue}>{pet.age} anos</Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Peso</Text>
-                <Text style={petDetailsStyles.infoValue}>{pet.weight} kg</Text>
-              </View>
-              <View style={petDetailsStyles.infoRow}>
-                <Text style={petDetailsStyles.infoLabel}>Tutor</Text>
-                <Text style={petDetailsStyles.infoValue}>
-                  {pet.tutorName || "Não informado"}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
+          <Text style={petDetailsStyles.sectionTitle}>Carteirinha de vacinas</Text>
 
-        <View style={petDetailsStyles.section}>
-          <Text style={petDetailsStyles.sectionTitle}>Vacinas do pet</Text>
-          <View style={petDetailsStyles.sectionCard}>
-            {vaccines.length > 0 ? (
-              vaccines.map((vaccine) => (
-                <View key={vaccine.id} style={petDetailsStyles.vaccineCard}>
-                  <View style={petDetailsStyles.vaccineHeader}>
-                    <Text style={petDetailsStyles.vaccineName}>
-                      {vaccine.name}
-                    </Text>
-                    <Text style={petDetailsStyles.vaccineStatus}>Aplicada</Text>
-                  </View>
-                  <Text style={petDetailsStyles.vaccineMeta}>
-                    Aplicação em {vaccine.date}
-                  </Text>
-                  <Text style={petDetailsStyles.vaccineDates}>
-                    Próximo reforço: {vaccine.nextDue}
+          {vaccines.length === 0 ? (
+            <View style={petDetailsStyles.sectionCard}>
+              <Text style={petDetailsStyles.emptyText}>
+                Nenhuma vacina registrada para este pet.
+              </Text>
+            </View>
+          ) : (
+            vaccines.map((vaccine) => (
+              <View key={vaccine.id} style={petDetailsStyles.vaccineCard}>
+                <View style={petDetailsStyles.vaccineHeader}>
+                  <Text style={petDetailsStyles.vaccineName}>
+                    {vaccine.name}
                   </Text>
                 </View>
-              ))
-            ) : (
-              <View style={petDetailsStyles.emptyState}>
-                <Text style={petDetailsStyles.emptyEmoji}>💉</Text>
-                <Text style={petDetailsStyles.emptyText}>
-                  Nenhuma vacina vinculada
+                <Text style={petDetailsStyles.vaccineMeta}>
+                  Aplicação em {vaccine.date}
                 </Text>
-                <Text style={petDetailsStyles.emptySubtext}>
-                  Aqui aparecerão as vacinas cadastradas para este pet.
+                <Text style={petDetailsStyles.vaccineMeta}>
+                  Próximo reforço: {vaccine.nextDue}
                 </Text>
               </View>
-            )}
-
-            <Pressable
-              style={petDetailsStyles.sectionAction}
-              onPress={() => router.push("/vaccines")}
-            >
-              <Text style={petDetailsStyles.sectionActionText}>
-                Ver carteirinha completa
-              </Text>
-            </Pressable>
-          </View>
+            ))
+          )}
         </View>
-
-        <View style={petDetailsStyles.footerSpacer} />
       </ScrollView>
     </SafeAreaView>
   );
