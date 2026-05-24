@@ -156,6 +156,24 @@ export const signupStyles = StyleSheet.create({
     textAlign: "center",
   },
 
+  typeButtonIcon: {
+    fontSize: 28,
+    marginBottom: 6,
+  },
+
+  typeDescription: {
+    fontSize: 14.5,
+    color: "rgba(245, 236, 215, 0.78)",
+    textAlign: "center",
+    lineHeight: 21,
+    marginBottom: 16,
+  },
+
+  typeDescriptionStrong: {
+    fontWeight: "700",
+    color: colors.cream,
+  },
+
   typeButtonTextActive: {
     fontSize: 15,
     fontWeight: "800",

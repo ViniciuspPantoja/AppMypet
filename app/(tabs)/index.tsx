@@ -1,6 +1,5 @@
-import { getFirebaseApp } from "@/database/firebase/firebase";
+import profileService from "@/app/services/profile.service";
 import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { homeStyles } from "../styles/home.styles";
@@ -10,10 +9,8 @@ export default function HomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    const auth = getAuth(getFirebaseApp());
-    if (auth.currentUser) {
-      setDisplayName(auth.currentUser.displayName || auth.currentUser.email);
-    }
+    const profile = profileService.buildUserProfile();
+    setDisplayName(profile?.displayName || profile?.email || null);
   }, []);
 
   return (

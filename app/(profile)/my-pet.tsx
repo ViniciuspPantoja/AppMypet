@@ -142,20 +142,6 @@ export default function MyPetScreen() {
     setUserProfile((prev) => (prev ? { ...prev, photoUrl: uri } : prev));
   }
 
-  function handleDeletePhoto() {
-    Alert.alert("Remover foto", "Deseja remover a foto de perfil?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: () =>
-          setUserProfile((prev) =>
-            prev ? { ...prev, photoUrl: undefined } : prev,
-          ),
-      },
-    ]);
-  }
-
   if (loading) {
     return (
       <SafeAreaView style={myPetStyles.safeArea}>

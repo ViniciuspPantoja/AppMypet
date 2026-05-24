@@ -1,8 +1,7 @@
+import authService from "@/app/services/auth.service";
 import { settingsStyles as styles } from "@/app/styles/settings.styles";
-import { getFirebaseApp } from "@/database/firebase/firebase";
 import { useRouter } from "expo-router";
-import { getAuth, signOut } from "firebase/auth";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Modal,
@@ -38,7 +37,6 @@ const settingsItems = [
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,7 +51,7 @@ export default function SettingsScreen() {
   async function handleLogout() {
     try {
       setLoading(true);
-      await signOut(auth);
+      await authService.signOutCurrentUser();
       setShowLogoutConfirm(false);
       openFeedback("Logout realizado com sucesso.");
       router.replace("/login");

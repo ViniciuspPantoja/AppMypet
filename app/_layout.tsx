@@ -3,35 +3,33 @@ import {
     DefaultTheme,
     ThemeProvider,
 } from "@react-navigation/native";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import "react-native-reanimated";
-
-import { useColorScheme } from "@/hooks/use-color-scheme";
-
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+import { useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+import AppLoadingScreen from "./loading";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Defer navigation to the next frame so the navigator mounts first
-    const raf = requestAnimationFrame(() => router.replace("/login"));
-    return () => cancelAnimationFrame(raf);
-  }, [router]);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <AppLoadingScreen />;
+  }
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false }} initialRouteName="(auth)">
+        <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="signup-type" />
-        <Stack.Screen name="signup-user" />
-        <Stack.Screen name="signup-company" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen name="petmap" />
         <Stack.Screen name="my-pet" />
