@@ -50,7 +50,7 @@ export default function SignupTypeScreen() {
               onPress={handleSelectUser}
               disabled={loading}
             >
-              <Text style={{ fontSize: 28, marginBottom: 6 }}>👤</Text>
+              <Text style={signupStyles.typeButtonIcon}>👤</Text>
               <Text style={signupStyles.typeButtonText}>Usuário</Text>
             </Pressable>
 
@@ -60,23 +60,24 @@ export default function SignupTypeScreen() {
               onPress={handleSelectCompany}
               disabled={loading}
             >
-              <Text style={{ fontSize: 28, marginBottom: 6 }}>🏢</Text>
+              <Text style={signupStyles.typeButtonIcon}>🏢</Text>
               <Text style={signupStyles.typeButtonText}>Empresa</Text>
             </Pressable>
           </View>
 
           {/* ── Descrições ────────────────────────────────────────── */}
           <View style={signupStyles.formSection}>
-            <Text style={[signupStyles.subtitle, { marginBottom: 16 }]}>
-              <Text style={{ fontWeight: "700" }}>Usuário:</Text> Para quem quer
-              encontrar lugares pet-friendly e compartilhar experiências.
+            <Text style={signupStyles.typeDescription}>
+              <Text style={signupStyles.typeDescriptionStrong}>Usuário:</Text>{" "}
+              Para quem quer encontrar lugares pet-friendly e compartilhar
+              experiências.
             </Text>
           </View>
 
           <View style={signupStyles.formSection}>
-            <Text style={[signupStyles.subtitle, { marginBottom: 16 }]}>
-              <Text style={{ fontWeight: "700" }}>Empresa:</Text> Para negócios
-              que desejam ser descobertos por amantes de animais.
+            <Text style={signupStyles.typeDescription}>
+              <Text style={signupStyles.typeDescriptionStrong}>Empresa:</Text>{" "}
+              Para negócios que desejam ser descobertos por amantes de animais.
             </Text>
           </View>
 
