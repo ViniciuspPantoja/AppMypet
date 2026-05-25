@@ -1,6 +1,8 @@
 import { partnersStyles as styles } from "@/app/styles/partners.styles";
+import { getFirestoreDb } from "@/database/firebase/firebase";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useEffect, useMemo, useState } from "react";
 import {
     Alert,
     Linking,
@@ -29,69 +31,110 @@ interface PartnerCard {
   emoji: string;
 }
 
+interface CompanyDocument {
+  businessName?: string;
+  businessSegment?: string;
+  isPartner?: boolean;
+  website?: string;
+  address?: string;
+  summary?: string;
+}
+
+const FALLBACK_PARTNER_TEXT = {
+  summary:
+    "Empresa cadastrada como parceira no app. Você pode abrir o site para ver mais detalhes.",
+  address: "Endereço não informado",
+};
+
+function getPartnerCategory(segment?: string): PartnerCategory {
+  if (!segment) return "Loja";
+  if (segment.includes("Clínica")) return "Clínica";
+  if (segment.includes("Hotel")) return "Hotel";
+  if (segment.includes("Banho")) return "Banho e Tosa";
+  if (segment.includes("Hospital")) return "Hospital";
+  return "Loja";
+}
+
+function getPartnerAccent(segment?: string): string {
+  if (!segment) return "#5b2132";
+  if (segment.includes("Clínica")) return "#5b2132";
+  if (segment.includes("Hotel")) return "#3d6d58";
+  if (segment.includes("Banho")) return "#3c5a8a";
+  if (segment.includes("Hospital")) return "#7a3e8e";
+  return "#b46a3c";
+}
+
+function getPartnerEmoji(segment?: string): string {
+  if (!segment) return "🤝";
+  if (segment.includes("Clínica")) return "🏥";
+  if (segment.includes("Hotel")) return "🏨";
+  if (segment.includes("Banho")) return "✂️";
+  if (segment.includes("Hospital")) return "🚑";
+  return "🛒";
+}
+
+function getPartnerSummary(segment?: string): string {
+  if (!segment) return FALLBACK_PARTNER_TEXT.summary;
+  if (segment.includes("Clínica")) {
+    return "Atendimento veterinário com consultas, vacinação e exames rápidos.";
+  }
+  if (segment.includes("Hotel")) {
+    return "Hospedagem premium para pets com recreação e alimentação personalizada.";
+  }
+  if (segment.includes("Banho")) {
+    return "Banho, tosa e cuidados de estética para o seu pet.";
+  }
+  if (segment.includes("Hospital")) {
+    return "Pronto atendimento e suporte veterinário para urgências.";
+  }
+  return "Produtos e serviços especiais para pets em um só lugar.";
+}
+
 export default function PartnersScreen() {
   const router = useRouter();
+  const db = useMemo(() => getFirestoreDb(), []);
+  const [partners, setPartners] = useState<PartnerCard[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const partners = useMemo<PartnerCard[]>(
-    () => [
-      {
-        id: "1",
-        name: "PetCare Clínica",
-        category: "Clínica",
-        summary:
-          "Atendimento veterinário completo com consultas, vacinação e exames rápidos.",
-        address: "Av. das Nações, 1200",
-        website: "https://example.com/petcare",
-        accent: "#5b2132",
-        emoji: "🏥",
-      },
-      {
-        id: "2",
-        name: "Mundo Pet Shop",
-        category: "Loja",
-        summary:
-          "Acessórios, rações e medicamentos veterinários com retirada no mesmo dia.",
-        address: "Rua Central, 88",
-        website: "https://example.com/mundopet",
-        accent: "#b46a3c",
-        emoji: "🛒",
-      },
-      {
-        id: "3",
-        name: "Paws Resort",
-        category: "Hotel",
-        summary:
-          "Hospedagem premium para pets com recreação, monitoramento e alimentação personalizada.",
-        address: "Estrada do Bosque, 450",
-        website: "https://example.com/pawsresort",
-        accent: "#3d6d58",
-        emoji: "🏨",
-      },
-      {
-        id: "4",
-        name: "Spa & Tosa Lux",
-        category: "Banho e Tosa",
-        summary:
-          "Banho, tosa higiênica e estética com produtos pensados para pele sensível.",
-        address: "Av. Jardim, 310",
-        website: "https://example.com/spatosa",
-        accent: "#3c5a8a",
-        emoji: "✂️",
-      },
-      {
-        id: "5",
-        name: "Hospital Vet 24h",
-        category: "Hospital",
-        summary:
-          "Emergência veterinária 24 horas, internação e pronto atendimento para casos urgentes.",
-        address: "Rua da Saúde, 999",
-        website: "https://example.com/hospitalvet24h",
-        accent: "#7a3e8e",
-        emoji: "🚑",
-      },
-    ],
-    [],
-  );
+  useEffect(() => {
+    async function loadPartners() {
+      try {
+        setLoading(true);
+        const snap = await getDocs(
+          query(collection(db, "companies"), where("isPartner", "==", true)),
+        );
+
+        const items = snap.docs
+          .map((doc) => {
+            const company = doc.data() as CompanyDocument;
+            const name = company.businessName?.trim() || "Empresa parceira";
+            const segment = company.businessSegment?.trim();
+
+            return {
+              id: doc.id,
+              name,
+              category: getPartnerCategory(segment),
+              summary: company.summary?.trim() || getPartnerSummary(segment),
+              address: company.address?.trim() || FALLBACK_PARTNER_TEXT.address,
+              website:
+                company.website?.trim() ||
+                `https://www.google.com/search?q=${encodeURIComponent(name)}`,
+              accent: getPartnerAccent(segment),
+              emoji: getPartnerEmoji(segment),
+            } as PartnerCard;
+          })
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        setPartners(items);
+      } catch {
+        Alert.alert("Erro", "Não foi possível carregar os parceiros.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadPartners();
+  }, [db]);
 
   async function openPartnerSite(url: string) {
     try {
@@ -122,8 +165,8 @@ export default function PartnersScreen() {
           </Pressable>
           <Text style={styles.title}>Marketplace de Parceiros</Text>
           <Text style={styles.subtitle}>
-            Empresas mockadas para você cadastrar manualmente e transformar em
-            parceiros reais.
+            Empresas marcadas como parceiras no Firebase aparecem aqui com o
+            mesmo padrão visual.
           </Text>
         </View>
 
@@ -143,46 +186,61 @@ export default function PartnersScreen() {
           <Text style={styles.sectionCount}>{partners.length} empresas</Text>
         </View>
 
-        {partners.map((partner) => (
-          <View
-            key={partner.id}
-            style={[styles.card, { borderLeftColor: partner.accent }]}
-          >
-            <View style={styles.cardTopRow}>
-              <View
-                style={[styles.logoBubble, { backgroundColor: partner.accent }]}
-              >
-                <Text style={styles.logoText}>{partner.emoji}</Text>
-              </View>
-              <View style={styles.cardHeaderText}>
-                <Text style={styles.cardName}>{partner.name}</Text>
-                <Text style={styles.cardCategory}>{partner.category}</Text>
-              </View>
-            </View>
-
-            <Text style={styles.cardSummary}>{partner.summary}</Text>
-
-            <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>Endereço</Text>
-              <Text style={styles.metaValue}>{partner.address}</Text>
-            </View>
-
-            <View style={styles.cardActions}>
-              <Pressable
-                style={styles.siteButton}
-                onPress={() => openPartnerSite(partner.website)}
-              >
-                <Text style={styles.siteButtonText}>Acessar site</Text>
-              </Pressable>
-              <Text style={styles.siteHint}>{partner.website}</Text>
-            </View>
+        {loading ? (
+          <View style={styles.footerNote}>
+            <Text style={styles.footerNoteText}>Carregando parceiros...</Text>
           </View>
-        ))}
+        ) : partners.length > 0 ? (
+          partners.map((partner) => (
+            <View
+              key={partner.id}
+              style={[styles.card, { borderLeftColor: partner.accent }]}
+            >
+              <View style={styles.cardTopRow}>
+                <View
+                  style={[
+                    styles.logoBubble,
+                    { backgroundColor: partner.accent },
+                  ]}
+                >
+                  <Text style={styles.logoText}>{partner.emoji}</Text>
+                </View>
+                <View style={styles.cardHeaderText}>
+                  <Text style={styles.cardName}>{partner.name}</Text>
+                  <Text style={styles.cardCategory}>{partner.category}</Text>
+                </View>
+              </View>
+
+              <Text style={styles.cardSummary}>{partner.summary}</Text>
+
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Endereço</Text>
+                <Text style={styles.metaValue}>{partner.address}</Text>
+              </View>
+
+              <View style={styles.cardActions}>
+                <Pressable
+                  style={styles.siteButton}
+                  onPress={() => openPartnerSite(partner.website)}
+                >
+                  <Text style={styles.siteButtonText}>Acessar site</Text>
+                </Pressable>
+                <Text style={styles.siteHint}>{partner.website}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <View style={styles.footerNote}>
+            <Text style={styles.footerNoteText}>
+              Nenhuma empresa foi marcada como parceira ainda.
+            </Text>
+          </View>
+        )}
 
         <View style={styles.footerNote}>
           <Text style={styles.footerNoteText}>
-            Você pode editar essa lista manualmente no arquivo da tela e trocar
-            os dados dos parceiros.
+            Cadastre uma empresa, marque a opção de parceira e ela aparecerá
+            automaticamente aqui.
           </Text>
         </View>
       </ScrollView>

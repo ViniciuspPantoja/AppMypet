@@ -47,6 +47,8 @@ export default function SignupCompanyScreen() {
     password: "",
     businessName: "",
     businessSegment: "",
+    address: "",
+    isPartner: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -148,6 +150,18 @@ export default function SignupCompanyScreen() {
       }
     }
 
+    if (field === "address") {
+      if (!formData.address) {
+        newErrors.address = "Endereço é obrigatório";
+        isValid = false;
+      } else if (formData.address.length < 5) {
+        newErrors.address = "Informe um endereço válido";
+        isValid = false;
+      } else {
+        delete newErrors.address;
+      }
+    }
+
     if (field === "password") {
       if (!formData.password) {
         newErrors.password = "Senha é obrigatória";
@@ -201,6 +215,15 @@ export default function SignupCompanyScreen() {
       isFormValid = false;
     }
 
+    // Validar endereço
+    if (!formData.address) {
+      newErrors.address = "Endereço é obrigatório";
+      isFormValid = false;
+    } else if (formData.address.length < 5) {
+      newErrors.address = "Informe um endereço válido";
+      isFormValid = false;
+    }
+
     // Validar senha
     if (!formData.password) {
       newErrors.password = "Senha é obrigatória";
@@ -216,6 +239,7 @@ export default function SignupCompanyScreen() {
       cnpj: true,
       businessName: true,
       businessSegment: true,
+      address: true,
       password: true,
     });
 
@@ -336,6 +360,59 @@ export default function SignupCompanyScreen() {
                 {errors.businessSegment}
               </Text>
             )}
+          </View>
+
+          <View style={signupStyles.formSection}>
+            <Text style={signupStyles.sectionTitle}>Endereço</Text>
+
+            <FormInput
+              placeholder="Rua, número, bairro, cidade"
+              value={formData.address}
+              onChangeText={(v) => handleFieldChange("address", v)}
+              onBlur={() => handleFieldBlur("address")}
+              error={errors.address}
+              touched={touched.address}
+              editable={!loading}
+            />
+          </View>
+
+          <View style={signupStyles.formSection}>
+            <Text style={signupStyles.sectionTitle}>Parceira</Text>
+            <View style={signupStyles.partnerToggleCard}>
+              <View style={signupStyles.partnerToggleTextBlock}>
+                <Text style={signupStyles.partnerToggleTitle}>
+                  Exibir na tela de parceiros
+                </Text>
+                <Text style={signupStyles.partnerToggleSubtitle}>
+                  Marque esta opção para disponibilizar a empresa no
+                  marketplace.
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isPartner: !prev.isPartner,
+                  }))
+                }
+                style={[
+                  signupStyles.partnerToggleButton,
+                  formData.isPartner && signupStyles.partnerToggleButtonActive,
+                ]}
+                disabled={loading}
+              >
+                <Text
+                  style={[
+                    signupStyles.partnerToggleButtonText,
+                    formData.isPartner &&
+                      signupStyles.partnerToggleButtonTextActive,
+                  ]}
+                >
+                  {formData.isPartner ? "Sim" : "Não"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
 
           <View style={signupStyles.formSection}>

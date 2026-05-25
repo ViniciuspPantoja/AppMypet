@@ -88,6 +88,8 @@ async function registerCompanyAccount(
     cnpj: data.cnpj.replace(/[^\d]/g, ""),
     businessName: data.businessName,
     businessSegment: data.businessSegment,
+    address: data.address.trim(),
+    isPartner: data.isPartner,
     accountType: "company",
     createdAt: new Date().toISOString(),
   });

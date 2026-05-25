@@ -220,6 +220,65 @@ export const signupStyles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  partnerToggleCard: {
+    minHeight: 74,
+    borderRadius: RADIUS.input,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.cream,
+    borderWidth: 1,
+    borderColor: "rgba(234, 217, 188, 0.95)",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: SPACING.md,
+    ...SHADOWS.floating,
+  },
+
+  partnerToggleTextBlock: {
+    flex: 1,
+  },
+
+  partnerToggleTitle: {
+    color: COLORS.wineDark,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+
+  partnerToggleSubtitle: {
+    color: "rgba(74, 16, 32, 0.65)",
+    fontSize: 12,
+    lineHeight: 17,
+  },
+
+  partnerToggleButton: {
+    minWidth: 68,
+    minHeight: 40,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: COLORS.wineLight,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(123, 30, 46, 0.08)",
+  },
+
+  partnerToggleButtonActive: {
+    backgroundColor: COLORS.terracotta,
+    borderColor: COLORS.terracottaDark,
+  },
+
+  partnerToggleButtonText: {
+    color: COLORS.wineDark,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+
+  partnerToggleButtonTextActive: {
+    color: COLORS.textOnWine,
+  },
+
   // ─────────────────────────────────────────────────────────────
   // Botões
   // ─────────────────────────────────────────────────────────────

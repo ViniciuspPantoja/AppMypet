@@ -23,6 +23,8 @@ export interface CompanySignupData {
   password: string;
   businessName: string; // Nome fantasia
   businessSegment: string; // Ramo de atuação
+  address: string;
+  isPartner: boolean;
 }
 
 /**
