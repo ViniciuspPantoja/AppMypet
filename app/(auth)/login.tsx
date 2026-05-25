@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
     ActivityIndicator,
+    Alert,
     Pressable,
     SafeAreaView,
     Text,
@@ -11,6 +12,7 @@ import {
 
 import authService from "@/app/services/auth.service";
 import { StatusMessage, StatusType } from "@/components/status-message";
+import { isValidEmail } from "@/utils/validators";
 import { loginStyles } from "../styles/login.styles";
 
 type AccountType = "usuario" | "empresa";
@@ -21,6 +23,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [failedPasswordAttempts, setFailedPasswordAttempts] = useState(0);
   const [status, setStatus] = useState({
     message: "",
     type: "error" as StatusType,
@@ -51,8 +54,52 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       await authService.signIn(email, password);
+      setFailedPasswordAttempts(0);
       router.replace("/(tabs)");
     } catch (error) {
+      const errorCode =
+        typeof error === "object" && error !== null && "code" in error
+          ? String(error.code)
+          : "";
+      const isWrongPasswordError = [
+        "auth/wrong-password",
+        "auth/invalid-credential",
+        "auth/invalid-login-credentials",
+      ].includes(errorCode);
+
+      if (isWrongPasswordError) {
+        const nextAttempts = failedPasswordAttempts + 1;
+        setFailedPasswordAttempts(nextAttempts);
+
+        if (nextAttempts >= 3) {
+          Alert.alert(
+            "Senha incorreta",
+            "Você já tentou três vezes. Digite seu e-mail no campo acima e toque em 'Esqueci minha senha' para receber o link de redefinição.",
+            [
+              {
+                text: "Agora não",
+                style: "cancel",
+              },
+              {
+                text: "Enviar e-mail",
+                onPress: () => {
+                  void handleForgotPassword();
+                },
+              },
+            ],
+          );
+          setFailedPasswordAttempts(0);
+          setStatus({ message: "", type: "error" });
+          return;
+        }
+
+        setStatus({
+          message: `Senha incorreta. Tentativa ${nextAttempts} de 3.`,
+          type: "error",
+        });
+        return;
+      }
+
       const message =
         error instanceof Error ? error.message : "Erro ao fazer login.";
       setStatus({ message: `Falha no login: ${message}`, type: "error" });
@@ -67,6 +114,41 @@ export default function LoginScreen() {
 
   function handleGuestAccess() {
     router.replace("/(tabs)");
+  }
+
+  async function handleForgotPassword() {
+    if (!email) {
+      setStatus({
+        message: "Informe seu e-mail para recuperar a senha.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setStatus({ message: "Informe um e-mail válido.", type: "error" });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await authService.sendPasswordReset(email);
+      setStatus({
+        message: "Enviamos um e-mail com instruções para redefinir sua senha.",
+        type: "success",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Erro ao enviar e-mail de redefinição.";
+      setStatus({
+        message: `Não foi possível recuperar a senha: ${message}`,
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -146,7 +228,7 @@ export default function LoginScreen() {
         />
 
         {/* ── Esqueci senha ────────────────────── */}
-        <Pressable disabled={loading}>
+        <Pressable disabled={loading} onPress={handleForgotPassword}>
           <Text style={loginStyles.forgotPassword}>Esqueci minha senha</Text>
         </Pressable>
 

@@ -35,6 +35,11 @@ function validateEmailField(email: string): string {
   return "";
 }
 
+function validateNameField(displayName: string): string {
+  if (!displayName.trim()) return "Nome é obrigatório";
+  return "";
+}
+
 function validateBirthDateField(birthDate: string, required = true): string {
   if (!birthDate) {
     return required ? "Data de nascimento é obrigatória" : "";
@@ -55,6 +60,7 @@ export default function SignupUserScreen() {
   const router = useRouter();
 
   const [formData, setFormData] = useState<UserSignupData>({
+    displayName: "",
     email: "",
     birthDate: "",
     password: "",
@@ -83,6 +89,7 @@ export default function SignupUserScreen() {
   }
 
   function getFieldError(field: keyof UserSignupData): string {
+    if (field === "displayName") return validateNameField(formData.displayName);
     if (field === "email") return validateEmailField(formData.email);
     if (field === "birthDate")
       return validateBirthDateField(formData.birthDate, false);
@@ -93,6 +100,7 @@ export default function SignupUserScreen() {
   // ── Validação do formulário completo ─────────────────────────
   function validateAll(): boolean {
     const newErrors: FormErrors = {
+      displayName: validateNameField(formData.displayName),
       email: validateEmailField(formData.email),
       birthDate: validateBirthDateField(formData.birthDate),
       password: validatePasswordField(formData.password),
@@ -104,7 +112,12 @@ export default function SignupUserScreen() {
     });
 
     setErrors(newErrors);
-    setTouched({ email: true, birthDate: true, password: true });
+    setTouched({
+      displayName: true,
+      email: true,
+      birthDate: true,
+      password: true,
+    });
     return Object.keys(newErrors).length === 0;
   }
 
@@ -163,6 +176,16 @@ export default function SignupUserScreen() {
 
           {/* Seção: Informações Pessoais */}
           <View style={signupStyles.formSection}>
+            <FormInput
+              placeholder="Seu nome completo"
+              value={formData.displayName}
+              onChangeText={(v) => updateField("displayName", v)}
+              onBlur={() => blurField("displayName")}
+              error={errors.displayName}
+              touched={touched.displayName}
+              editable={!loading}
+            />
+
             <FormInput
               placeholder="seu.email@exemplo.com"
               autoCapitalize="none"

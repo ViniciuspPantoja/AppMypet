@@ -10,10 +10,16 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getAuth, updateEmail, updateProfile } from "firebase/auth";
+import {
+    getAuth,
+    updateEmail,
+    updatePassword,
+    updateProfile,
+} from "firebase/auth";
 import {
     collection,
     doc,
+    getDoc,
     getDocs,
     query,
     setDoc,
@@ -42,6 +48,7 @@ export default function MyPetScreen() {
     displayName: "",
     birthDate: "",
     email: "",
+    password: "",
   });
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ message: string; type: StatusType }>({
@@ -56,15 +63,23 @@ export default function MyPetScreen() {
       const db = getFirestoreDb();
 
       if (auth.currentUser) {
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+
         const petsQuery = query(
           collection(db, "pets"),
           where("tutorUid", "==", auth.currentUser.uid),
         );
 
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        const birthDate =
+          typeof userData.birthDate === "string" ? userData.birthDate : "";
+
         setUserProfile({
           uid: auth.currentUser.uid,
           email: auth.currentUser.email || "",
           displayName: auth.currentUser.displayName || "Usuário",
+          birthDate,
           photoUrl: auth.currentUser.photoURL || undefined,
           createdAt: new Date(
             auth.currentUser.metadata?.creationTime || Date.now(),
@@ -85,8 +100,9 @@ export default function MyPetScreen() {
         // Inicializa dados do formulário de edição
         setEditForm({
           displayName: auth.currentUser.displayName || "",
-          birthDate: "",
+          birthDate,
           email: auth.currentUser.email || "",
+          password: "",
         });
       }
     } finally {
@@ -216,6 +232,30 @@ export default function MyPetScreen() {
                   autoCapitalize="none"
                 />
 
+                <View style={myPetStyles.infoItem}>
+                  <View style={myPetStyles.passwordHeaderRow}>
+                    <Text style={myPetStyles.infoLabel}>Senha</Text>
+                    <Pressable
+                      style={myPetStyles.passwordToggleButton}
+                      onPress={() => setShowPassword((prev) => !prev)}
+                      disabled={saving}
+                    >
+                      <Text style={myPetStyles.passwordToggleIcon}>
+                        {passwordToggleIcon}
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <Text style={myPetStyles.infoValue}>
+                    {passwordDisplayText}
+                  </Text>
+
+                  <Text style={myPetStyles.sectionActionText}>
+                    A senha atual não pode ser exibida. Digite uma nova senha
+                    abaixo para alterá-la.
+                  </Text>
+                </View>
+
                 <FormInput
                   placeholder="DD/MM/AAAA"
                   value={editForm.birthDate}
@@ -224,6 +264,16 @@ export default function MyPetScreen() {
                   }
                   editable={!saving}
                   maxLength={10}
+                />
+
+                <FormInput
+                  placeholder="Nova senha"
+                  value={editForm.password}
+                  onChangeText={(v) =>
+                    setEditForm((p) => ({ ...p, password: v }))
+                  }
+                  editable={!saving}
+                  secureTextEntry
                 />
 
                 {/* form inputs only; save/cancel rendered below to replace the Edit button */}
@@ -237,23 +287,21 @@ export default function MyPetScreen() {
               </>
             )}
 
-            {!isEditing && (
-              <View style={myPetStyles.infoGrid}>
-                <View style={myPetStyles.infoItem}>
-                  <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
-                  <Text style={myPetStyles.infoValue}>
-                    {userProfile?.birthDate || "Não informado"}
-                  </Text>
-                </View>
-
-                <View style={myPetStyles.infoItem}>
-                  <Text style={myPetStyles.infoLabel}>Membro desde</Text>
-                  <Text style={myPetStyles.infoValue}>
-                    {userProfile?.createdAt || "Não informado"}
-                  </Text>
-                </View>
+            <View style={myPetStyles.infoGrid}>
+              <View style={myPetStyles.infoItem}>
+                <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
+                <Text style={myPetStyles.infoValue}>
+                  {userProfile?.birthDate || "Não informado"}
+                </Text>
               </View>
-            )}
+
+              <View style={myPetStyles.infoItem}>
+                <Text style={myPetStyles.infoLabel}>Membro desde</Text>
+                <Text style={myPetStyles.infoValue}>
+                  {userProfile?.createdAt || "Não informado"}
+                </Text>
+              </View>
+            </View>
 
             {/* Bottom action: when editing, show Save/Cancel; otherwise show Edit */}
             {isEditing ? (
@@ -293,6 +341,14 @@ export default function MyPetScreen() {
                       return;
                     }
 
+                    if (editForm.password && editForm.password.length < 6) {
+                      setStatus({
+                        message: "A senha deve ter no mínimo 6 caracteres.",
+                        type: "error",
+                      });
+                      return;
+                    }
+
                     try {
                       setSaving(true);
                       // Update email if changed
@@ -314,6 +370,13 @@ export default function MyPetScreen() {
                           setSaving(false);
                           return;
                         }
+                      }
+
+                      if (editForm.password) {
+                        await updatePassword(
+                          auth.currentUser,
+                          editForm.password,
+                        );
                       }
 
                       // Update auth profile
@@ -343,6 +406,8 @@ export default function MyPetScreen() {
                           : prev,
                       );
 
+                      setEditForm((prev) => ({ ...prev, password: "" }));
+
                       setStatus({ message: "", type: "success" });
                       setShowSuccessModal(true);
                       setIsEditing(false);
@@ -371,6 +436,7 @@ export default function MyPetScreen() {
                       displayName: userProfile?.displayName || "",
                       birthDate: userProfile?.birthDate || "",
                       email: userProfile?.email || "",
+                      password: "",
                     });
                     setStatus({ message: "", type: "success" });
                   }}
@@ -388,6 +454,7 @@ export default function MyPetScreen() {
                     displayName: userProfile?.displayName || "",
                     birthDate: userProfile?.birthDate || "",
                     email: userProfile?.email || "",
+                    password: "",
                   });
                   setStatus({ message: "", type: "success" });
                 }}

@@ -8,10 +8,24 @@ interface FormInputProps extends TextInputProps {
   error?: string;
   hint?: string;
   touched?: boolean;
+  rightAccessory?: React.ReactNode;
 }
 
 export const FormInput = React.forwardRef<TextInput, FormInputProps>(
-  ({ label, error, hint, touched, style, onFocus, onBlur, ...props }, ref) => {
+  (
+    {
+      label,
+      error,
+      hint,
+      touched,
+      style,
+      onFocus,
+      onBlur,
+      rightAccessory,
+      ...props
+    },
+    ref,
+  ) => {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleFocus: NonNullable<TextInputProps["onFocus"]> = (e) => {
@@ -30,19 +44,30 @@ export const FormInput = React.forwardRef<TextInput, FormInputProps>(
       <View style={formInputStyles.wrapper}>
         {label && <Text style={formInputStyles.label}>{label}</Text>}
 
-        <TextInput
-          ref={ref}
+        <View
           style={[
-            formInputStyles.input,
-            isFocused && !hasError && formInputStyles.inputFocused,
-            hasError && formInputStyles.inputWithError,
-            style,
+            formInputStyles.inputRow,
+            isFocused && !hasError && formInputStyles.inputRowFocused,
+            hasError && formInputStyles.inputRowWithError,
           ]}
-          placeholderTextColor={colors.textHint}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          {...props}
-        />
+        >
+          <TextInput
+            ref={ref}
+            style={[
+              formInputStyles.input,
+              style,
+              rightAccessory && formInputStyles.inputWithAccessory,
+            ]}
+            placeholderTextColor={colors.textHint}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            {...props}
+          />
+
+          {rightAccessory && (
+            <View style={formInputStyles.rightAccessory}>{rightAccessory}</View>
+          )}
+        </View>
 
         {hasError && <Text style={formInputStyles.fieldError}>{error}</Text>}
 

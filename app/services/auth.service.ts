@@ -3,6 +3,7 @@ import { CompanySignupData, UserSignupData } from "@/types/signup.types";
 import {
     createUserWithEmailAndPassword,
     getAuth,
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
     updateProfile,
@@ -31,6 +32,14 @@ async function signOutCurrentUser(): Promise<void> {
   await signOut(auth);
 }
 
+async function sendPasswordReset(email: string): Promise<void> {
+  const auth = getAuthInstance();
+  await sendPasswordResetEmail(auth, email.trim(), {
+    url: "https://mypetzone-3ff92.firebaseapp.com",
+    handleCodeInApp: false,
+  });
+}
+
 async function registerUserAccount(
   data: UserSignupData,
 ): Promise<UserCredential> {
@@ -43,10 +52,13 @@ async function registerUserAccount(
     data.password,
   );
 
-  await updateProfile(credential.user, { displayName: "User" });
+  await updateProfile(credential.user, {
+    displayName: data.displayName.trim(),
+  });
 
   await setDoc(doc(db, "users", credential.user.uid), {
     email: data.email,
+    displayName: data.displayName.trim(),
     birthDate: data.birthDate,
     accountType: "user",
     createdAt: new Date().toISOString(),
@@ -86,6 +98,7 @@ async function registerCompanyAccount(
 const authService = {
   signIn,
   signOutCurrentUser,
+  sendPasswordReset,
   registerUserAccount,
   registerCompanyAccount,
 };

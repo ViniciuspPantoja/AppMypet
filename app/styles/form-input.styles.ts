@@ -2,10 +2,30 @@ import { StyleSheet } from "react-native";
 import { colors, radius, spacing, typography } from "./tokens/tokens";
 
 export const formInputStyles = StyleSheet.create({
-
   wrapper: {
     width: "100%",
     marginBottom: spacing.sm,
+  },
+
+  inputRow: {
+    width: "100%",
+    minHeight: 52,
+    backgroundColor: colors.cream,
+    borderRadius: radius.pill,
+    borderWidth: 2,
+    borderColor: colors.creamDark,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  inputRowFocused: {
+    borderColor: colors.terracotta,
+    borderWidth: 2,
+  },
+
+  inputRowWithError: {
+    borderColor: colors.statusError,
+    borderWidth: 2,
   },
 
   label: {
@@ -17,25 +37,19 @@ export const formInputStyles = StyleSheet.create({
   },
 
   input: {
-    width: "100%",
+    flex: 1,
     height: 52,
-    backgroundColor: colors.cream,
-    borderRadius: radius.pill,
     paddingHorizontal: spacing.lg,
     fontSize: 15,
     color: colors.wine,
-    borderWidth: 2,
-    borderColor: colors.creamDark,
   },
 
-  inputFocused: {
-    borderColor: colors.terracotta,
-    borderWidth: 2,
+  inputWithAccessory: {
+    paddingRight: spacing.sm,
   },
 
-  inputWithError: {
-    borderColor: colors.statusError,
-    borderWidth: 2,
+  rightAccessory: {
+    paddingRight: spacing.md,
   },
 
   fieldError: {

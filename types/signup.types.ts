@@ -8,6 +8,7 @@ export type SignupType = "user" | "company";
  * Dados do cadastro de Usuário
  */
 export interface UserSignupData {
+  displayName: string;
   email: string;
   birthDate: string; // DD/MM/YYYY
   password: string;
