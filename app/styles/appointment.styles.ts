@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
 import { colors, radius, spacing, typography } from "./tokens/tokens";
 
+const CALENDAR_GAP = 4;
+const CALENDAR_COLUMN_WIDTH = "13.12%";
+
 export const appointmentStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -165,11 +168,15 @@ export const appointmentStyles = StyleSheet.create({
 
   weekRow: {
     flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: spacing.sm,
+    gap: CALENDAR_GAP,
   },
 
   weekDay: {
-    flex: 1,
+    width: CALENDAR_COLUMN_WIDTH,
     textAlign: "center",
     ...typography.label,
     color: colors.cream,
@@ -181,11 +188,12 @@ export const appointmentStyles = StyleSheet.create({
   calendarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: CALENDAR_GAP,
+    justifyContent: "center",
   },
 
   dayCell: {
-    width: "13.6%",
+    width: CALENDAR_COLUMN_WIDTH,
     minHeight: 58,
     borderRadius: 14,
     backgroundColor: "rgba(255,255,255,0.05)",
@@ -493,6 +501,18 @@ export const appointmentStyles = StyleSheet.create({
     opacity: 0.7,
     textTransform: "uppercase",
     marginBottom: spacing.xs,
+  },
+
+  modalInput: {
+    minHeight: 46,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    backgroundColor: colors.cream,
+    color: colors.wineMedium,
+    borderWidth: 1.5,
+    borderColor: colors.creamDark,
+    ...typography.body,
   },
 
   petChipsRow: {
