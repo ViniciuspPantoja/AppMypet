@@ -1,8 +1,12 @@
 import appointmentService from "@/app/services/appointment.service";
 import { appointmentStyles } from "@/app/styles/appointment.styles";
+import { getFirebaseApp, getFirestoreDb } from "@/database/firebase/firebase";
 import type { Appointment } from "@/types/appointment.types";
+import type { Pet } from "@/types/pet.types";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { getAuth } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -19,7 +23,6 @@ import {
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const INITIAL_FORM = {
-  petName: "",
   title: "",
   date: TODAY,
   time: "09:00",
@@ -45,13 +48,18 @@ function isValidTime(value: string): boolean {
 
 export default function AppointmentScreen() {
   const router = useRouter();
+  const auth = useMemo(() => getAuth(getFirebaseApp()), []);
+  const db = useMemo(() => getFirestoreDb(), []);
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingPets, setLoadingPets] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [activeMonth, setActiveMonth] = useState(new Date());
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   useEffect(() => {
     load();
@@ -70,6 +78,38 @@ export default function AppointmentScreen() {
       setLoading(false);
     }
   }
+
+  const loadPets = useCallback(async () => {
+    if (!auth.currentUser) {
+      setPets([]);
+      setSelectedPetId(null);
+      return;
+    }
+
+    try {
+      setLoadingPets(true);
+      const q = query(
+        collection(db, "pets"),
+        where("tutorUid", "==", auth.currentUser.uid),
+      );
+      const snap = await getDocs(q);
+      const items = snap.docs.map((petDoc) => ({
+        ...(petDoc.data() as Pet),
+        id: petDoc.id,
+      }));
+      setPets(items);
+      setSelectedPetId((current) => current ?? items[0]?.id ?? null);
+    } catch {
+      setPets([]);
+      setSelectedPetId(null);
+    } finally {
+      setLoadingPets(false);
+    }
+  }, [auth.currentUser, db]);
+
+  useEffect(() => {
+    void loadPets();
+  }, [loadPets]);
 
   // ── Calendário ──────────────────────────────────────────────────────────────
 
@@ -121,6 +161,7 @@ export default function AppointmentScreen() {
   function openModal() {
     // Sincroniza o formulário com o dia selecionado no calendário
     setForm({ ...INITIAL_FORM, date: selectedDate });
+    setSelectedPetId(pets[0]?.id ?? null);
     setShowModal(true);
   }
 
@@ -132,8 +173,18 @@ export default function AppointmentScreen() {
   // ── Salvar ──────────────────────────────────────────────────────────────────
 
   async function save() {
-    if (!form.title.trim() || !form.petName.trim()) {
-      Alert.alert("Campos obrigatórios", "Preencha o nome do pet e o título.");
+    if (!auth.currentUser) {
+      Alert.alert("Autenticação necessária", "Você precisa estar logado.");
+      return;
+    }
+
+    if (!selectedPetId) {
+      Alert.alert("Selecione um pet", "Escolha um pet para criar o evento.");
+      return;
+    }
+
+    if (!form.title.trim()) {
+      Alert.alert("Campos obrigatórios", "Preencha o título do evento.");
       return;
     }
 
@@ -151,14 +202,19 @@ export default function AppointmentScreen() {
     }
 
     try {
+      const pet = pets.find((item) => item.id === selectedPetId);
+
       await appointmentService.create({
-        petName: form.petName.trim(),
+        petId: selectedPetId,
+        petName: pet?.name || "",
         title: form.title.trim(),
         date: form.date,
         time: form.time,
         location: form.location.trim(),
         notes: form.notes.trim(),
         status: "scheduled",
+        userUid: auth.currentUser.uid,
+        userEmail: auth.currentUser.email || "",
       } as Appointment);
 
       closeModal();
@@ -380,103 +436,152 @@ export default function AppointmentScreen() {
       <Modal visible={showModal} transparent animationType="fade">
         <View style={appointmentStyles.modalBackdrop}>
           <View style={appointmentStyles.modalCard}>
-            <View style={appointmentStyles.modalHeader}>
-              <Text style={appointmentStyles.modalTitle}>Nova Consulta</Text>
-              <TouchableOpacity
-                style={appointmentStyles.modalCloseButton}
-                onPress={closeModal}
-                accessibilityLabel="Fechar modal"
-                accessibilityRole="button"
-              >
-                <Text style={appointmentStyles.modalCloseText}>✕</Text>
-              </TouchableOpacity>
-            </View>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={appointmentStyles.modalScrollContent}
+            >
+              <View style={appointmentStyles.modalHeader}>
+                <Text style={appointmentStyles.modalTitle}>Nova Consulta</Text>
+                <TouchableOpacity
+                  style={appointmentStyles.modalCloseButton}
+                  onPress={closeModal}
+                  accessibilityLabel="Fechar modal"
+                  accessibilityRole="button"
+                >
+                  <Text style={appointmentStyles.modalCloseText}>✕</Text>
+                </TouchableOpacity>
+              </View>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Pet *</Text>
-              <TextInput
-                placeholder="Nome do pet"
-                value={form.petName}
-                onChangeText={(t) => setForm((s) => ({ ...s, petName: t }))}
-                style={appointmentStyles.modalInput}
-                returnKeyType="next"
-              />
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>Pet *</Text>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Título *</Text>
-              <TextInput
-                placeholder="Ex: Consulta veterinária"
-                value={form.title}
-                onChangeText={(t) => setForm((s) => ({ ...s, title: t }))}
-                style={appointmentStyles.modalInput}
-                returnKeyType="next"
-              />
-            </View>
+                {loadingPets ? (
+                  <ActivityIndicator style={{ marginTop: 12 }} />
+                ) : pets.length > 0 ? (
+                  <View style={appointmentStyles.petChipsRow}>
+                    {pets.map((pet) => {
+                      const isActive = selectedPetId === pet.id;
+                      return (
+                        <TouchableOpacity
+                          key={pet.id}
+                          style={[
+                            appointmentStyles.petChip,
+                            isActive && appointmentStyles.petChipActive,
+                          ]}
+                          onPress={() => setSelectedPetId(pet.id)}
+                        >
+                          <Text
+                            style={[
+                              appointmentStyles.petChipText,
+                              isActive && appointmentStyles.petChipTextActive,
+                            ]}
+                          >
+                            {pet.name}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <>
+                    <Text style={appointmentStyles.formHint}>
+                      Nenhum pet cadastrado para selecionar.
+                    </Text>
+                    <TouchableOpacity
+                      style={appointmentStyles.linkButton}
+                      onPress={() => {
+                        closeModal();
+                        router.push("/pet-register");
+                      }}
+                    >
+                      <Text style={appointmentStyles.linkButtonText}>
+                        Cadastrar pet
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Data *</Text>
-              <TextInput
-                placeholder="AAAA-MM-DD"
-                value={form.date}
-                onChangeText={(t) => setForm((s) => ({ ...s, date: t }))}
-                style={appointmentStyles.modalInput}
-                keyboardType="numeric"
-                maxLength={10}
-                returnKeyType="next"
-              />
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>
+                  Título *
+                </Text>
+                <TextInput
+                  placeholder="Ex: Consulta veterinária"
+                  value={form.title}
+                  onChangeText={(t) => setForm((s) => ({ ...s, title: t }))}
+                  style={appointmentStyles.modalInput}
+                  returnKeyType="next"
+                />
+              </View>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Hora *</Text>
-              <TextInput
-                placeholder="HH:MM"
-                value={form.time}
-                onChangeText={(t) => setForm((s) => ({ ...s, time: t }))}
-                style={appointmentStyles.modalInput}
-                keyboardType="numeric"
-                maxLength={5}
-                returnKeyType="next"
-              />
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>Data *</Text>
+                <TextInput
+                  placeholder="AAAA-MM-DD"
+                  value={form.date}
+                  onChangeText={(t) => setForm((s) => ({ ...s, date: t }))}
+                  style={appointmentStyles.modalInput}
+                  keyboardType="numeric"
+                  maxLength={10}
+                  returnKeyType="next"
+                />
+              </View>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Local</Text>
-              <TextInput
-                placeholder="Clínica, Pet shop..."
-                value={form.location}
-                onChangeText={(t) => setForm((s) => ({ ...s, location: t }))}
-                style={appointmentStyles.modalInput}
-                returnKeyType="next"
-              />
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>Hora *</Text>
+                <TextInput
+                  placeholder="HH:MM"
+                  value={form.time}
+                  onChangeText={(t) => setForm((s) => ({ ...s, time: t }))}
+                  style={appointmentStyles.modalInput}
+                  keyboardType="numeric"
+                  maxLength={5}
+                  returnKeyType="next"
+                />
+              </View>
 
-            <View style={appointmentStyles.modalSection}>
-              <Text style={appointmentStyles.modalSectionTitle}>Notas</Text>
-              <TextInput
-                placeholder="Observações"
-                value={form.notes}
-                onChangeText={(t) => setForm((s) => ({ ...s, notes: t }))}
-                style={appointmentStyles.modalInput}
-                multiline
-                numberOfLines={3}
-              />
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>Local</Text>
+                <TextInput
+                  placeholder="Clínica, Pet shop..."
+                  value={form.location}
+                  onChangeText={(t) => setForm((s) => ({ ...s, location: t }))}
+                  style={appointmentStyles.modalInput}
+                  returnKeyType="next"
+                />
+              </View>
 
-            <View style={appointmentStyles.modalButtonRow}>
-              <TouchableOpacity
-                style={appointmentStyles.cancelButton}
-                onPress={closeModal}
-              >
-                <Text style={appointmentStyles.cancelButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={appointmentStyles.saveButton}
-                onPress={save}
-              >
-                <Text style={appointmentStyles.saveButtonText}>Salvar</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={appointmentStyles.modalSection}>
+                <Text style={appointmentStyles.modalSectionTitle}>Notas</Text>
+                <TextInput
+                  placeholder="Observações"
+                  value={form.notes}
+                  onChangeText={(t) => setForm((s) => ({ ...s, notes: t }))}
+                  style={appointmentStyles.modalInput}
+                  multiline
+                  numberOfLines={3}
+                />
+              </View>
+
+              <View style={appointmentStyles.modalButtonRow}>
+                <TouchableOpacity
+                  style={appointmentStyles.cancelButton}
+                  onPress={closeModal}
+                >
+                  <Text style={appointmentStyles.cancelButtonText}>
+                    Cancelar
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={appointmentStyles.saveButton}
+                  onPress={save}
+                >
+                  <Text style={appointmentStyles.saveButtonText}>Salvar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

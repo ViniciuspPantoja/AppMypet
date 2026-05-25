@@ -460,6 +460,10 @@ export const appointmentStyles = StyleSheet.create({
     maxHeight: "92%",
   },
 
+  modalScrollContent: {
+    paddingBottom: spacing.sm,
+  },
+
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -552,6 +556,24 @@ export const appointmentStyles = StyleSheet.create({
     opacity: 0.55,
     marginTop: spacing.xs,
     lineHeight: 17,
+  },
+
+  linkButton: {
+    alignSelf: "flex-start",
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.cream,
+    backgroundColor: "rgba(245,236,215,0.08)",
+  },
+
+  linkButtonText: {
+    ...typography.caption,
+    color: colors.cream,
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   modalButtonRow: {
