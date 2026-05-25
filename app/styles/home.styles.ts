@@ -2,7 +2,7 @@ import { Dimensions, StyleSheet } from "react-native";
 import { colors, radius, spacing, typography } from "./tokens/tokens";
 
 const { width } = Dimensions.get("window");
-const CARD_SIZE = (width - spacing.lg * 2 - spacing.sm * 3) / 2;
+const CARD_SIZE = (width - spacing.md * 2 - spacing.sm) / 2;
 
 export const homeStyles = StyleSheet.create({
   // ── Tela ────────────────────────────────────────────────────
@@ -138,6 +138,7 @@ export const homeStyles = StyleSheet.create({
   // ── Grid de Cards ───────────────────────────────────────────
   gridRow: {
     flexDirection: "row",
+    justifyContent: "center",
     gap: spacing.sm,
     marginBottom: spacing.sm,
   },

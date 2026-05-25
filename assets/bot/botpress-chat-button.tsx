@@ -1,14 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-    Modal,
-    SafeAreaView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Modal, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
+import { BOTPRESS_BRAND_COLOR } from "./botpress-config";
 import { BOTPRESS_HTML } from "./botpress-html";
+import { botpressNativeStyles } from "./botpress-native.styles";
 
 interface BotpressChatButtonProps {
   position?: "bottom-right" | "bottom-left";
@@ -21,7 +17,7 @@ interface BotpressChatButtonProps {
 export default function BotpressChatButton({
   position = "bottom-right",
   size = 60,
-  backgroundColor = "#6366f1",
+  backgroundColor = BOTPRESS_BRAND_COLOR,
   iconColor = "#fff",
   bottomOffset = 20,
 }: BotpressChatButtonProps) {
@@ -34,10 +30,9 @@ export default function BotpressChatButton({
 
   return (
     <>
-      {/* Botão flutuante */}
       <TouchableOpacity
         style={[
-          styles.button,
+          botpressNativeStyles.button,
           {
             width: size,
             height: size,
@@ -52,24 +47,27 @@ export default function BotpressChatButton({
         <MaterialIcons name="chat" size={size / 2} color={iconColor} />
       </TouchableOpacity>
 
-      {/* Modal com o chat */}
       <Modal
         visible={isOpen}
         animationType="slide"
         presentationStyle="pageSheet"
         onRequestClose={() => setIsOpen(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.header}>
-            <View style={styles.headerContent}>
-              <MaterialIcons name="support-agent" size={20} color="#6366f1" />
-              <View style={styles.headerText}>
-                <View style={styles.headerTitle}>Suporte MyPet</View>
-                <View style={styles.headerSubtitle}>Online</View>
+        <SafeAreaView style={botpressNativeStyles.modalContainer}>
+          <View style={botpressNativeStyles.header}>
+            <View style={botpressNativeStyles.headerContent}>
+              <MaterialIcons
+                name="support-agent"
+                size={20}
+                color={BOTPRESS_BRAND_COLOR}
+              />
+              <View style={botpressNativeStyles.headerText}>
+                <Text style={botpressNativeStyles.headerTitle}>Suporte MyPet</Text>
+                <Text style={botpressNativeStyles.headerSubtitle}>Online</Text>
               </View>
             </View>
             <TouchableOpacity
-              style={styles.closeButton}
+              style={botpressNativeStyles.closeButton}
               onPress={() => setIsOpen(false)}
             >
               <MaterialIcons name="close" size={24} color="#1f2937" />
@@ -78,7 +76,7 @@ export default function BotpressChatButton({
 
           <WebView
             source={{ html: BOTPRESS_HTML }}
-            style={styles.webview}
+            style={botpressNativeStyles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             startInLoadingState={true}
@@ -88,56 +86,3 @@ export default function BotpressChatButton({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    position: "absolute",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 999,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    backgroundColor: "#fff",
-  },
-  headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    flex: 1,
-  },
-  headerText: {
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 2,
-  },
-  closeButton: {
-    padding: 8,
-  },
-  webview: {
-    flex: 1,
-  },
-});

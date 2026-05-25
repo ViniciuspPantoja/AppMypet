@@ -55,7 +55,7 @@ export default function LoginScreen() {
       setLoading(true);
       await authService.signIn(email, password);
       setFailedPasswordAttempts(0);
-      router.replace("/(tabs)");
+      router.replace("/home");
     } catch (error) {
       const errorCode =
         typeof error === "object" && error !== null && "code" in error
@@ -113,7 +113,7 @@ export default function LoginScreen() {
   }
 
   function handleGuestAccess() {
-    router.replace("/(tabs)");
+    router.replace("/home");
   }
 
   async function handleForgotPassword() {

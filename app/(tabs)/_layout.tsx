@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 
-import BotpressChatButton from "@/components/botpress-chat-button";
+import BotpressChatButton from "@/assets/bot/botpress-chat-button";
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
@@ -13,6 +13,7 @@ export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
       <Tabs
+        initialRouteName="home"
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
@@ -20,7 +21,7 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="index"
+          name="home"
           options={{
             title: "Home",
             tabBarIcon: ({ color }) => (
@@ -40,11 +41,7 @@ export default function TabLayout() {
       </Tabs>
 
       {/* Botão flutuante de suporte */}
-      <BotpressChatButton
-        position="bottom-right"
-        backgroundColor="#6366f1"
-        bottomOffset={80}
-      />
+      <BotpressChatButton position="bottom-right" bottomOffset={80} />
     </View>
   );
 }

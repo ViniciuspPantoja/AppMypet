@@ -1,25 +1,48 @@
+import { auth } from "@/database/firebase/firebase";
 import {
     DarkTheme,
     DefaultTheme,
     ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useRef, useState } from "react";
 import { useColorScheme } from "react-native";
 import AppLoadingScreen from "./loading";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  const segments = useSegments();
   const [loading, setLoading] = useState(true);
+  const hasForcedInitialLoginRef = useRef(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const unsubscribe = onAuthStateChanged(auth, () => {
       setLoading(false);
-    }, 2000);
+    });
 
-    return () => clearTimeout(timer);
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (hasForcedInitialLoginRef.current) {
+      return;
+    }
+
+    hasForcedInitialLoginRef.current = true;
+
+    const inAuthGroup = segments[0] === "(auth)";
+
+    if (!inAuthGroup) {
+      router.replace("/login");
+    }
+  }, [loading, router, segments]);
 
   if (loading) {
     return <AppLoadingScreen />;
