@@ -10,12 +10,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import {
-    getAuth,
-    updateEmail,
-    updatePassword,
-    updateProfile,
-} from "firebase/auth";
+import { getAuth, updateEmail, updateProfile } from "firebase/auth";
 import {
     collection,
     doc,
@@ -36,7 +31,7 @@ import {
     SafeAreaView,
     ScrollView,
     Text,
-    View,
+    View
 } from "react-native";
 import { myPetStyles } from "../styles/my-pet.styles";
 
@@ -50,7 +45,6 @@ export default function MyPetScreen() {
     displayName: "",
     birthDate: "",
     email: "",
-    password: "",
   });
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ message: string; type: StatusType }>({
@@ -104,7 +98,6 @@ export default function MyPetScreen() {
           displayName: auth.currentUser.displayName || "",
           birthDate,
           email: auth.currentUser.email || "",
-          password: "",
         });
       }
     } finally {
@@ -288,30 +281,6 @@ export default function MyPetScreen() {
                     autoCapitalize="none"
                   />
 
-                  <View style={myPetStyles.infoItem}>
-                    <View style={myPetStyles.passwordHeaderRow}>
-                      <Text style={myPetStyles.infoLabel}>Senha</Text>
-                      <Pressable
-                        style={myPetStyles.passwordToggleButton}
-                        onPress={() => setShowPassword((prev) => !prev)}
-                        disabled={saving}
-                      >
-                        <Text style={myPetStyles.passwordToggleIcon}>
-                          {passwordToggleIcon}
-                        </Text>
-                      </Pressable>
-                    </View>
-
-                    <Text style={myPetStyles.infoValue}>
-                      {passwordDisplayText}
-                    </Text>
-
-                    <Text style={myPetStyles.sectionActionText}>
-                      A senha atual não pode ser exibida. Digite uma nova senha
-                      abaixo para alterá-la.
-                    </Text>
-                  </View>
-
                   <FormInput
                     placeholder="DD/MM/AAAA"
                     value={editForm.birthDate}
@@ -322,16 +291,6 @@ export default function MyPetScreen() {
                     maxLength={10}
                   />
 
-                  <FormInput
-                    placeholder="Nova senha"
-                    value={editForm.password}
-                    onChangeText={(v) =>
-                      setEditForm((p) => ({ ...p, password: v }))
-                    }
-                    editable={!saving}
-                    secureTextEntry
-                  />
-
                   {/* form inputs only; save/cancel rendered below to replace the Edit button */}
                 </>
               ) : (
@@ -340,24 +299,26 @@ export default function MyPetScreen() {
                     {userProfile?.displayName || "Usuário"}
                   </Text>
                   <Text style={myPetStyles.email}>{userProfile?.email}</Text>
+
+                  <View style={myPetStyles.infoGrid}>
+                    <View style={myPetStyles.infoItem}>
+                      <Text style={myPetStyles.infoLabel}>
+                        Data de nascimento
+                      </Text>
+                      <Text style={myPetStyles.infoValue}>
+                        {userProfile?.birthDate || "Não informado"}
+                      </Text>
+                    </View>
+
+                    <View style={myPetStyles.infoItem}>
+                      <Text style={myPetStyles.infoLabel}>Membro desde</Text>
+                      <Text style={myPetStyles.infoValue}>
+                        {userProfile?.createdAt || "Não informado"}
+                      </Text>
+                    </View>
+                  </View>
                 </>
               )}
-
-              <View style={myPetStyles.infoGrid}>
-                <View style={myPetStyles.infoItem}>
-                  <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
-                  <Text style={myPetStyles.infoValue}>
-                    {userProfile?.birthDate || "Não informado"}
-                  </Text>
-                </View>
-
-                <View style={myPetStyles.infoItem}>
-                  <Text style={myPetStyles.infoLabel}>Membro desde</Text>
-                  <Text style={myPetStyles.infoValue}>
-                    {userProfile?.createdAt || "Não informado"}
-                  </Text>
-                </View>
-              </View>
 
               {/* Bottom action: when editing, show Save/Cancel; otherwise show Edit */}
               {isEditing ? (
@@ -395,14 +356,6 @@ export default function MyPetScreen() {
                       if (editForm.email && !isValidEmail(editForm.email)) {
                         setStatus({
                           message: "Email inválido.",
-                          type: "error",
-                        });
-                        return;
-                      }
-
-                      if (editForm.password && editForm.password.length < 6) {
-                        setStatus({
-                          message: "A senha deve ter no mínimo 6 caracteres.",
                           type: "error",
                         });
                         return;
@@ -465,8 +418,6 @@ export default function MyPetScreen() {
                             : prev,
                         );
 
-                        setEditForm((prev) => ({ ...prev, password: "" }));
-
                         setStatus({ message: "", type: "success" });
                         setShowSuccessModal(true);
                         setIsEditing(false);
@@ -513,7 +464,6 @@ export default function MyPetScreen() {
                       displayName: userProfile?.displayName || "",
                       birthDate: userProfile?.birthDate || "",
                       email: userProfile?.email || "",
-                      password: "",
                     });
                     setStatus({ message: "", type: "success" });
                   }}
