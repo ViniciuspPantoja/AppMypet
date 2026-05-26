@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { Platform } from "react-native";
 import { useState } from "react";
-import { Modal, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Modal, SafeAreaView, TouchableOpacity } from "react-native";
 import WebView from "react-native-webview";
 import { BOTPRESS_BRAND_COLOR } from "./botpress-config";
 import { BOTPRESS_HTML } from "./botpress-html";
@@ -23,6 +24,11 @@ export default function BotpressChatButton({
 }: BotpressChatButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  function openBotpressWebTab() {
+    const botpressUrl = `data:text/html;charset=utf-8,${encodeURIComponent(BOTPRESS_HTML)}`;
+    window.open(botpressUrl, "_blank", "noopener,noreferrer");
+  }
+
   const positionStyle =
     position === "bottom-right"
       ? { right: 20, bottom: bottomOffset }
@@ -41,48 +47,30 @@ export default function BotpressChatButton({
           },
           positionStyle,
         ]}
-        onPress={() => setIsOpen(true)}
+        onPress={Platform.OS === "web" ? openBotpressWebTab : () => setIsOpen(true)}
         activeOpacity={0.8}
       >
         <MaterialIcons name="chat" size={size / 2} color={iconColor} />
       </TouchableOpacity>
 
-      <Modal
-        visible={isOpen}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <SafeAreaView style={botpressNativeStyles.modalContainer}>
-          <View style={botpressNativeStyles.header}>
-            <View style={botpressNativeStyles.headerContent}>
-              <MaterialIcons
-                name="support-agent"
-                size={20}
-                color={BOTPRESS_BRAND_COLOR}
-              />
-              <View style={botpressNativeStyles.headerText}>
-                <Text style={botpressNativeStyles.headerTitle}>Suporte MyPet</Text>
-                <Text style={botpressNativeStyles.headerSubtitle}>Online</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={botpressNativeStyles.closeButton}
-              onPress={() => setIsOpen(false)}
-            >
-              <MaterialIcons name="close" size={24} color="#1f2937" />
-            </TouchableOpacity>
-          </View>
-
-          <WebView
-            source={{ html: BOTPRESS_HTML }}
-            style={botpressNativeStyles.webview}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            startInLoadingState={true}
-          />
-        </SafeAreaView>
-      </Modal>
+      {Platform.OS === "web" ? null : (
+        <Modal
+          visible={isOpen}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setIsOpen(false)}
+        >
+          <SafeAreaView style={botpressNativeStyles.modalContainer}>
+            <WebView
+              source={{ html: BOTPRESS_HTML }}
+              style={botpressNativeStyles.webview}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={true}
+            />
+          </SafeAreaView>
+        </Modal>
+      )}
     </>
   );
 }

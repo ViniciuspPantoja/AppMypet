@@ -1,6 +1,6 @@
 import {
-  BOTPRESS_BOT_SCRIPT_URL,
-  BOTPRESS_INJECT_SCRIPT_URL,
+    BOTPRESS_BOT_SCRIPT_URL,
+    BOTPRESS_INJECT_SCRIPT_URL,
 } from "./botpress-config";
 import { createBotpressHtml } from "./botpress-web.logic";
 import { BOTPRESS_WEB_CSS } from "./botpress-web.styles";

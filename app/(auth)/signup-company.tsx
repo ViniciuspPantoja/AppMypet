@@ -13,7 +13,9 @@ import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -275,219 +277,229 @@ export default function SignupCompanyScreen() {
 
   return (
     <SafeAreaView style={signupStyles.container}>
-      <ScrollView
-        contentContainerStyle={signupStyles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={signupStyles.card}>
-          <View style={signupStyles.appIconWrapper}>
-            <Text style={signupStyles.appIcon}>🐾</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={signupStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <View style={signupStyles.card}>
+            <View style={signupStyles.appIconWrapper}>
+              <Text style={signupStyles.appIcon}>🐾</Text>
+            </View>
 
-          <Text style={signupStyles.title}>Cadastro de Empresa</Text>
-          <Text style={signupStyles.subtitle}>
-            Complete os dados da sua empresa para criar sua conta.
-          </Text>
+            <Text style={signupStyles.title}>Cadastro de Empresa</Text>
+            <Text style={signupStyles.subtitle}>
+              Complete os dados da sua empresa para criar sua conta.
+            </Text>
 
-          {!!statusMessage && (
-            <StatusMessage
-              type={statusType}
-              message={statusMessage}
-              visible={!!statusMessage}
-              onDismiss={() => setStatusMessage("")}
-            />
-          )}
-
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Dados da Empresa</Text>
-
-            <FormInput
-              placeholder="Nome da empresa"
-              value={formData.businessName}
-              onChangeText={(v) => handleFieldChange("businessName", v)}
-              onBlur={() => handleFieldBlur("businessName")}
-              error={errors.businessName}
-              touched={touched.businessName}
-              editable={!loading}
-            />
-
-            <FormInput
-              placeholder="contato@empresa.com"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={formData.email}
-              onChangeText={(v) => handleFieldChange("email", v)}
-              onBlur={() => handleFieldBlur("email")}
-              error={errors.email}
-              touched={touched.email}
-              editable={!loading}
-            />
-
-            <FormInput
-              placeholder="00.000.000/0000-00"
-              keyboardType="numeric"
-              value={formData.cnpj}
-              onChangeText={(v) => handleFieldChange("cnpj", v)}
-              onBlur={() => handleFieldBlur("cnpj")}
-              error={errors.cnpj}
-              touched={touched.cnpj}
-              editable={!loading}
-              maxLength={18}
-            />
-          </View>
-
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Ramo de Atuação</Text>
-
-            <Pressable
-              onPress={() => setShowSegmentModal(true)}
-              style={signupStyles.inputLikeButton}
-              disabled={loading}
-            >
-              <Text
-                style={[
-                  signupStyles.inputLikeButtonText,
-                  !formData.businessSegment &&
-                    signupStyles.inputLikeButtonPlaceholder,
-                ]}
-              >
-                {formData.businessSegment || "Selecione o ramo"}
-              </Text>
-            </Pressable>
-
-            {errors.businessSegment && touched.businessSegment && (
-              <Text style={signupStyles.errorText}>
-                {errors.businessSegment}
-              </Text>
+            {!!statusMessage && (
+              <StatusMessage
+                type={statusType}
+                message={statusMessage}
+                visible={!!statusMessage}
+                onDismiss={() => setStatusMessage("")}
+              />
             )}
-          </View>
 
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Endereço</Text>
+            <View style={signupStyles.formSection}>
+              <Text style={signupStyles.sectionTitle}>Dados da Empresa</Text>
 
-            <FormInput
-              placeholder="Rua, número, bairro, cidade"
-              value={formData.address}
-              onChangeText={(v) => handleFieldChange("address", v)}
-              onBlur={() => handleFieldBlur("address")}
-              error={errors.address}
-              touched={touched.address}
-              editable={!loading}
-            />
-          </View>
+              <FormInput
+                placeholder="Nome da empresa"
+                value={formData.businessName}
+                onChangeText={(v) => handleFieldChange("businessName", v)}
+                onBlur={() => handleFieldBlur("businessName")}
+                error={errors.businessName}
+                touched={touched.businessName}
+                editable={!loading}
+              />
 
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Parceira</Text>
-            <View style={signupStyles.partnerToggleCard}>
-              <View style={signupStyles.partnerToggleTextBlock}>
-                <Text style={signupStyles.partnerToggleTitle}>
-                  Exibir na tela de parceiros
-                </Text>
-                <Text style={signupStyles.partnerToggleSubtitle}>
-                  Marque esta opção para disponibilizar a empresa no
-                  marketplace.
-                </Text>
-              </View>
+              <FormInput
+                placeholder="contato@empresa.com"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={formData.email}
+                onChangeText={(v) => handleFieldChange("email", v)}
+                onBlur={() => handleFieldBlur("email")}
+                error={errors.email}
+                touched={touched.email}
+                editable={!loading}
+              />
+
+              <FormInput
+                placeholder="00.000.000/0000-00"
+                keyboardType="numeric"
+                value={formData.cnpj}
+                onChangeText={(v) => handleFieldChange("cnpj", v)}
+                onBlur={() => handleFieldBlur("cnpj")}
+                error={errors.cnpj}
+                touched={touched.cnpj}
+                editable={!loading}
+                maxLength={18}
+              />
+            </View>
+
+            <View style={signupStyles.formSection}>
+              <Text style={signupStyles.sectionTitle}>Ramo de Atuação</Text>
 
               <Pressable
-                onPress={() =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    isPartner: !prev.isPartner,
-                  }))
-                }
-                style={[
-                  signupStyles.partnerToggleButton,
-                  formData.isPartner && signupStyles.partnerToggleButtonActive,
-                ]}
+                onPress={() => setShowSegmentModal(true)}
+                style={signupStyles.inputLikeButton}
                 disabled={loading}
               >
                 <Text
                   style={[
-                    signupStyles.partnerToggleButtonText,
-                    formData.isPartner &&
-                      signupStyles.partnerToggleButtonTextActive,
+                    signupStyles.inputLikeButtonText,
+                    !formData.businessSegment &&
+                      signupStyles.inputLikeButtonPlaceholder,
                   ]}
                 >
-                  {formData.isPartner ? "Sim" : "Não"}
+                  {formData.businessSegment || "Selecione o ramo"}
                 </Text>
               </Pressable>
-            </View>
-          </View>
 
-          <View style={signupStyles.formSection}>
-            <Text style={signupStyles.sectionTitle}>Segurança</Text>
-
-            <FormInput
-              placeholder="Senha (Mínimo de 6 caracteres)"
-              secureTextEntry
-              value={formData.password}
-              onChangeText={(v) => handleFieldChange("password", v)}
-              onBlur={() => handleFieldBlur("password")}
-              error={errors.password}
-              touched={touched.password}
-              editable={!loading}
-            />
-          </View>
-
-          <View style={signupStyles.buttonRow}>
-            <Pressable
-              style={[
-                signupStyles.primaryButton,
-                loading && signupStyles.primaryButtonDisabled,
-              ]}
-              onPress={handleSignup}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={signupStyles.primaryButtonText}>Criar conta</Text>
+              {errors.businessSegment && touched.businessSegment && (
+                <Text style={signupStyles.errorText}>
+                  {errors.businessSegment}
+                </Text>
               )}
-            </Pressable>
+            </View>
 
-            <Pressable
-              style={signupStyles.secondaryButton}
-              onPress={() => router.replace("/signup-type")}
-              disabled={loading}
-            >
-              <Text style={signupStyles.secondaryButtonText}>Voltar</Text>
-            </Pressable>
-          </View>
+            <View style={signupStyles.formSection}>
+              <Text style={signupStyles.sectionTitle}>Endereço</Text>
 
-          <Modal
-            visible={showSegmentModal}
-            animationType="slide"
-            transparent={false}
-            onRequestClose={() => setShowSegmentModal(false)}
-          >
-            <SafeAreaView style={signupStyles.modalContainer}>
-              <View style={signupStyles.modalHeader}>
-                <Text style={signupStyles.modalTitle}>Selecione o ramo</Text>
-                <Pressable onPress={() => setShowSegmentModal(false)}>
-                  <Text style={signupStyles.modalCloseText}>Fechar</Text>
+              <FormInput
+                placeholder="Rua, número, bairro, cidade"
+                value={formData.address}
+                onChangeText={(v) => handleFieldChange("address", v)}
+                onBlur={() => handleFieldBlur("address")}
+                error={errors.address}
+                touched={touched.address}
+                editable={!loading}
+              />
+            </View>
+
+            <View style={signupStyles.formSection}>
+              <Text style={signupStyles.sectionTitle}>Parceira</Text>
+              <View style={signupStyles.partnerToggleCard}>
+                <View style={signupStyles.partnerToggleTextBlock}>
+                  <Text style={signupStyles.partnerToggleTitle}>
+                    Exibir na tela de parceiros
+                  </Text>
+                  <Text style={signupStyles.partnerToggleSubtitle}>
+                    Marque esta opção para disponibilizar a empresa no
+                    marketplace.
+                  </Text>
+                </View>
+
+                <Pressable
+                  onPress={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isPartner: !prev.isPartner,
+                    }))
+                  }
+                  style={[
+                    signupStyles.partnerToggleButton,
+                    formData.isPartner &&
+                      signupStyles.partnerToggleButtonActive,
+                  ]}
+                  disabled={loading}
+                >
+                  <Text
+                    style={[
+                      signupStyles.partnerToggleButtonText,
+                      formData.isPartner &&
+                        signupStyles.partnerToggleButtonTextActive,
+                    ]}
+                  >
+                    {formData.isPartner ? "Sim" : "Não"}
+                  </Text>
                 </Pressable>
               </View>
+            </View>
 
-              <FlatList
-                data={BUSINESS_SEGMENTS}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <Pressable
-                    onPress={() => {
-                      handleFieldChange("businessSegment", item);
-                      setShowSegmentModal(false);
-                    }}
-                    style={signupStyles.modalItem}
-                  >
-                    <Text style={signupStyles.modalItemText}>{item}</Text>
-                  </Pressable>
-                )}
+            <View style={signupStyles.formSection}>
+              <Text style={signupStyles.sectionTitle}>Segurança</Text>
+
+              <FormInput
+                placeholder="Senha (Mínimo de 6 caracteres)"
+                secureTextEntry
+                value={formData.password}
+                onChangeText={(v) => handleFieldChange("password", v)}
+                onBlur={() => handleFieldBlur("password")}
+                error={errors.password}
+                touched={touched.password}
+                editable={!loading}
               />
-            </SafeAreaView>
-          </Modal>
-        </View>
-      </ScrollView>
+            </View>
+
+            <View style={signupStyles.buttonRow}>
+              <Pressable
+                style={[
+                  signupStyles.primaryButton,
+                  loading && signupStyles.primaryButtonDisabled,
+                ]}
+                onPress={handleSignup}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={signupStyles.primaryButtonText}>
+                    Criar conta
+                  </Text>
+                )}
+              </Pressable>
+
+              <Pressable
+                style={signupStyles.secondaryButton}
+                onPress={() => router.replace("/signup-type")}
+                disabled={loading}
+              >
+                <Text style={signupStyles.secondaryButtonText}>Voltar</Text>
+              </Pressable>
+            </View>
+
+            <Modal
+              visible={showSegmentModal}
+              animationType="slide"
+              transparent={false}
+              onRequestClose={() => setShowSegmentModal(false)}
+            >
+              <SafeAreaView style={signupStyles.modalContainer}>
+                <View style={signupStyles.modalHeader}>
+                  <Text style={signupStyles.modalTitle}>Selecione o ramo</Text>
+                  <Pressable onPress={() => setShowSegmentModal(false)}>
+                    <Text style={signupStyles.modalCloseText}>Fechar</Text>
+                  </Pressable>
+                </View>
+
+                <FlatList
+                  data={BUSINESS_SEGMENTS}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <Pressable
+                      onPress={() => {
+                        handleFieldChange("businessSegment", item);
+                        setShowSegmentModal(false);
+                      }}
+                      style={signupStyles.modalItem}
+                    >
+                      <Text style={signupStyles.modalItemText}>{item}</Text>
+                    </Pressable>
+                  )}
+                />
+              </SafeAreaView>
+            </Modal>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

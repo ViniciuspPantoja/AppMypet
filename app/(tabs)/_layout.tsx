@@ -17,6 +17,9 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
+          // hide native tab bar UI since device provides native controls
+          tabBarStyle: { display: "none" },
+          // keep haptic behavior for any custom buttons (no visible tab buttons)
           tabBarButton: HapticTab,
         }}
       >

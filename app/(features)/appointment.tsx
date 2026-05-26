@@ -10,7 +10,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     ScrollView,
     Text,
     TextInput,
@@ -435,10 +437,14 @@ export default function AppointmentScreen() {
       {/* Modal fora do ScrollView para evitar conflitos com teclado no Android */}
       <Modal visible={showModal} transparent animationType="fade">
         <View style={appointmentStyles.modalBackdrop}>
-          <View style={appointmentStyles.modalCard}>
+          <KeyboardAvoidingView
+            style={appointmentStyles.modalCard}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               contentContainerStyle={appointmentStyles.modalScrollContent}
             >
               <View style={appointmentStyles.modalHeader}>
@@ -582,7 +588,7 @@ export default function AppointmentScreen() {
                 </TouchableOpacity>
               </View>
             </ScrollView>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
     </>

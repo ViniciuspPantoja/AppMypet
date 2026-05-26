@@ -29,7 +29,9 @@ import { useCallback, useState } from "react";
 import {
     Alert,
     Image,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -146,16 +148,62 @@ export default function MyPetScreen() {
     }
   }
 
-  async function handleAddPhoto() {
-    const uri = await pickImageFromLibrary();
+  async function pickImageFromCamera() {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Permissão necessária",
+          "Precisamos de acesso à câmera para tirar uma foto na hora.",
+        );
+        return null;
+      }
+
+      const result: any = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (result.cancelled === true) return null;
+
+      const uri = result.assets?.[0]?.uri ?? result.uri;
+      return uri ?? null;
+    } catch (err) {
+      console.warn("Camera pick error", err);
+      return null;
+    }
+  }
+
+  async function updateProfilePhoto(source: "camera" | "library") {
+    const uri =
+      source === "camera"
+        ? await pickImageFromCamera()
+        : await pickImageFromLibrary();
+
     if (!uri) return;
+
     setUserProfile((prev) => (prev ? { ...prev, photoUrl: uri } : prev));
   }
 
-  async function handleChangePhoto() {
-    const uri = await pickImageFromLibrary();
-    if (!uri) return;
-    setUserProfile((prev) => (prev ? { ...prev, photoUrl: uri } : prev));
+  function handleAvatarPress() {
+    Alert.alert("Foto de perfil", "Escolha como deseja enviar sua foto.", [
+      {
+        text: "Tirar foto",
+        onPress: () => {
+          void updateProfilePhoto("camera");
+        },
+      },
+      {
+        text: "Escolher da galeria",
+        onPress: () => {
+          void updateProfilePhoto("library");
+        },
+      },
+      { text: "Cancelar", style: "cancel" },
+    ]);
   }
 
   if (loading) {
@@ -170,268 +218,297 @@ export default function MyPetScreen() {
 
   return (
     <SafeAreaView style={myPetStyles.safeArea}>
-      <ScrollView contentContainerStyle={myPetStyles.scrollContent}>
-        <View style={myPetStyles.header}>
-          <Pressable
-            style={myPetStyles.backButton}
-            onPress={() => router.back()}
-          >
-            <Text style={myPetStyles.backButtonText}>← Voltar</Text>
-          </Pressable>
-        </View>
-
-        <View style={myPetStyles.hero}>
-          <View style={myPetStyles.avatarWrap}>
-            {userProfile?.photoUrl ? (
-              <Image
-                source={{ uri: userProfile.photoUrl }}
-                style={myPetStyles.avatarImage}
-              />
-            ) : (
-              <Text style={myPetStyles.avatarPlaceholder}>👤</Text>
-            )}
-
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={myPetStyles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <View style={myPetStyles.header}>
             <Pressable
-              style={myPetStyles.avatarEditButton}
-              onPress={
-                userProfile?.photoUrl ? handleChangePhoto : handleAddPhoto
-              }
+              style={myPetStyles.backButton}
+              onPress={() => router.back()}
             >
-              <Text style={myPetStyles.avatarEditIcon}>✏️</Text>
+              <Text style={myPetStyles.backButtonText}>← Voltar</Text>
             </Pressable>
           </View>
-          {/* Avatar edit badge is used instead of separate action buttons */}
 
-          <View style={myPetStyles.card}>
-            {!!status.message && (
-              <StatusMessage
-                type={status.type}
-                message={status.message}
-                visible={!!status.message}
-                onDismiss={() => setStatus({ message: "", type: "success" })}
-              />
-            )}
-
-            {isEditing ? (
-              <>
-                <FormInput
-                  placeholder="Nome"
-                  value={editForm.displayName}
-                  onChangeText={(v) =>
-                    setEditForm((p) => ({ ...p, displayName: v }))
-                  }
-                  editable={!saving}
+          <View style={myPetStyles.hero}>
+            <View style={myPetStyles.avatarWrap}>
+              {userProfile?.photoUrl ? (
+                <Image
+                  source={{ uri: userProfile.photoUrl }}
+                  style={myPetStyles.avatarImage}
                 />
+              ) : (
+                <Text style={myPetStyles.avatarPlaceholder}>👤</Text>
+              )}
 
-                <FormInput
-                  placeholder="Email"
-                  value={editForm.email}
-                  onChangeText={(v) => setEditForm((p) => ({ ...p, email: v }))}
-                  editable={!saving}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
+              <Pressable
+                style={myPetStyles.avatarEditButton}
+                onPress={handleAvatarPress}
+              >
+                <Text style={myPetStyles.avatarEditIcon}>✏️</Text>
+              </Pressable>
+            </View>
+            {/* Avatar edit badge is used instead of separate action buttons */}
+
+            <View style={myPetStyles.card}>
+              {!!status.message && (
+                <StatusMessage
+                  type={status.type}
+                  message={status.message}
+                  visible={!!status.message}
+                  onDismiss={() => setStatus({ message: "", type: "success" })}
                 />
+              )}
 
-                <View style={myPetStyles.infoItem}>
-                  <View style={myPetStyles.passwordHeaderRow}>
-                    <Text style={myPetStyles.infoLabel}>Senha</Text>
-                    <Pressable
-                      style={myPetStyles.passwordToggleButton}
-                      onPress={() => setShowPassword((prev) => !prev)}
-                      disabled={saving}
-                    >
-                      <Text style={myPetStyles.passwordToggleIcon}>
-                        {passwordToggleIcon}
-                      </Text>
-                    </Pressable>
+              {isEditing ? (
+                <>
+                  <FormInput
+                    placeholder="Nome"
+                    value={editForm.displayName}
+                    onChangeText={(v) =>
+                      setEditForm((p) => ({ ...p, displayName: v }))
+                    }
+                    editable={!saving}
+                  />
+
+                  <FormInput
+                    placeholder="Email"
+                    value={editForm.email}
+                    onChangeText={(v) =>
+                      setEditForm((p) => ({ ...p, email: v }))
+                    }
+                    editable={!saving}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+
+                  <View style={myPetStyles.infoItem}>
+                    <View style={myPetStyles.passwordHeaderRow}>
+                      <Text style={myPetStyles.infoLabel}>Senha</Text>
+                      <Pressable
+                        style={myPetStyles.passwordToggleButton}
+                        onPress={() => setShowPassword((prev) => !prev)}
+                        disabled={saving}
+                      >
+                        <Text style={myPetStyles.passwordToggleIcon}>
+                          {passwordToggleIcon}
+                        </Text>
+                      </Pressable>
+                    </View>
+
+                    <Text style={myPetStyles.infoValue}>
+                      {passwordDisplayText}
+                    </Text>
+
+                    <Text style={myPetStyles.sectionActionText}>
+                      A senha atual não pode ser exibida. Digite uma nova senha
+                      abaixo para alterá-la.
+                    </Text>
                   </View>
 
-                  <Text style={myPetStyles.infoValue}>
-                    {passwordDisplayText}
-                  </Text>
+                  <FormInput
+                    placeholder="DD/MM/AAAA"
+                    value={editForm.birthDate}
+                    onChangeText={(v) =>
+                      setEditForm((p) => ({ ...p, birthDate: formatDate(v) }))
+                    }
+                    editable={!saving}
+                    maxLength={10}
+                  />
 
-                  <Text style={myPetStyles.sectionActionText}>
-                    A senha atual não pode ser exibida. Digite uma nova senha
-                    abaixo para alterá-la.
+                  <FormInput
+                    placeholder="Nova senha"
+                    value={editForm.password}
+                    onChangeText={(v) =>
+                      setEditForm((p) => ({ ...p, password: v }))
+                    }
+                    editable={!saving}
+                    secureTextEntry
+                  />
+
+                  {/* form inputs only; save/cancel rendered below to replace the Edit button */}
+                </>
+              ) : (
+                <>
+                  <Text style={myPetStyles.name}>
+                    {userProfile?.displayName || "Usuário"}
+                  </Text>
+                  <Text style={myPetStyles.email}>{userProfile?.email}</Text>
+                </>
+              )}
+
+              <View style={myPetStyles.infoGrid}>
+                <View style={myPetStyles.infoItem}>
+                  <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
+                  <Text style={myPetStyles.infoValue}>
+                    {userProfile?.birthDate || "Não informado"}
                   </Text>
                 </View>
 
-                <FormInput
-                  placeholder="DD/MM/AAAA"
-                  value={editForm.birthDate}
-                  onChangeText={(v) =>
-                    setEditForm((p) => ({ ...p, birthDate: formatDate(v) }))
-                  }
-                  editable={!saving}
-                  maxLength={10}
-                />
-
-                <FormInput
-                  placeholder="Nova senha"
-                  value={editForm.password}
-                  onChangeText={(v) =>
-                    setEditForm((p) => ({ ...p, password: v }))
-                  }
-                  editable={!saving}
-                  secureTextEntry
-                />
-
-                {/* form inputs only; save/cancel rendered below to replace the Edit button */}
-              </>
-            ) : (
-              <>
-                <Text style={myPetStyles.name}>
-                  {userProfile?.displayName || "Usuário"}
-                </Text>
-                <Text style={myPetStyles.email}>{userProfile?.email}</Text>
-              </>
-            )}
-
-            <View style={myPetStyles.infoGrid}>
-              <View style={myPetStyles.infoItem}>
-                <Text style={myPetStyles.infoLabel}>Data de nascimento</Text>
-                <Text style={myPetStyles.infoValue}>
-                  {userProfile?.birthDate || "Não informado"}
-                </Text>
+                <View style={myPetStyles.infoItem}>
+                  <Text style={myPetStyles.infoLabel}>Membro desde</Text>
+                  <Text style={myPetStyles.infoValue}>
+                    {userProfile?.createdAt || "Não informado"}
+                  </Text>
+                </View>
               </View>
 
-              <View style={myPetStyles.infoItem}>
-                <Text style={myPetStyles.infoLabel}>Membro desde</Text>
-                <Text style={myPetStyles.infoValue}>
-                  {userProfile?.createdAt || "Não informado"}
-                </Text>
-              </View>
-            </View>
+              {/* Bottom action: when editing, show Save/Cancel; otherwise show Edit */}
+              {isEditing ? (
+                <View style={{ flexDirection: "row", gap: 12 }}>
+                  <Pressable
+                    style={myPetStyles.actionButton}
+                    onPress={async () => {
+                      // Delegate to save handler
+                      const auth = getAuth(getFirebaseApp());
+                      const db = getFirestoreDb();
+                      if (!auth.currentUser) return;
 
-            {/* Bottom action: when editing, show Save/Cancel; otherwise show Edit */}
-            {isEditing ? (
-              <View style={{ flexDirection: "row", gap: 12 }}>
-                <Pressable
-                  style={myPetStyles.actionButton}
-                  onPress={async () => {
-                    // Delegate to save handler
-                    const auth = getAuth(getFirebaseApp());
-                    const db = getFirestoreDb();
-                    if (!auth.currentUser) return;
-
-                    // Validate name
-                    if (!editForm.displayName.trim()) {
-                      setStatus({
-                        message: "Nome é obrigatório.",
-                        type: "error",
-                      });
-                      return;
-                    }
-
-                    // Validate birth date if provided
-                    if (editForm.birthDate) {
-                      const res = validateBirthDate(editForm.birthDate);
-                      if (!res.isValid) {
+                      // Validate name
+                      if (!editForm.displayName.trim()) {
                         setStatus({
-                          message: res.error || "Data inválida.",
+                          message: "Nome é obrigatório.",
                           type: "error",
                         });
                         return;
                       }
-                    }
 
-                    // Validate email format
-                    if (editForm.email && !isValidEmail(editForm.email)) {
-                      setStatus({ message: "Email inválido.", type: "error" });
-                      return;
-                    }
-
-                    if (editForm.password && editForm.password.length < 6) {
-                      setStatus({
-                        message: "A senha deve ter no mínimo 6 caracteres.",
-                        type: "error",
-                      });
-                      return;
-                    }
-
-                    try {
-                      setSaving(true);
-                      // Update email if changed
-                      if (
-                        editForm.email &&
-                        auth.currentUser.email !== editForm.email
-                      ) {
-                        try {
-                          await updateEmail(auth.currentUser, editForm.email);
-                        } catch (emailErr) {
-                          const msg =
-                            emailErr instanceof Error
-                              ? emailErr.message
-                              : String(emailErr);
+                      // Validate birth date if provided
+                      if (editForm.birthDate) {
+                        const res = validateBirthDate(editForm.birthDate);
+                        if (!res.isValid) {
                           setStatus({
-                            message: `Erro ao atualizar email: ${msg}`,
+                            message: res.error || "Data inválida.",
                             type: "error",
                           });
-                          setSaving(false);
                           return;
                         }
                       }
 
-                      if (editForm.password) {
-                        await updatePassword(
-                          auth.currentUser,
-                          editForm.password,
-                        );
+                      // Validate email format
+                      if (editForm.email && !isValidEmail(editForm.email)) {
+                        setStatus({
+                          message: "Email inválido.",
+                          type: "error",
+                        });
+                        return;
                       }
 
-                      // Update auth profile
-                      await updateProfile(auth.currentUser, {
-                        displayName: editForm.displayName.trim(),
-                      });
+                      if (editForm.password && editForm.password.length < 6) {
+                        setStatus({
+                          message: "A senha deve ter no mínimo 6 caracteres.",
+                          type: "error",
+                        });
+                        return;
+                      }
 
-                      // Update firestore user doc
-                      await setDoc(
-                        doc(db, "users", auth.currentUser.uid),
-                        {
+                      try {
+                        setSaving(true);
+                        // Update email if changed
+                        if (
+                          editForm.email &&
+                          auth.currentUser.email !== editForm.email
+                        ) {
+                          try {
+                            await updateEmail(auth.currentUser, editForm.email);
+                          } catch (emailErr) {
+                            const msg =
+                              emailErr instanceof Error
+                                ? emailErr.message
+                                : String(emailErr);
+                            setStatus({
+                              message: `Erro ao atualizar email: ${msg}`,
+                              type: "error",
+                            });
+                            setSaving(false);
+                            return;
+                          }
+                        }
+
+                        if (editForm.password) {
+                          await updatePassword(
+                            auth.currentUser,
+                            editForm.password,
+                          );
+                        }
+
+                        // Update auth profile
+                        await updateProfile(auth.currentUser, {
                           displayName: editForm.displayName.trim(),
-                          birthDate: editForm.birthDate || null,
-                          email: editForm.email || null,
-                        },
-                        { merge: true },
-                      );
+                        });
 
-                      setUserProfile((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              displayName: editForm.displayName.trim(),
-                              birthDate: editForm.birthDate || prev.birthDate,
-                              email: editForm.email || prev.email,
-                            }
-                          : prev,
-                      );
+                        // Update firestore user doc
+                        await setDoc(
+                          doc(db, "users", auth.currentUser.uid),
+                          {
+                            displayName: editForm.displayName.trim(),
+                            birthDate: editForm.birthDate || null,
+                            email: editForm.email || null,
+                          },
+                          { merge: true },
+                        );
 
-                      setEditForm((prev) => ({ ...prev, password: "" }));
+                        setUserProfile((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                displayName: editForm.displayName.trim(),
+                                birthDate: editForm.birthDate || prev.birthDate,
+                                email: editForm.email || prev.email,
+                              }
+                            : prev,
+                        );
 
-                      setStatus({ message: "", type: "success" });
-                      setShowSuccessModal(true);
+                        setEditForm((prev) => ({ ...prev, password: "" }));
+
+                        setStatus({ message: "", type: "success" });
+                        setShowSuccessModal(true);
+                        setIsEditing(false);
+                      } catch (err) {
+                        const msg =
+                          err instanceof Error
+                            ? err.message
+                            : "Erro ao atualizar perfil.";
+                        setStatus({ message: `Erro: ${msg}`, type: "error" });
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    disabled={saving}
+                  >
+                    <Text style={myPetStyles.actionButtonText}>
+                      {saving ? "Salvando..." : "Salvar"}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[myPetStyles.actionButton, { marginLeft: 8 }]}
+                    onPress={() => {
                       setIsEditing(false);
-                    } catch (err) {
-                      const msg =
-                        err instanceof Error
-                          ? err.message
-                          : "Erro ao atualizar perfil.";
-                      setStatus({ message: `Erro: ${msg}`, type: "error" });
-                    } finally {
-                      setSaving(false);
-                    }
-                  }}
-                  disabled={saving}
-                >
-                  <Text style={myPetStyles.actionButtonText}>
-                    {saving ? "Salvando..." : "Salvar"}
-                  </Text>
-                </Pressable>
-
+                      setEditForm({
+                        displayName: userProfile?.displayName || "",
+                        birthDate: userProfile?.birthDate || "",
+                        email: userProfile?.email || "",
+                        password: "",
+                      });
+                      setStatus({ message: "", type: "success" });
+                    }}
+                    disabled={saving}
+                  >
+                    <Text style={myPetStyles.actionButtonText}>Cancelar</Text>
+                  </Pressable>
+                </View>
+              ) : (
                 <Pressable
-                  style={[myPetStyles.actionButton, { marginLeft: 8 }]}
+                  style={myPetStyles.actionButton}
                   onPress={() => {
-                    setIsEditing(false);
+                    setIsEditing(true);
                     setEditForm({
                       displayName: userProfile?.displayName || "",
                       birthDate: userProfile?.birthDate || "",
@@ -440,121 +517,110 @@ export default function MyPetScreen() {
                     });
                     setStatus({ message: "", type: "success" });
                   }}
-                  disabled={saving}
                 >
-                  <Text style={myPetStyles.actionButtonText}>Cancelar</Text>
+                  <Text style={myPetStyles.actionButtonText}>
+                    Editar perfil
+                  </Text>
                 </Pressable>
+              )}
+
+              <Modal
+                visible={showSuccessModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowSuccessModal(false)}
+              >
+                <View style={myPetStyles.modalOverlay}>
+                  <View style={myPetStyles.modalContent}>
+                    <Text style={myPetStyles.modalTitle}>
+                      Perfil atualizado
+                    </Text>
+                    <Text style={myPetStyles.modalMessage}>
+                      Seu perfil foi atualizado com sucesso.
+                    </Text>
+                    <Pressable
+                      style={myPetStyles.modalButton}
+                      onPress={() => setShowSuccessModal(false)}
+                    >
+                      <Text style={myPetStyles.modalButtonText}>OK</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            </View>
+          </View>
+
+          <View style={myPetStyles.section}>
+            <View style={myPetStyles.sectionHeader}>
+              <Text style={myPetStyles.sectionTitle}>Seção dos pets</Text>
+              <Pressable
+                style={myPetStyles.sectionAction}
+                onPress={() => router.push("/pet-register")}
+              >
+                <Text style={myPetStyles.sectionActionText}>+ Adicionar</Text>
+              </Pressable>
+            </View>
+
+            {pets.length === 0 ? (
+              <View style={myPetStyles.emptyState}>
+                <Text style={myPetStyles.emptyEmoji}>🐾</Text>
+                <Text style={myPetStyles.emptyTitle}>
+                  Nenhum pet cadastrado
+                </Text>
+                <Text style={myPetStyles.emptyText}>
+                  Adicione o primeiro pet para começar a preencher esta área.
+                </Text>
               </View>
             ) : (
-              <Pressable
-                style={myPetStyles.actionButton}
-                onPress={() => {
-                  setIsEditing(true);
-                  setEditForm({
-                    displayName: userProfile?.displayName || "",
-                    birthDate: userProfile?.birthDate || "",
-                    email: userProfile?.email || "",
-                    password: "",
-                  });
-                  setStatus({ message: "", type: "success" });
-                }}
-              >
-                <Text style={myPetStyles.actionButtonText}>Editar perfil</Text>
-              </Pressable>
-            )}
-
-            <Modal
-              visible={showSuccessModal}
-              transparent
-              animationType="fade"
-              onRequestClose={() => setShowSuccessModal(false)}
-            >
-              <View style={myPetStyles.modalOverlay}>
-                <View style={myPetStyles.modalContent}>
-                  <Text style={myPetStyles.modalTitle}>Perfil atualizado</Text>
-                  <Text style={myPetStyles.modalMessage}>
-                    Seu perfil foi atualizado com sucesso.
-                  </Text>
-                  <Pressable
-                    style={myPetStyles.modalButton}
-                    onPress={() => setShowSuccessModal(false)}
-                  >
-                    <Text style={myPetStyles.modalButtonText}>OK</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </Modal>
-          </View>
-        </View>
-
-        <View style={myPetStyles.section}>
-          <View style={myPetStyles.sectionHeader}>
-            <Text style={myPetStyles.sectionTitle}>Seção dos pets</Text>
-            <Pressable
-              style={myPetStyles.sectionAction}
-              onPress={() => router.push("/pet-register")}
-            >
-              <Text style={myPetStyles.sectionActionText}>+ Adicionar</Text>
-            </Pressable>
-          </View>
-
-          {pets.length === 0 ? (
-            <View style={myPetStyles.emptyState}>
-              <Text style={myPetStyles.emptyEmoji}>🐾</Text>
-              <Text style={myPetStyles.emptyTitle}>Nenhum pet cadastrado</Text>
-              <Text style={myPetStyles.emptyText}>
-                Adicione o primeiro pet para começar a preencher esta área.
-              </Text>
-            </View>
-          ) : (
-            <View style={myPetStyles.petList}>
-              {pets.map((pet) => (
-                <View key={pet.id} style={myPetStyles.petCard}>
-                  <View style={myPetStyles.petAvatarWrap}>
-                    {pet.photoUrl ? (
-                      <Image
-                        source={{ uri: pet.photoUrl }}
-                        style={myPetStyles.petAvatarImage}
-                      />
-                    ) : (
-                      <Text style={myPetStyles.petAvatarEmoji}>
-                        {pet.species === "Cachorro" ? "🐕" : "🐈"}
-                      </Text>
-                    )}
-                  </View>
-
-                  <View style={myPetStyles.petContent}>
-                    <Text style={myPetStyles.petName}>{pet.name}</Text>
-                    <Text style={myPetStyles.petMeta}>
-                      {pet.species} • {pet.breed}
-                    </Text>
-                    <View style={myPetStyles.petInfoRow}>
-                      <Text style={myPetStyles.petInfoText}>
-                        {pet.age} ano{pet.age > 1 ? "s" : ""}
-                      </Text>
-                      <Text style={myPetStyles.petInfoText}>
-                        {pet.weight}kg
-                      </Text>
+              <View style={myPetStyles.petList}>
+                {pets.map((pet) => (
+                  <View key={pet.id} style={myPetStyles.petCard}>
+                    <View style={myPetStyles.petAvatarWrap}>
+                      {pet.photoUrl ? (
+                        <Image
+                          source={{ uri: pet.photoUrl }}
+                          style={myPetStyles.petAvatarImage}
+                        />
+                      ) : (
+                        <Text style={myPetStyles.petAvatarEmoji}>
+                          {pet.species === "Cachorro" ? "🐕" : "🐈"}
+                        </Text>
+                      )}
                     </View>
-                  </View>
 
-                  <Pressable
-                    onPress={() =>
-                      router.push({
-                        pathname: "/pet-details/[petId]",
-                        params: { petId: pet.id },
-                      })
-                    }
-                    style={myPetStyles.petChevronButton}
-                  >
-                    <Text style={myPetStyles.petChevron}>→</Text>
-                  </Pressable>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-      </ScrollView>
+                    <View style={myPetStyles.petContent}>
+                      <Text style={myPetStyles.petName}>{pet.name}</Text>
+                      <Text style={myPetStyles.petMeta}>
+                        {pet.species} • {pet.breed}
+                      </Text>
+                      <View style={myPetStyles.petInfoRow}>
+                        <Text style={myPetStyles.petInfoText}>
+                          {pet.age} ano{pet.age > 1 ? "s" : ""}
+                        </Text>
+                        <Text style={myPetStyles.petInfoText}>
+                          {pet.weight}kg
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Pressable
+                      onPress={() =>
+                        router.push({
+                          pathname: "/pet-details/[petId]",
+                          params: { petId: pet.id },
+                        })
+                      }
+                      style={myPetStyles.petChevronButton}
+                    >
+                      <Text style={myPetStyles.petChevron}>→</Text>
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -26,9 +26,18 @@ export const loginStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.wine,
+  },
+
+  keyboardContainer: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
+    paddingVertical: 24,
   },
 
   // ── Card principal ─────────────────────────────────────────

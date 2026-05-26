@@ -3,8 +3,11 @@ import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    KeyboardAvoidingView,
+    Platform,
     Pressable,
     SafeAreaView,
+    ScrollView,
     Text,
     TextInput,
     View,
@@ -153,124 +156,144 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={loginStyles.container}>
-      <View style={loginStyles.card}>
-        {/* ── Ícone topo ───────────────────────── */}
-        <View style={loginStyles.appIconWrapper}>
-          <Text style={loginStyles.appIcon}>🐾</Text>
-        </View>
-
-        {/* ── Nome do app ───────────────────────── */}
-        <Text style={loginStyles.appName}>my petZone</Text>
-
-        {/* ── Título / contexto ────────────────── */}
-        <Text style={loginStyles.subtitle}>
-          Escolha como deseja acessar para encontrar lugares pet‑friendly perto
-          de você.
-        </Text>
-
-        {/* ── Seletor tipo conta ───────────────── */}
-        <View style={loginStyles.typeSelectorRow}>
-          <Pressable
-            style={[
-              loginStyles.typeButton,
-              accountType === "usuario" && loginStyles.typeButtonActive,
-            ]}
-            onPress={() => setAccountType("usuario")}
-            disabled={loading}
-          >
-            <Text
-              style={[
-                loginStyles.typeButtonText,
-                accountType === "usuario" && loginStyles.typeButtonTextActive,
-              ]}
-            >
-              Usuário
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[
-              loginStyles.typeButton,
-              accountType === "empresa" && loginStyles.typeButtonActive,
-            ]}
-            onPress={() => setAccountType("empresa")}
-            disabled={loading}
-          >
-            <Text
-              style={[
-                loginStyles.typeButtonText,
-                accountType === "empresa" && loginStyles.typeButtonTextActive,
-              ]}
-            >
-              Empresa
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* ── Inputs ───────────────────────────── */}
-        <TextInput
-          style={loginStyles.input}
-          placeholder="E-mail"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          editable={!loading}
-        />
-
-        <TextInput
-          style={loginStyles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          editable={!loading}
-        />
-
-        {/* ── Esqueci senha ────────────────────── */}
-        <Pressable disabled={loading} onPress={handleForgotPassword}>
-          <Text style={loginStyles.forgotPassword}>Esqueci minha senha</Text>
-        </Pressable>
-
-        {/* ── Botões principais ───────────────── */}
-        <View style={loginStyles.buttonsRow}>
-          <Pressable
-            style={loginStyles.primaryButton}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#7B1E2E" />
-            ) : (
-              <Text style={loginStyles.primaryButtonText}>Entrar</Text>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={loginStyles.secondaryButton}
-            onPress={handleSignup}
-            disabled={loading}
-          >
-            <Text style={loginStyles.secondaryButtonText}>Criar conta</Text>
-          </Pressable>
-        </View>
-
-        {/* ── Visitante ───────────────────────── */}
-        <Pressable
-          style={loginStyles.guestButton}
-          onPress={handleGuestAccess}
-          disabled={loading}
+      <KeyboardAvoidingView
+        style={loginStyles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={loginStyles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={loginStyles.guestButtonText}>Entrar como visitante</Text>
-        </Pressable>
+          <View style={loginStyles.card}>
+            {/* ── Ícone topo ───────────────────────── */}
+            <View style={loginStyles.appIconWrapper}>
+              <Text style={loginStyles.appIcon}>🐾</Text>
+            </View>
 
-        <StatusMessage
-          type={status.type}
-          message={status.message}
-          visible={!!status.message}
-          onDismiss={() => setStatus({ message: "", type: "error" })}
-        />
-      </View>
+            {/* ── Nome do app ───────────────────────── */}
+            <Text style={loginStyles.appName}>my petZone</Text>
+
+            {/* ── Título / contexto ────────────────── */}
+            <Text style={loginStyles.subtitle}>
+              Escolha como deseja acessar para encontrar lugares pet‑friendly
+              perto de você.
+            </Text>
+
+            {/* ── Seletor tipo conta ───────────────── */}
+            <View style={loginStyles.typeSelectorRow}>
+              <Pressable
+                style={[
+                  loginStyles.typeButton,
+                  accountType === "usuario" && loginStyles.typeButtonActive,
+                ]}
+                onPress={() => setAccountType("usuario")}
+                disabled={loading}
+              >
+                <Text
+                  style={[
+                    loginStyles.typeButtonText,
+                    accountType === "usuario" &&
+                      loginStyles.typeButtonTextActive,
+                  ]}
+                >
+                  Usuário
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[
+                  loginStyles.typeButton,
+                  accountType === "empresa" && loginStyles.typeButtonActive,
+                ]}
+                onPress={() => setAccountType("empresa")}
+                disabled={loading}
+              >
+                <Text
+                  style={[
+                    loginStyles.typeButtonText,
+                    accountType === "empresa" &&
+                      loginStyles.typeButtonTextActive,
+                  ]}
+                >
+                  Empresa
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* ── Inputs ───────────────────────────── */}
+            <TextInput
+              style={loginStyles.input}
+              placeholder="E-mail"
+              placeholderTextColor="#8B5E3C"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              editable={!loading}
+            />
+
+            <TextInput
+              style={loginStyles.input}
+              placeholder="Senha"
+              placeholderTextColor="#8B5E3C"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              editable={!loading}
+            />
+
+            {/* ── Esqueci senha ────────────────────── */}
+            <Pressable disabled={loading} onPress={handleForgotPassword}>
+              <Text style={loginStyles.forgotPassword}>
+                Esqueci minha senha
+              </Text>
+            </Pressable>
+
+            {/* ── Botões principais ───────────────── */}
+            <View style={loginStyles.buttonsRow}>
+              <Pressable
+                style={loginStyles.primaryButton}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#7B1E2E" />
+                ) : (
+                  <Text style={loginStyles.primaryButtonText}>Entrar</Text>
+                )}
+              </Pressable>
+
+              <Pressable
+                style={loginStyles.secondaryButton}
+                onPress={handleSignup}
+                disabled={loading}
+              >
+                <Text style={loginStyles.secondaryButtonText}>Criar conta</Text>
+              </Pressable>
+            </View>
+
+            {/* ── Visitante ───────────────────────── */}
+            <Pressable
+              style={loginStyles.guestButton}
+              onPress={handleGuestAccess}
+              disabled={loading}
+            >
+              <Text style={loginStyles.guestButtonText}>
+                Entrar como visitante
+              </Text>
+            </Pressable>
+
+            <StatusMessage
+              type={status.type}
+              message={status.message}
+              visible={!!status.message}
+              onDismiss={() => setStatus({ message: "", type: "error" })}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

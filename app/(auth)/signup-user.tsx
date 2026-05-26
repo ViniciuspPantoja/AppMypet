@@ -11,7 +11,9 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
     ActivityIndicator,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -157,101 +159,109 @@ export default function SignupUserScreen() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <SafeAreaView style={signupStyles.container}>
-      <ScrollView
-        contentContainerStyle={signupStyles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={signupStyles.card}>
-          {/* Ícone */}
-          <View style={signupStyles.appIconWrapper}>
-            <Text style={signupStyles.appIcon}>🐾</Text>
+        <ScrollView
+          contentContainerStyle={signupStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <View style={signupStyles.card}>
+            {/* Ícone */}
+            <View style={signupStyles.appIconWrapper}>
+              <Text style={signupStyles.appIcon}>🐾</Text>
+            </View>
+
+            {/* Cabeçalho */}
+            <Text style={signupStyles.title}>Criar conta</Text>
+            <Text style={signupStyles.subtitle}>
+              Preencha os dados abaixo e comece a explorar lugares pet-friendly.
+            </Text>
+
+            {/* Seção: Informações Pessoais */}
+            <View style={signupStyles.formSection}>
+              <FormInput
+                placeholder="Seu nome completo"
+                value={formData.displayName}
+                onChangeText={(v) => updateField("displayName", v)}
+                onBlur={() => blurField("displayName")}
+                error={errors.displayName}
+                touched={touched.displayName}
+                editable={!loading}
+              />
+
+              <FormInput
+                placeholder="seu.email@exemplo.com"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={formData.email}
+                onChangeText={(v) => updateField("email", v)}
+                onBlur={() => blurField("email")}
+                error={errors.email}
+                touched={touched.email}
+                editable={!loading}
+              />
+
+              <FormInput
+                placeholder="DD/MM/AAAA"
+                keyboardType="numeric"
+                value={formData.birthDate}
+                onChangeText={(v) => updateField("birthDate", formatDate(v))}
+                onBlur={() => blurField("birthDate")}
+                error={errors.birthDate}
+                touched={touched.birthDate}
+                editable={!loading}
+                maxLength={10}
+              />
+            </View>
+
+            {/* Seção: Segurança */}
+            <View style={signupStyles.formSection}>
+              <FormInput
+                placeholder="Senha (Mínimo de 6 caracteres)"
+                secureTextEntry
+                value={formData.password}
+                onChangeText={(v) => updateField("password", v)}
+                onBlur={() => blurField("password")}
+                error={errors.password}
+                touched={touched.password}
+                editable={!loading}
+              />
+            </View>
+
+            {/* Botões */}
+            <View style={signupStyles.buttonRow}>
+              <Pressable
+                style={[
+                  signupStyles.primaryButton,
+                  loading && signupStyles.primaryButtonDisabled,
+                ]}
+                onPress={handleSignup}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#7B1E2E" />
+                ) : (
+                  <Text style={signupStyles.primaryButtonText}>
+                    Criar conta
+                  </Text>
+                )}
+              </Pressable>
+
+              <Pressable
+                style={signupStyles.secondaryButton}
+                onPress={() => router.replace("/signup-type")}
+                disabled={loading}
+              >
+                <Text style={signupStyles.secondaryButtonText}>Voltar</Text>
+              </Pressable>
+            </View>
           </View>
-
-          {/* Cabeçalho */}
-          <Text style={signupStyles.title}>Criar conta</Text>
-          <Text style={signupStyles.subtitle}>
-            Preencha os dados abaixo e comece a explorar lugares pet-friendly.
-          </Text>
-
-          {/* Seção: Informações Pessoais */}
-          <View style={signupStyles.formSection}>
-            <FormInput
-              placeholder="Seu nome completo"
-              value={formData.displayName}
-              onChangeText={(v) => updateField("displayName", v)}
-              onBlur={() => blurField("displayName")}
-              error={errors.displayName}
-              touched={touched.displayName}
-              editable={!loading}
-            />
-
-            <FormInput
-              placeholder="seu.email@exemplo.com"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={formData.email}
-              onChangeText={(v) => updateField("email", v)}
-              onBlur={() => blurField("email")}
-              error={errors.email}
-              touched={touched.email}
-              editable={!loading}
-            />
-
-            <FormInput
-              placeholder="DD/MM/AAAA"
-              keyboardType="numeric"
-              value={formData.birthDate}
-              onChangeText={(v) => updateField("birthDate", formatDate(v))}
-              onBlur={() => blurField("birthDate")}
-              error={errors.birthDate}
-              touched={touched.birthDate}
-              editable={!loading}
-              maxLength={10}
-            />
-          </View>
-
-          {/* Seção: Segurança */}
-          <View style={signupStyles.formSection}>
-            <FormInput
-              placeholder="Senha (Mínimo de 6 caracteres)"
-              secureTextEntry
-              value={formData.password}
-              onChangeText={(v) => updateField("password", v)}
-              onBlur={() => blurField("password")}
-              error={errors.password}
-              touched={touched.password}
-              editable={!loading}
-            />
-          </View>
-
-          {/* Botões */}
-          <View style={signupStyles.buttonRow}>
-            <Pressable
-              style={[
-                signupStyles.primaryButton,
-                loading && signupStyles.primaryButtonDisabled,
-              ]}
-              onPress={handleSignup}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#7B1E2E" />
-              ) : (
-                <Text style={signupStyles.primaryButtonText}>Criar conta</Text>
-              )}
-            </Pressable>
-
-            <Pressable
-              style={signupStyles.secondaryButton}
-              onPress={() => router.replace("/signup-type")}
-              disabled={loading}
-            >
-              <Text style={signupStyles.secondaryButtonText}>Voltar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <Modal visible={feedbackVisible} transparent animationType="fade">
         <View style={signupStyles.modalBackdrop}>
