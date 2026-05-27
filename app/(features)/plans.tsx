@@ -1,6 +1,6 @@
-import { plansStyles } from "../styles/plans.styles";
 import { useRouter } from "expo-router";
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { plansStyles } from "../styles/plans.styles";
 
 const plans = [
   {
@@ -38,7 +38,7 @@ export default function PlansScreen() {
             style={plansStyles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={plansStyles.backButtonText}>← Voltar</Text>
+            <Text style={plansStyles.backButtonText}>‹</Text>
           </Pressable>
 
           <Text style={plansStyles.eyebrow}>Planos</Text>

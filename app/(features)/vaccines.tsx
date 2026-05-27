@@ -18,7 +18,9 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -320,313 +322,331 @@ export default function VaccinesScreen() {
 
   return (
     <SafeAreaView style={vaccinesStyles.safeArea}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* ── Header ── */}
-        <View style={vaccinesStyles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={vaccinesStyles.backButton}
-          >
-            <Text style={vaccinesStyles.backButtonText}>‹</Text>
-          </Pressable>
-          <Text style={vaccinesStyles.headerTitle}>Carteirinha de Vacinas</Text>
-        </View>
-
-        {/* ── Patinhas decorativas ── */}
-        <Text style={[vaccinesStyles.pawDecor, { top: 60, right: 16 }]}>
-          🐾
-        </Text>
-        <Text style={[vaccinesStyles.pawDecor, { top: 160, left: -8 }]}>
-          🐾
-        </Text>
-
-        {/* ── Alerta vacinas próximas ── */}
-        {upcomingVaccines.length > 0 && (
-          <View style={vaccinesStyles.alertSection}>
-            <Text style={vaccinesStyles.alertTitle}>
-              ⚠️ {upcomingVaccines.length} vacinação(ões) vencendo em breve
-            </Text>
-            <Text style={vaccinesStyles.alertDescription}>
-              Fique em dia com a saúde do seu pet nos próximos 30 dias
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          {/* ── Header ── */}
+          <View style={vaccinesStyles.header}>
+            <Pressable
+              onPress={() => router.back()}
+              style={vaccinesStyles.backButton}
+            >
+              <Text style={vaccinesStyles.backButtonText}>‹</Text>
+            </Pressable>
+            <Text style={vaccinesStyles.headerTitle}>
+              Carteirinha de Vacinas
             </Text>
           </View>
-        )}
 
-        {/* ── Botão adicionar ── */}
-        <View style={vaccinesStyles.actionSection}>
-          <Pressable style={vaccinesStyles.addButton} onPress={openCreateModal}>
-            <Text style={vaccinesStyles.addButtonText}>
-              + Adicionar Vacinação
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* ── Histórico ── */}
-        <View style={vaccinesStyles.section}>
-          <Text style={vaccinesStyles.sectionTitle}>
-            Histórico de Vacinações
+          {/* ── Patinhas decorativas ── */}
+          <Text style={[vaccinesStyles.pawDecor, { top: 60, right: 16 }]}>
+            🐾
+          </Text>
+          <Text style={[vaccinesStyles.pawDecor, { top: 160, left: -8 }]}>
+            🐾
           </Text>
 
-          {loading ? (
-            <ActivityIndicator style={{ marginTop: 20 }} />
-          ) : vaccines.length > 0 ? (
-            vaccines.map((vaccine) => (
-              <View key={vaccine.id} style={vaccinesStyles.vaccineCard}>
-                {/* Nome + status */}
-                <View style={vaccinesStyles.vaccineCardHeader}>
-                  <Text style={vaccinesStyles.vaccineName}>{vaccine.name}</Text>
-                  <Text style={vaccinesStyles.vaccineStatus}>✓ Aplicada</Text>
-                </View>
-
-                {/* Infos em linha */}
-                <View style={vaccinesStyles.vaccineCardInfo}>
-                  <View style={vaccinesStyles.infoRow}>
-                    <Text style={vaccinesStyles.infoLabel}>Pet</Text>
-                    <Text style={vaccinesStyles.infoValue}>
-                      {vaccine.petName}
-                    </Text>
-                  </View>
-                  <View style={vaccinesStyles.infoRow}>
-                    <Text style={vaccinesStyles.infoLabel}>Data aplicação</Text>
-                    <Text style={vaccinesStyles.infoValue}>
-                      {vaccine.applicationDate}
-                    </Text>
-                  </View>
-                  <View style={vaccinesStyles.infoRow}>
-                    <Text style={vaccinesStyles.infoLabel}>
-                      Próximo reforço
-                    </Text>
-                    <Text style={vaccinesStyles.infoValue}>
-                      {vaccine.nextDue}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Botão editar */}
-                <Pressable
-                  style={vaccinesStyles.editButton}
-                  onPress={() => openEditModal(vaccine)}
-                >
-                  <Text style={vaccinesStyles.editButtonText}>Editar</Text>
-                </Pressable>
-              </View>
-            ))
-          ) : (
-            <View style={vaccinesStyles.emptyState}>
-              <Text style={vaccinesStyles.emptyStateEmoji}>💉</Text>
-              <Text style={vaccinesStyles.emptyStateText}>
-                Nenhuma vacinação registrada
+          {/* ── Alerta vacinas próximas ── */}
+          {upcomingVaccines.length > 0 && (
+            <View style={vaccinesStyles.alertSection}>
+              <Text style={vaccinesStyles.alertTitle}>
+                ⚠️ {upcomingVaccines.length} vacinação(ões) vencendo em breve
               </Text>
-              <Text style={vaccinesStyles.emptyStateSubtext}>
-                Comece adicionando a primeira vacinação do seu pet
+              <Text style={vaccinesStyles.alertDescription}>
+                Fique em dia com a saúde do seu pet nos próximos 30 dias
               </Text>
             </View>
           )}
-        </View>
 
-        {/* ── Modal de adicionar vacina ── */}
-        <Modal visible={showAddModal} animationType="slide" transparent>
-          <View style={styles.modalBackdrop}>
-            <View style={styles.modalCard}>
-              <Text style={styles.modalTitle}>Adicionar Vacinação</Text>
+          {/* ── Botão adicionar ── */}
+          <View style={vaccinesStyles.actionSection}>
+            <Pressable
+              style={vaccinesStyles.addButton}
+              onPress={openCreateModal}
+            >
+              <Text style={vaccinesStyles.addButtonText}>
+                + Adicionar Vacinação
+              </Text>
+            </Pressable>
+          </View>
 
-              <Text style={styles.fieldLabel}>Pet</Text>
-              <View style={styles.petList}>
-                {pets.length === 0 ? (
-                  <Text style={styles.noPets}>Nenhum pet encontrado</Text>
-                ) : (
-                  pets.map((p) => (
-                    <Pressable
-                      key={p.id}
-                      style={[
-                        styles.petItem,
-                        selectedPetId === p.id && styles.petItemActive,
-                      ]}
-                      onPress={() => setSelectedPetId(p.id)}
-                    >
-                      <Text style={styles.petName}>{p.name}</Text>
-                      <Text style={styles.petMeta}>{p.species}</Text>
-                    </Pressable>
-                  ))
-                )}
+          {/* ── Histórico ── */}
+          <View style={vaccinesStyles.section}>
+            <Text style={vaccinesStyles.sectionTitle}>
+              Histórico de Vacinações
+            </Text>
+
+            {loading ? (
+              <ActivityIndicator style={{ marginTop: 20 }} />
+            ) : vaccines.length > 0 ? (
+              vaccines.map((vaccine) => (
+                <View key={vaccine.id} style={vaccinesStyles.vaccineCard}>
+                  {/* Nome + status */}
+                  <View style={vaccinesStyles.vaccineCardHeader}>
+                    <Text style={vaccinesStyles.vaccineName}>
+                      {vaccine.name}
+                    </Text>
+                    <Text style={vaccinesStyles.vaccineStatus}>✓ Aplicada</Text>
+                  </View>
+
+                  {/* Infos em linha */}
+                  <View style={vaccinesStyles.vaccineCardInfo}>
+                    <View style={vaccinesStyles.infoRow}>
+                      <Text style={vaccinesStyles.infoLabel}>Pet</Text>
+                      <Text style={vaccinesStyles.infoValue}>
+                        {vaccine.petName}
+                      </Text>
+                    </View>
+                    <View style={vaccinesStyles.infoRow}>
+                      <Text style={vaccinesStyles.infoLabel}>
+                        Data aplicação
+                      </Text>
+                      <Text style={vaccinesStyles.infoValue}>
+                        {vaccine.applicationDate}
+                      </Text>
+                    </View>
+                    <View style={vaccinesStyles.infoRow}>
+                      <Text style={vaccinesStyles.infoLabel}>
+                        Próximo reforço
+                      </Text>
+                      <Text style={vaccinesStyles.infoValue}>
+                        {vaccine.nextDue}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Botão editar */}
+                  <Pressable
+                    style={vaccinesStyles.editButton}
+                    onPress={() => openEditModal(vaccine)}
+                  >
+                    <Text style={vaccinesStyles.editButtonText}>Editar</Text>
+                  </Pressable>
+                </View>
+              ))
+            ) : (
+              <View style={vaccinesStyles.emptyState}>
+                <Text style={vaccinesStyles.emptyStateEmoji}>💉</Text>
+                <Text style={vaccinesStyles.emptyStateText}>
+                  Nenhuma vacinação registrada
+                </Text>
+                <Text style={vaccinesStyles.emptyStateSubtext}>
+                  Comece adicionando a primeira vacinação do seu pet
+                </Text>
               </View>
+            )}
+          </View>
 
-              <FormInput
-                label="Vacina"
-                placeholder="Ex.: Raiva"
-                value={vaccineName}
-                onChangeText={setVaccineName}
-              />
+          {/* ── Modal de adicionar vacina ── */}
+          <Modal visible={showAddModal} animationType="slide" transparent>
+            <View style={styles.modalBackdrop}>
+              <View style={styles.modalCard}>
+                <Text style={styles.modalTitle}>Adicionar Vacinação</Text>
 
-              <FormInput
-                label="Data aplicação"
-                placeholder="DD/MM/AAAA"
-                value={applicationDate}
-                onChangeText={(v) => setApplicationDate(formatDate(v))}
-              />
+                <Text style={styles.fieldLabel}>Pet</Text>
+                <View style={styles.petList}>
+                  {pets.length === 0 ? (
+                    <Text style={styles.noPets}>Nenhum pet encontrado</Text>
+                  ) : (
+                    pets.map((p) => (
+                      <Pressable
+                        key={p.id}
+                        style={[
+                          styles.petItem,
+                          selectedPetId === p.id && styles.petItemActive,
+                        ]}
+                        onPress={() => setSelectedPetId(p.id)}
+                      >
+                        <Text style={styles.petName}>{p.name}</Text>
+                        <Text style={styles.petMeta}>{p.species}</Text>
+                      </Pressable>
+                    ))
+                  )}
+                </View>
 
-              <FormInput
-                label="Próximo reforço"
-                placeholder="DD/MM/AAAA"
-                value={nextDue}
-                onChangeText={(v) => setNextDue(formatDate(v))}
-              />
+                <FormInput
+                  label="Vacina"
+                  placeholder="Ex.: Raiva"
+                  value={vaccineName}
+                  onChangeText={setVaccineName}
+                />
 
-              <View style={styles.modalButtons}>
-                <Pressable
-                  style={styles.primaryButton}
-                  onPress={handleSaveVaccine}
+                <FormInput
+                  label="Data aplicação"
+                  placeholder="DD/MM/AAAA"
+                  value={applicationDate}
+                  onChangeText={(v) => setApplicationDate(formatDate(v))}
+                />
+
+                <FormInput
+                  label="Próximo reforço"
+                  placeholder="DD/MM/AAAA"
+                  value={nextDue}
+                  onChangeText={(v) => setNextDue(formatDate(v))}
+                />
+
+                <View style={styles.modalButtons}>
+                  <Pressable
+                    style={styles.primaryButton}
+                    onPress={handleSaveVaccine}
+                  >
+                    <Text style={styles.primaryButtonText}>Salvar</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.secondaryButton}
+                    onPress={() => {
+                      setShowAddModal(false);
+                      clearForm();
+                    }}
+                  >
+                    <Text style={styles.secondaryButtonText}>Cancelar</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {/* ── Modal de editar vacina ── */}
+          <Modal visible={showEditModal} animationType="slide" transparent>
+            <View style={styles.modalBackdrop}>
+              <View style={styles.modalCard}>
+                <Text style={styles.modalTitle}>Editar Vacinação</Text>
+
+                <Text style={styles.fieldLabel}>Pet</Text>
+                <View style={styles.petList}>
+                  {pets.length === 0 ? (
+                    <Text style={styles.noPets}>Nenhum pet encontrado</Text>
+                  ) : (
+                    pets.map((p) => (
+                      <Pressable
+                        key={p.id}
+                        style={[
+                          styles.petItem,
+                          selectedPetId === p.id && styles.petItemActive,
+                        ]}
+                        onPress={() => setSelectedPetId(p.id)}
+                      >
+                        <Text style={styles.petName}>{p.name}</Text>
+                        <Text style={styles.petMeta}>{p.species}</Text>
+                      </Pressable>
+                    ))
+                  )}
+                </View>
+
+                <FormInput
+                  label="Vacina"
+                  placeholder="Ex.: Raiva"
+                  value={vaccineName}
+                  onChangeText={setVaccineName}
+                />
+
+                <FormInput
+                  label="Data aplicação"
+                  placeholder="DD/MM/AAAA"
+                  value={applicationDate}
+                  onChangeText={(v) => setApplicationDate(formatDate(v))}
+                />
+
+                <FormInput
+                  label="Próximo reforço"
+                  placeholder="DD/MM/AAAA"
+                  value={nextDue}
+                  onChangeText={(v) => setNextDue(formatDate(v))}
+                />
+
+                <View style={styles.modalButtons}>
+                  <Pressable
+                    style={styles.deleteButton}
+                    onPress={() => setShowDeleteConfirm(true)}
+                  >
+                    <Text style={styles.deleteButtonText}>🗑</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.primaryButton}
+                    onPress={handleUpdateVaccine}
+                  >
+                    <Text style={styles.primaryButtonText}>Salvar</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.secondaryButton}
+                    onPress={() => {
+                      setShowEditModal(false);
+                      clearEditForm();
+                    }}
+                  >
+                    <Text style={styles.secondaryButtonText}>Cancelar</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {/* ── Confirmação de exclusão ── */}
+          <Modal visible={showDeleteConfirm} transparent animationType="fade">
+            <View style={styles.feedbackBackdrop}>
+              <View style={styles.feedbackCard}>
+                <Text style={[styles.feedbackIcon, styles.feedbackIconError]}>
+                  🗑
+                </Text>
+                <Text style={styles.feedbackTitle}>Excluir vacinação?</Text>
+                <Text style={styles.feedbackMessage}>
+                  Esta ação remove a vacina da carteirinha do pet.
+                </Text>
+
+                <View style={styles.confirmDeleteButtons}>
+                  <Pressable
+                    style={styles.secondaryButton}
+                    onPress={() => setShowDeleteConfirm(false)}
+                  >
+                    <Text style={styles.secondaryButtonText}>Cancelar</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.deleteConfirmButton}
+                    onPress={handleDeleteVaccine}
+                  >
+                    <Text style={styles.deleteConfirmButtonText}>Excluir</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {/* ── Popup de confirmação ── */}
+          <Modal visible={feedbackVisible} transparent animationType="fade">
+            <View style={styles.feedbackBackdrop}>
+              <View style={styles.feedbackCard}>
+                <Text
+                  style={[
+                    styles.feedbackIcon,
+                    feedbackType === "success"
+                      ? styles.feedbackIconSuccess
+                      : styles.feedbackIconError,
+                  ]}
                 >
-                  <Text style={styles.primaryButtonText}>Salvar</Text>
-                </Pressable>
+                  {feedbackType === "success" ? "✓" : "!"}
+                </Text>
+                <Text style={styles.feedbackTitle}>
+                  {feedbackType === "success" ? "Pronto" : "Atenção"}
+                </Text>
+                <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
+
                 <Pressable
-                  style={styles.secondaryButton}
-                  onPress={() => {
-                    setShowAddModal(false);
-                    clearForm();
-                  }}
+                  style={styles.feedbackButton}
+                  onPress={closeFeedbackModal}
                 >
-                  <Text style={styles.secondaryButtonText}>Cancelar</Text>
+                  <Text style={styles.feedbackButtonText}>OK</Text>
                 </Pressable>
               </View>
             </View>
-          </View>
-        </Modal>
-
-        {/* ── Modal de editar vacina ── */}
-        <Modal visible={showEditModal} animationType="slide" transparent>
-          <View style={styles.modalBackdrop}>
-            <View style={styles.modalCard}>
-              <Text style={styles.modalTitle}>Editar Vacinação</Text>
-
-              <Text style={styles.fieldLabel}>Pet</Text>
-              <View style={styles.petList}>
-                {pets.length === 0 ? (
-                  <Text style={styles.noPets}>Nenhum pet encontrado</Text>
-                ) : (
-                  pets.map((p) => (
-                    <Pressable
-                      key={p.id}
-                      style={[
-                        styles.petItem,
-                        selectedPetId === p.id && styles.petItemActive,
-                      ]}
-                      onPress={() => setSelectedPetId(p.id)}
-                    >
-                      <Text style={styles.petName}>{p.name}</Text>
-                      <Text style={styles.petMeta}>{p.species}</Text>
-                    </Pressable>
-                  ))
-                )}
-              </View>
-
-              <FormInput
-                label="Vacina"
-                placeholder="Ex.: Raiva"
-                value={vaccineName}
-                onChangeText={setVaccineName}
-              />
-
-              <FormInput
-                label="Data aplicação"
-                placeholder="DD/MM/AAAA"
-                value={applicationDate}
-                onChangeText={(v) => setApplicationDate(formatDate(v))}
-              />
-
-              <FormInput
-                label="Próximo reforço"
-                placeholder="DD/MM/AAAA"
-                value={nextDue}
-                onChangeText={(v) => setNextDue(formatDate(v))}
-              />
-
-              <View style={styles.modalButtons}>
-                <Pressable
-                  style={styles.deleteButton}
-                  onPress={() => setShowDeleteConfirm(true)}
-                >
-                  <Text style={styles.deleteButtonText}>🗑</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.primaryButton}
-                  onPress={handleUpdateVaccine}
-                >
-                  <Text style={styles.primaryButtonText}>Salvar</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.secondaryButton}
-                  onPress={() => {
-                    setShowEditModal(false);
-                    clearEditForm();
-                  }}
-                >
-                  <Text style={styles.secondaryButtonText}>Cancelar</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        {/* ── Confirmação de exclusão ── */}
-        <Modal visible={showDeleteConfirm} transparent animationType="fade">
-          <View style={styles.feedbackBackdrop}>
-            <View style={styles.feedbackCard}>
-              <Text style={[styles.feedbackIcon, styles.feedbackIconError]}>
-                🗑
-              </Text>
-              <Text style={styles.feedbackTitle}>Excluir vacinação?</Text>
-              <Text style={styles.feedbackMessage}>
-                Esta ação remove a vacina da carteirinha do pet.
-              </Text>
-
-              <View style={styles.confirmDeleteButtons}>
-                <Pressable
-                  style={styles.secondaryButton}
-                  onPress={() => setShowDeleteConfirm(false)}
-                >
-                  <Text style={styles.secondaryButtonText}>Cancelar</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.deleteConfirmButton}
-                  onPress={handleDeleteVaccine}
-                >
-                  <Text style={styles.deleteConfirmButtonText}>Excluir</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        {/* ── Popup de confirmação ── */}
-        <Modal visible={feedbackVisible} transparent animationType="fade">
-          <View style={styles.feedbackBackdrop}>
-            <View style={styles.feedbackCard}>
-              <Text
-                style={[
-                  styles.feedbackIcon,
-                  feedbackType === "success"
-                    ? styles.feedbackIconSuccess
-                    : styles.feedbackIconError,
-                ]}
-              >
-                {feedbackType === "success" ? "✓" : "!"}
-              </Text>
-              <Text style={styles.feedbackTitle}>
-                {feedbackType === "success" ? "Pronto" : "Atenção"}
-              </Text>
-              <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
-
-              <Pressable
-                style={styles.feedbackButton}
-                onPress={closeFeedbackModal}
-              >
-                <Text style={styles.feedbackButtonText}>OK</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-      </ScrollView>
+          </Modal>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

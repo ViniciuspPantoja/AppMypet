@@ -90,20 +90,22 @@ export const myPetStyles = StyleSheet.create({
   },
 
   backButton: {
-    alignSelf: "flex-start",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 14,
-    backgroundColor: "rgba(245, 236, 215, 0.10)",
-    borderWidth: 1,
-    borderColor: "rgba(245, 236, 215, 0.18)",
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.pill,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   backButtonText: {
+    fontSize: 22,
     color: colors.textOnWine,
-    fontSize: 14.5,
-    fontWeight: "800",
-    letterSpacing: 0.2,
+    fontWeight: "700",
+    includeFontPadding: false,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
 
   // ───────────────────────────────────────────────────────────
@@ -259,6 +261,8 @@ export const myPetStyles = StyleSheet.create({
   actionButton: {
     marginTop: SPACING.sm,
     minHeight: 48,
+    minWidth: 120,
+    paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.input,
     backgroundColor: colors.cream,
     borderWidth: 1,
@@ -310,6 +314,59 @@ export const myPetStyles = StyleSheet.create({
   },
 
   sectionActionText: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 12.5,
+    letterSpacing: 0.2,
+    textAlign: "center",
+  },
+
+  sectionDelete: {
+    minHeight: 40,
+    paddingHorizontal: 12,
+    borderRadius: RADIUS.input,
+    backgroundColor: colors.error,
+    borderWidth: 1,
+    borderColor: "rgba(255,107,107,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
+  },
+
+  sectionDeletePressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.97 }],
+  },
+
+  sectionDeleteText: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 12.5,
+    letterSpacing: 0.2,
+    textAlign: "center",
+  },
+
+  petDeleteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(245,236,215,0.06)",
+  },
+
+  petDeleteButton: {
+    minHeight: 36,
+    paddingHorizontal: 14,
+    borderRadius: RADIUS.input,
+    backgroundColor: colors.error,
+    borderWidth: 1,
+    borderColor: "rgba(255,107,107,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  petDeleteButtonText: {
     color: "#fff",
     fontWeight: "900",
     fontSize: 12.5,

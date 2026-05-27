@@ -9,6 +9,8 @@ import { addDoc, collection } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -29,7 +31,7 @@ interface PetFormState {
 type FormErrors = Partial<Record<keyof PetFormState, string>>;
 type FormTouched = Partial<Record<keyof PetFormState, boolean>>;
 
-const SPECIES_OPTIONS = ["Cachorro", "Gato", "Outro"];
+const SPECIES_OPTIONS = ["Cachorro", "Gato", "Pássaro", "Peixe", "Outro"];
 const SEX_OPTIONS = ["Macho", "Fêmea"];
 
 function parseNumber(value: string): number {
@@ -179,168 +181,178 @@ export default function PetRegisterScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>← Voltar</Text>
-          </Pressable>
-        </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <View style={styles.header}>
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
+              <Text style={styles.backButtonText}>‹</Text>
+            </Pressable>
+          </View>
 
-        <View style={styles.card}>
-          <Text style={styles.icon}>🐾</Text>
-          <Text style={styles.title}>Cadastrar pet</Text>
-          <Text style={styles.subtitle}>
-            Preencha os dados do pet e mantenha o tutor vinculado ao seu perfil.
-          </Text>
+          <View style={styles.card}>
+            <Text style={styles.icon}>🐾</Text>
+            <Text style={styles.title}>Cadastrar pet</Text>
+            <Text style={styles.subtitle}>
+              Preencha os dados do pet e mantenha o tutor vinculado ao seu
+              perfil.
+            </Text>
 
-          {!!status.message && (
-            <StatusMessage
-              type={status.type}
-              message={status.message}
-              visible={!!status.message}
-              onDismiss={() => setStatus({ message: "", type: "success" })}
+            {!!status.message && (
+              <StatusMessage
+                type={status.type}
+                message={status.message}
+                visible={!!status.message}
+                onDismiss={() => setStatus({ message: "", type: "success" })}
+              />
+            )}
+
+            <FormInput
+              label="Nome do pet"
+              placeholder="Ex.: Max"
+              value={formData.name}
+              onChangeText={(value) => updateField("name", value)}
+              onBlur={() => blurField("name")}
+              error={errors.name}
+              touched={touched.name}
+              editable={!loading}
             />
-          )}
 
-          <FormInput
-            label="Nome do pet"
-            placeholder="Ex.: Max"
-            value={formData.name}
-            onChangeText={(value) => updateField("name", value)}
-            onBlur={() => blurField("name")}
-            error={errors.name}
-            touched={touched.name}
-            editable={!loading}
-          />
-
-          <Text style={styles.groupLabel}>Espécie</Text>
-          <View style={styles.chipRow}>
-            {SPECIES_OPTIONS.map((option) => (
-              <Pressable
-                key={option}
-                style={[
-                  styles.chip,
-                  formData.species === option && styles.chipActive,
-                ]}
-                onPress={() => updateField("species", option)}
-                disabled={loading}
-              >
-                <Text
+            <Text style={styles.groupLabel}>Espécie</Text>
+            <View style={styles.chipRow}>
+              {SPECIES_OPTIONS.map((option) => (
+                <Pressable
+                  key={option}
                   style={[
-                    styles.chipText,
-                    formData.species === option && styles.chipTextActive,
+                    styles.chip,
+                    formData.species === option && styles.chipActive,
                   ]}
+                  onPress={() => updateField("species", option)}
+                  disabled={loading}
                 >
-                  {option}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          {!!errors.species && touched.species && (
-            <Text style={styles.fieldError}>{errors.species}</Text>
-          )}
+                  <Text
+                    style={[
+                      styles.chipText,
+                      formData.species === option && styles.chipTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            {!!errors.species && touched.species && (
+              <Text style={styles.fieldError}>{errors.species}</Text>
+            )}
 
-          <FormInput
-            label="Raça"
-            placeholder="Ex.: Golden Retriever"
-            value={formData.breed}
-            onChangeText={(value) => updateField("breed", value)}
-            onBlur={() => blurField("breed")}
-            error={errors.breed}
-            touched={touched.breed}
-            editable={!loading}
-          />
+            <FormInput
+              label="Raça"
+              placeholder="Ex.: Golden Retriever"
+              value={formData.breed}
+              onChangeText={(value) => updateField("breed", value)}
+              onBlur={() => blurField("breed")}
+              error={errors.breed}
+              touched={touched.breed}
+              editable={!loading}
+            />
 
-          <Text style={styles.groupLabel}>Sexo</Text>
-          <View style={styles.chipRow}>
-            {SEX_OPTIONS.map((option) => (
-              <Pressable
-                key={option}
-                style={[
-                  styles.chip,
-                  formData.sex === option && styles.chipActive,
-                ]}
-                onPress={() => updateField("sex", option)}
-                disabled={loading}
-              >
-                <Text
+            <Text style={styles.groupLabel}>Sexo</Text>
+            <View style={styles.chipRow}>
+              {SEX_OPTIONS.map((option) => (
+                <Pressable
+                  key={option}
                   style={[
-                    styles.chipText,
-                    formData.sex === option && styles.chipTextActive,
+                    styles.chip,
+                    formData.sex === option && styles.chipActive,
                   ]}
+                  onPress={() => updateField("sex", option)}
+                  disabled={loading}
                 >
-                  {option}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          {!!errors.sex && touched.sex && (
-            <Text style={styles.fieldError}>{errors.sex}</Text>
-          )}
+                  <Text
+                    style={[
+                      styles.chipText,
+                      formData.sex === option && styles.chipTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            {!!errors.sex && touched.sex && (
+              <Text style={styles.fieldError}>{errors.sex}</Text>
+            )}
 
-          <View style={styles.inlineRow}>
-            <View style={styles.inlineField}>
-              <FormInput
-                label="Idade"
-                placeholder="Ex.: 3"
-                value={formData.age}
-                onChangeText={(value) => updateField("age", value)}
-                onBlur={() => blurField("age")}
-                error={errors.age}
-                touched={touched.age}
-                editable={!loading}
-                keyboardType="number-pad"
-              />
+            <View style={styles.inlineRow}>
+              <View style={styles.inlineField}>
+                <FormInput
+                  label="Idade"
+                  placeholder="Ex.: 3"
+                  value={formData.age}
+                  onChangeText={(value) => updateField("age", value)}
+                  onBlur={() => blurField("age")}
+                  error={errors.age}
+                  touched={touched.age}
+                  editable={!loading}
+                  keyboardType="number-pad"
+                />
+              </View>
+
+              <View style={styles.inlineField}>
+                <FormInput
+                  label="Peso"
+                  placeholder="Ex.: 12.5"
+                  value={formData.weight}
+                  onChangeText={(value) => updateField("weight", value)}
+                  onBlur={() => blurField("weight")}
+                  error={errors.weight}
+                  touched={touched.weight}
+                  editable={!loading}
+                  keyboardType="decimal-pad"
+                />
+              </View>
             </View>
 
-            <View style={styles.inlineField}>
-              <FormInput
-                label="Peso"
-                placeholder="Ex.: 12.5"
-                value={formData.weight}
-                onChangeText={(value) => updateField("weight", value)}
-                onBlur={() => blurField("weight")}
-                error={errors.weight}
-                touched={touched.weight}
-                editable={!loading}
-                keyboardType="decimal-pad"
-              />
+            <View style={styles.tutorCard}>
+              <Text style={styles.tutorLabel}>Tutor vinculado</Text>
+              <Text style={styles.tutorValue}>
+                {auth.currentUser?.displayName || "Usuário"}
+              </Text>
+              <Text style={styles.tutorHint}>
+                {auth.currentUser?.email || "Nenhum email disponível"}
+              </Text>
+            </View>
+
+            <View style={styles.buttonRow}>
+              <Pressable
+                style={[styles.primaryButton, loading && styles.buttonDisabled]}
+                onPress={handleSavePet}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={colors.wine} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>Salvar pet</Text>
+                )}
+              </Pressable>
+
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={() => router.back()}
+                disabled={loading}
+              >
+                <Text style={styles.secondaryButtonText}>Cancelar</Text>
+              </Pressable>
             </View>
           </View>
-
-          <View style={styles.tutorCard}>
-            <Text style={styles.tutorLabel}>Tutor vinculado</Text>
-            <Text style={styles.tutorValue}>
-              {auth.currentUser?.displayName || "Usuário"}
-            </Text>
-            <Text style={styles.tutorHint}>
-              {auth.currentUser?.email || "Nenhum email disponível"}
-            </Text>
-          </View>
-
-          <View style={styles.buttonRow}>
-            <Pressable
-              style={[styles.primaryButton, loading && styles.buttonDisabled]}
-              onPress={handleSavePet}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={colors.wine} />
-              ) : (
-                <Text style={styles.primaryButtonText}>Salvar pet</Text>
-              )}
-            </Pressable>
-
-            <Pressable
-              style={styles.secondaryButton}
-              onPress={() => router.back()}
-              disabled={loading}
-            >
-              <Text style={styles.secondaryButtonText}>Cancelar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -358,16 +370,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   backButton: {
-    alignSelf: "flex-start",
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    width: 36,
+    height: 36,
     borderRadius: 999,
-    backgroundColor: "rgba(245, 236, 215, 0.12)",
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backButtonText: {
+    fontSize: 22,
     color: colors.cream,
-    fontWeight: "800",
-    fontSize: 16,
+    fontWeight: "700",
+    includeFontPadding: false,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
   card: {
     backgroundColor: colors.cardBg,

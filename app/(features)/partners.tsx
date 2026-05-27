@@ -161,7 +161,7 @@ export default function PartnersScreen() {
       >
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>‹ Voltar</Text>
+            <Text style={styles.backButtonText}>‹</Text>
           </Pressable>
           <Text style={styles.title}>Marketplace de Parceiros</Text>
           <Text style={styles.subtitle}>

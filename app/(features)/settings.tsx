@@ -74,7 +74,7 @@ export default function SettingsScreen() {
       >
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>‹ Voltar</Text>
+            <Text style={styles.backButtonText}>‹</Text>
           </Pressable>
 
           <Text style={styles.title}>Configurações</Text>

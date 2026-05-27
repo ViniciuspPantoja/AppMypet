@@ -279,7 +279,7 @@ export default function SignupCompanyScreen() {
     <SafeAreaView style={signupStyles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={signupStyles.scrollContent}

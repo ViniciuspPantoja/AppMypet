@@ -31,20 +31,22 @@ export const appointmentStyles = StyleSheet.create({
   },
 
   backButton: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: radius.pill,
-    backgroundColor: colors.wine,
-    borderWidth: 2,
-    borderColor: colors.wineLight,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
 
   backButtonText: {
+    fontSize: 22,
     color: colors.cream,
-    fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "700",
+    includeFontPadding: false,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
 
   headerTexts: {

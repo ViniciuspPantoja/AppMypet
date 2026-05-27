@@ -45,6 +45,9 @@ export const vaccinesStyles = StyleSheet.create({
     color: vaccineColors.bgCard,
     fontWeight: "700",
     includeFontPadding: false,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
 
   headerTitle: {

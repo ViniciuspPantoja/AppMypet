@@ -2,10 +2,12 @@
  * Tipos e interfaces para Pets
  */
 
+export type PetSpecies = "Cachorro" | "Gato" | "Pássaro" | "Peixe" | "Outro";
+
 export interface Pet {
   id: string;
   name: string;
-  species: string; // cachorro, gato, etc
+  species: PetSpecies;
   breed: string;
   sex?: string;
   age: number;

@@ -10,9 +10,15 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getAuth, updateEmail, updateProfile } from "firebase/auth";
+import {
+    getAuth,
+    updateEmail,
+    updatePassword,
+    updateProfile,
+} from "firebase/auth";
 import {
     collection,
+    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -22,6 +28,7 @@ import {
 } from "firebase/firestore";
 import { useCallback, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Image,
     KeyboardAvoidingView,
@@ -31,9 +38,24 @@ import {
     SafeAreaView,
     ScrollView,
     Text,
-    View
+    View,
 } from "react-native";
 import { myPetStyles } from "../styles/my-pet.styles";
+
+function getSpeciesEmoji(species: string) {
+  switch (species) {
+    case "Cachorro":
+      return "🐕";
+    case "Gato":
+      return "🐈";
+    case "Pássaro":
+      return "🐦";
+    case "Peixe":
+      return "🐟";
+    default:
+      return "🐾";
+  }
+}
 
 export default function MyPetScreen() {
   const router = useRouter();
@@ -52,6 +74,10 @@ export default function MyPetScreen() {
     type: "success",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState<string>("");
 
   const loadUserData = useCallback(async () => {
     try {
@@ -141,6 +167,21 @@ export default function MyPetScreen() {
     }
   }
 
+  async function handleDeletePet(id: string) {
+    if (!id) return;
+    try {
+      setDeleting(true);
+      const db = getFirestoreDb();
+      await deleteDoc(doc(db, "pets", id));
+      setPets((prev) => prev.filter((p) => p.id !== id));
+      setDeleteModalVisible(false);
+    } catch (err) {
+      Alert.alert("Erro", "Não foi possível excluir o pet.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function pickImageFromCamera() {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -213,7 +254,7 @@ export default function MyPetScreen() {
     <SafeAreaView style={myPetStyles.safeArea}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={myPetStyles.scrollContent}
@@ -225,9 +266,124 @@ export default function MyPetScreen() {
               style={myPetStyles.backButton}
               onPress={() => router.back()}
             >
-              <Text style={myPetStyles.backButtonText}>← Voltar</Text>
+              <Text style={myPetStyles.backButtonText}>‹</Text>
             </Pressable>
           </View>
+          <Modal
+            visible={deleteModalVisible}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setDeleteModalVisible(false)}
+          >
+            <View style={myPetStyles.modalOverlay}>
+              <View style={myPetStyles.modalContent}>
+                <Text style={myPetStyles.modalTitle}>Excluir pet</Text>
+                <ScrollView style={{ width: "100%" }}>
+                  {pets.filter((p) => p.tutorUid === userProfile?.uid)
+                    .length === 0 ? (
+                    <Text
+                      style={{
+                        color: "#fff",
+                        textAlign: "center",
+                        marginTop: 8,
+                      }}
+                    >
+                      Nenhum pet vinculado encontrado.
+                    </Text>
+                  ) : (
+                    pets
+                      .filter((p) => p.tutorUid === userProfile?.uid)
+                      .map((p) => (
+                        <View key={p.id} style={myPetStyles.petDeleteRow}>
+                          <Text style={{ color: "#fff", fontWeight: "800" }}>
+                            {p.name} • {p.species}
+                          </Text>
+                          <Pressable
+                            style={({ pressed }) => [
+                              myPetStyles.petDeleteButton,
+                              pressed && { opacity: 0.88, transform: [{ scale: 0.97 }] },
+                            ]}
+                            onPress={() => {
+                              setConfirmDeleteId(p.id);
+                              setConfirmDeleteName(p.name);
+                            }}
+                            disabled={deleting}
+                            hitSlop={8}
+                          >
+                            {deleting ? (
+                              <ActivityIndicator color="#fff" />
+                            ) : (
+                              <Text style={myPetStyles.petDeleteButtonText}>
+                                Excluir
+                              </Text>
+                            )}
+                          </Pressable>
+                        </View>
+                      ))
+                  )}
+                </ScrollView>
+                <Pressable
+                  style={[myPetStyles.modalButton, { marginTop: 12 }]}
+                  onPress={() => setDeleteModalVisible(false)}
+                >
+                  <Text style={myPetStyles.modalButtonText}>Fechar</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={!!confirmDeleteId}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setConfirmDeleteId(null)}
+          >
+            <View style={myPetStyles.modalOverlay}>
+              <View style={myPetStyles.modalContent}>
+                <Text style={myPetStyles.modalTitle}>
+                  Excluir {confirmDeleteName}?
+                </Text>
+                <Text style={myPetStyles.modalMessage}>
+                  Esta ação não pode ser desfeita.
+                </Text>
+
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  <Pressable
+                    style={({ pressed }) => [
+                      myPetStyles.modalButton,
+                      { flex: 1 },
+                      pressed && { opacity: 0.88 },
+                    ]}
+                    onPress={() => setConfirmDeleteId(null)}
+                  >
+                    <Text style={myPetStyles.modalButtonText}>Cancelar</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={({ pressed }) => [
+                      [
+                        myPetStyles.modalButton,
+                        {
+                          flex: 1,
+                          backgroundColor: "#FF6B6B",
+                          borderColor: "rgba(255,107,107,0.9)",
+                        },
+                      ],
+                      pressed && { opacity: 0.88 },
+                    ]}
+                    onPress={() => {
+                      if (confirmDeleteId) {
+                        handleDeletePet(confirmDeleteId);
+                        setConfirmDeleteId(null);
+                      }
+                    }}
+                  >
+                    <Text style={myPetStyles.modalButtonText}>Excluir</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           <View style={myPetStyles.hero}>
             <View style={myPetStyles.avatarWrap}>
@@ -503,12 +659,24 @@ export default function MyPetScreen() {
           <View style={myPetStyles.section}>
             <View style={myPetStyles.sectionHeader}>
               <Text style={myPetStyles.sectionTitle}>Seção dos pets</Text>
-              <Pressable
-                style={myPetStyles.sectionAction}
-                onPress={() => router.push("/pet-register")}
-              >
-                <Text style={myPetStyles.sectionActionText}>+ Adicionar</Text>
-              </Pressable>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable
+                  style={myPetStyles.sectionAction}
+                  onPress={() => router.push("/pet-register")}
+                >
+                  <Text style={myPetStyles.sectionActionText}>+ Adicionar</Text>
+                </Pressable>
+
+                <Pressable
+                  style={({ pressed }) => [
+                    myPetStyles.sectionDelete,
+                    pressed && myPetStyles.sectionDeletePressed,
+                  ]}
+                  onPress={() => setDeleteModalVisible(true)}
+                >
+                  <Text style={myPetStyles.sectionDeleteText}>- Excluir</Text>
+                </Pressable>
+              </View>
             </View>
 
             {pets.length === 0 ? (
@@ -533,7 +701,7 @@ export default function MyPetScreen() {
                         />
                       ) : (
                         <Text style={myPetStyles.petAvatarEmoji}>
-                          {pet.species === "Cachorro" ? "🐕" : "🐈"}
+                          {getSpeciesEmoji(pet.species)}
                         </Text>
                       )}
                     </View>

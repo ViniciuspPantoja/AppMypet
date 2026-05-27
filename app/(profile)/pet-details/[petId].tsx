@@ -150,7 +150,15 @@ export default function PetDetailsScreen() {
           <View style={petDetailsStyles.heroCard}>
             <View style={petDetailsStyles.avatarWrap}>
               <Text style={petDetailsStyles.avatarEmoji}>
-                {pet.species === "Gato" ? "🐈" : "🐕"}
+                {pet.species === "Cachorro"
+                  ? "🐕"
+                  : pet.species === "Gato"
+                    ? "🐈"
+                    : pet.species === "Pássaro"
+                      ? "🐦"
+                      : pet.species === "Peixe"
+                        ? "🐟"
+                        : "🐾"}
               </Text>
             </View>
             <Text style={petDetailsStyles.petName}>{pet.name}</Text>

@@ -85,21 +85,23 @@ export const plansStyles = StyleSheet.create({
   },
 
   backButton: {
-    alignSelf: "flex-start",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 14,
-    backgroundColor: "rgba(245, 236, 215, 0.10)",
-    borderWidth: 1,
-    borderColor: "rgba(245, 236, 215, 0.18)",
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.pill,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: SPACING.lg,
   },
 
   backButtonText: {
+    fontSize: 22,
     color: colors.textOnWine,
-    fontSize: 14.5,
-    fontWeight: "800",
-    letterSpacing: 0.2,
+    fontWeight: "700",
+    includeFontPadding: false,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
 
   eyebrow: {
