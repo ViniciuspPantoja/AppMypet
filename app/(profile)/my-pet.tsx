@@ -301,7 +301,10 @@ export default function MyPetScreen() {
                           <Pressable
                             style={({ pressed }) => [
                               myPetStyles.petDeleteButton,
-                              pressed && { opacity: 0.88, transform: [{ scale: 0.97 }] },
+                              pressed && {
+                                opacity: 0.88,
+                                transform: [{ scale: 0.97 }],
+                              },
                             ]}
                             onPress={() => {
                               setConfirmDeleteId(p.id);

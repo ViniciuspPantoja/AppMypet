@@ -189,11 +189,11 @@ export default function HomeScreen() {
               onPress={() => router.push("/pet-shop")}
             >
               <MaterialCommunityIcons
-                name="cart-outline"
+                name="warehouse"
                 size={18}
                 color="#F5ECD7"
               />
-              <Text style={homeStyles.quickLabel}>Pet Shop</Text>
+              <Text style={homeStyles.quickLabel}>Estoque</Text>
             </Pressable>
 
             <Pressable
