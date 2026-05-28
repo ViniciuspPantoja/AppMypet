@@ -66,7 +66,7 @@ export default function NotificationsScreen() {
             <View style={notificationsStyles.headerTextWrap}>
               <Text style={notificationsStyles.title}>Notificações</Text>
               <Text style={notificationsStyles.subtitle}>
-                Alertas pendentes de vacinas e consultas
+                Alertas pendentes de vacinas, consultas e estoque
               </Text>
             </View>
           </View>
@@ -116,15 +116,13 @@ export default function NotificationsScreen() {
               Nenhum alerta pendente
             </Text>
             <Text style={notificationsStyles.emptyText}>
-              Quando houver vacinas vencendo ou consultas próximas, elas
-              aparecerão aqui.
+              Quando houver vacinas vencendo, consultas próximas ou itens de
+              estoque quase acabando, elas aparecerão aqui.
             </Text>
           </View>
         ) : (
           <View style={notificationsStyles.listContent}>
             {alerts.map((alert) => {
-              const severityKey =
-                alert.severity as keyof typeof notificationsStyles;
               const cardStyle =
                 alert.severity === "critical"
                   ? notificationsStyles.alertCardCritical

@@ -1,5 +1,10 @@
 import { getFirestoreDb } from "@/database/firebase/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+    calculateEstimatedDays,
+    getStockStatus,
+    type StockItem,
+} from "./estoque.service";
 
 export type NotificationAlertSeverity = "critical" | "warning" | "info";
 
@@ -25,6 +30,20 @@ interface AppointmentDoc {
   date: string;
   time: string;
   status?: string;
+}
+
+interface StockDoc {
+  id: string;
+  name: string;
+  quantity: number;
+  unit?: StockItem["unit"];
+  category?: StockItem["category"];
+  dailyConsumption?: number;
+  dailyConsumptionUnit?: StockItem["dailyConsumptionUnit"];
+  portionsPerDay?: number;
+  portionSize?: number;
+  estimatedDays?: number | null;
+  status?: StockItem["status"];
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -159,6 +178,58 @@ function buildAppointmentAlerts(
   return alerts;
 }
 
+function addDays(date: Date, days: number): Date {
+  const nextDate = new Date(date);
+  nextDate.setDate(nextDate.getDate() + days);
+  return nextDate;
+}
+
+function buildStockAlerts(
+  stockItems: StockDoc[],
+  today: Date,
+): NotificationAlert[] {
+  const alerts: NotificationAlert[] = [];
+
+  stockItems.forEach((item) => {
+    const dailyConsumption =
+      typeof item.portionsPerDay === "number" &&
+      typeof item.portionSize === "number"
+        ? item.portionsPerDay * item.portionSize
+        : item.dailyConsumption;
+
+    const estimatedDays =
+      typeof item.estimatedDays === "number"
+        ? item.estimatedDays
+        : calculateEstimatedDays({
+            quantity: item.quantity,
+            quantityUnit: item.unit,
+            dailyConsumption,
+            dailyConsumptionUnit: item.dailyConsumptionUnit,
+          });
+
+    const status = item.status ?? getStockStatus(estimatedDays ?? null);
+    if (!estimatedDays || !status || status === "healthy") return;
+
+    const depletionDate = addDays(today, Math.ceil(estimatedDays));
+
+    alerts.push({
+      id: `stock-${status}-${item.id}`,
+      dueDate: depletionDate,
+      severity: status === "critical" ? "critical" : "warning",
+      title:
+        status === "critical"
+          ? `Estoque crítico: ${item.name}`
+          : `Estoque baixo: ${item.name}`,
+      description:
+        status === "critical"
+          ? `Esse item deve acabar em cerca de ${Math.ceil(estimatedDays)} dia(s).`
+          : `Esse item deve acabar em cerca de ${Math.ceil(estimatedDays)} dia(s).`,
+    });
+  });
+
+  return alerts;
+}
+
 function sortAlerts(alerts: NotificationAlert[]): NotificationAlert[] {
   const severityWeight: Record<NotificationAlertSeverity, number> = {
     critical: 0,
@@ -178,14 +249,16 @@ async function listPendingAlerts(
 ): Promise<NotificationAlert[]> {
   const db = getFirestoreDb();
 
-  const [vaccinesSnapshot, appointmentsSnapshot] = await Promise.all([
-    getDocs(
-      query(collection(db, "vaccines"), where("tutorUid", "==", userUid)),
-    ),
-    getDocs(
-      query(collection(db, "appointments"), where("userUid", "==", userUid)),
-    ),
-  ]);
+  const [vaccinesSnapshot, appointmentsSnapshot, stockSnapshot] =
+    await Promise.all([
+      getDocs(
+        query(collection(db, "vaccines"), where("tutorUid", "==", userUid)),
+      ),
+      getDocs(
+        query(collection(db, "appointments"), where("userUid", "==", userUid)),
+      ),
+      getDocs(query(collection(db, "stock"), where("tutorUid", "==", userUid))),
+    ]);
 
   const vaccines = vaccinesSnapshot.docs.map((docItem) => ({
     ...(docItem.data() as Omit<VaccineDoc, "id">),
@@ -197,10 +270,16 @@ async function listPendingAlerts(
     id: docItem.id,
   }));
 
+  const stockItems = stockSnapshot.docs.map((docItem) => ({
+    ...(docItem.data() as Omit<StockDoc, "id">),
+    id: docItem.id,
+  }));
+
   const today = startOfToday();
   const alerts = [
     ...buildVaccineAlerts(vaccines, today),
     ...buildAppointmentAlerts(appointments, today),
+    ...buildStockAlerts(stockItems, today),
   ];
 
   return sortAlerts(alerts);

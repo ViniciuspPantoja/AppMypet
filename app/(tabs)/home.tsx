@@ -186,7 +186,7 @@ export default function HomeScreen() {
 
             <Pressable
               style={homeStyles.quickPill}
-              onPress={() => router.push("/pet-shop")}
+              onPress={() => router.push("/estoque")}
             >
               <MaterialCommunityIcons
                 name="warehouse"
