@@ -6,7 +6,16 @@ import type { Pet } from "@/types/pet.types";
 import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { formatDate } from "@/utils/validators";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+interface VaccineBooster {
+  id: string;
+  name: string;
+  petName: string;
+  nextDue: string; // DD/MM/YYYY
+  isoDate: string; // YYYY-MM-DD
+}
 import {
     ActivityIndicator,
     Alert,
@@ -22,7 +31,21 @@ import {
 
 // ─── Constantes de módulo ────────────────────────────────────────────────────
 
-const TODAY = new Date().toISOString().slice(0, 10);
+const TODAY_ISO = new Date().toISOString().slice(0, 10);
+
+function isoToPtBr(iso: string): string {
+  const [yyyy, mm, dd] = iso.split("-");
+  if (!yyyy || !mm || !dd) return iso;
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function ptBrToIso(date: string): string {
+  const [dd, mm, yyyy] = date.split("/");
+  if (!dd || !mm || !yyyy) return date;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+const TODAY = isoToPtBr(TODAY_ISO);
 
 const INITIAL_FORM = {
   title: "",
@@ -54,11 +77,13 @@ export default function AppointmentScreen() {
   const db = useMemo(() => getFirestoreDb(), []);
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [boosters, setBoosters] = useState<VaccineBooster[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPets, setLoadingPets] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(INITIAL_FORM);
   const [activeMonth, setActiveMonth] = useState(new Date());
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
@@ -74,6 +99,27 @@ export default function AppointmentScreen() {
       setLoading(true);
       const list = await appointmentService.list();
       setAppointments(list);
+
+      // Carrega reforços de vacinas do usuário atual
+      const uid = auth.currentUser?.uid;
+      if (uid) {
+        const snap = await getDocs(
+          query(collection(db, "vaccines"), where("tutorUid", "==", uid)),
+        );
+        const items: VaccineBooster[] = snap.docs
+          .map((d) => {
+            const data = d.data() as any;
+            return {
+              id: d.id,
+              name: data.name || "Vacina",
+              petName: data.petName || "",
+              nextDue: data.nextDue || "",
+              isoDate: ptBrToIso(data.nextDue || ""),
+            };
+          })
+          .filter((v) => !!v.isoDate);
+        setBoosters(items);
+      }
     } catch {
       Alert.alert("Erro", "Não foi possível carregar as consultas.");
     } finally {
@@ -150,6 +196,14 @@ export default function AppointmentScreen() {
     return map;
   }, [appointments]);
 
+  const boostersByDate = useMemo(() => {
+    const map = new Map<string, number>();
+    boosters.forEach((b) => {
+      map.set(b.isoDate, (map.get(b.isoDate) || 0) + 1);
+    });
+    return map;
+  }, [boosters]);
+
   function prevMonth() {
     setActiveMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1));
   }
@@ -161,14 +215,28 @@ export default function AppointmentScreen() {
   // ── Modal ───────────────────────────────────────────────────────────────────
 
   function openModal() {
-    // Sincroniza o formulário com o dia selecionado no calendário
-    setForm({ ...INITIAL_FORM, date: selectedDate });
+    setEditingId(null);
+    setForm({ ...INITIAL_FORM, date: isoToPtBr(selectedDate) });
     setSelectedPetId(pets[0]?.id ?? null);
+    setShowModal(true);
+  }
+
+  function openEditModal(a: Appointment) {
+    setEditingId(a.id);
+    setForm({
+      title: a.title,
+      date: isoToPtBr(a.date),
+      time: a.time,
+      location: a.location,
+      notes: a.notes,
+    });
+    setSelectedPetId(a.petId ?? pets[0]?.id ?? null);
     setShowModal(true);
   }
 
   function closeModal() {
     setShowModal(false);
+    setEditingId(null);
     setForm(INITIAL_FORM);
   }
 
@@ -190,11 +258,10 @@ export default function AppointmentScreen() {
       return;
     }
 
-    if (!isValidDate(form.date)) {
-      Alert.alert(
-        "Data inválida",
-        "Use o formato AAAA-MM-DD (ex: 2025-06-15).",
-      );
+    const isoDate = ptBrToIso(form.date);
+
+    if (!isValidDate(isoDate)) {
+      Alert.alert("Data inválida", "Use o formato DD/MM/AAAA (ex: 15/06/2025).");
       return;
     }
 
@@ -206,18 +273,30 @@ export default function AppointmentScreen() {
     try {
       const pet = pets.find((item) => item.id === selectedPetId);
 
-      await appointmentService.create({
-        petId: selectedPetId,
-        petName: pet?.name || "",
-        title: form.title.trim(),
-        date: form.date,
-        time: form.time,
-        location: form.location.trim(),
-        notes: form.notes.trim(),
-        status: "scheduled",
-        userUid: auth.currentUser.uid,
-        userEmail: auth.currentUser.email || "",
-      } as Appointment);
+      if (editingId) {
+        await appointmentService.update(editingId, {
+          petId: selectedPetId ?? undefined,
+          petName: pet?.name || "",
+          title: form.title.trim(),
+          date: isoDate,
+          time: form.time,
+          location: form.location.trim(),
+          notes: form.notes.trim(),
+        });
+      } else {
+        await appointmentService.create({
+          petId: selectedPetId,
+          petName: pet?.name || "",
+          title: form.title.trim(),
+          date: isoDate,
+          time: form.time,
+          location: form.location.trim(),
+          notes: form.notes.trim(),
+          status: "scheduled",
+          userUid: auth.currentUser.uid,
+          userEmail: auth.currentUser.email || "",
+        } as Appointment);
+      }
 
       closeModal();
       await load();
@@ -249,6 +328,7 @@ export default function AppointmentScreen() {
   // ── Dados do dia selecionado ────────────────────────────────────────────────
 
   const dayAppointments = appointments.filter((a) => a.date === selectedDate);
+  const dayBoosters = boosters.filter((b) => b.isoDate === selectedDate);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
@@ -347,18 +427,14 @@ export default function AppointmentScreen() {
                   return (
                     <View
                       key={`empty-${idx}`}
-                      style={[
-                        appointmentStyles.dayCell,
-                        appointmentStyles.dayCellInactive,
-                      ]}
+                      style={[appointmentStyles.dayCell, appointmentStyles.dayCellInactive]}
                     />
                   );
                 }
-
-                const isToday = d.date === TODAY;
+                const isToday = d.date === TODAY_ISO;
                 const isSelected = d.date === selectedDate;
                 const count = countsByDate.get(d.date as string) || 0;
-
+                const boosterCount = boostersByDate.get(d.date as string) || 0;
                 return (
                   <TouchableOpacity
                     key={d.date}
@@ -368,25 +444,18 @@ export default function AppointmentScreen() {
                       isSelected && appointmentStyles.dayCellSelected,
                     ]}
                     onPress={() => setSelectedDate(d.date as string)}
-                    accessibilityLabel={`Dia ${d.label}, ${count} compromisso(s)`}
+                    accessibilityLabel={`Dia ${d.label}, ${count} consulta(s), ${boosterCount} reforço(s)`}
                     accessibilityRole="button"
                   >
-                    <Text
-                      style={[
-                        appointmentStyles.dayNumber,
-                        isSelected && appointmentStyles.dayNumberSelected,
-                      ]}
-                    >
+                    <Text style={[appointmentStyles.dayNumber, isSelected && appointmentStyles.dayNumberSelected]}>
                       {d.label}
                     </Text>
                     <View style={appointmentStyles.dayDotRow}>
-                      {Array.from({ length: Math.min(count, 3) }).map(
-                        (_, i) => (
-                          <View key={i} style={appointmentStyles.dayDot} />
-                        ),
-                      )}
-                      {count > 3 && (
-                        <View style={appointmentStyles.dayDotMore} />
+                      {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
+                        <View key={i} style={appointmentStyles.dayDot} />
+                      ))}
+                      {boosterCount > 0 && (
+                        <View style={[appointmentStyles.dayDot, { backgroundColor: "#D4623A" }]} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -400,44 +469,47 @@ export default function AppointmentScreen() {
             <View style={appointmentStyles.agendaHeader}>
               <Text style={appointmentStyles.agendaTitle}>Agenda</Text>
               <Text style={appointmentStyles.agendaCount}>
-                {dayAppointments.length} compromisso(s)
+                {dayAppointments.length + dayBoosters.length} evento(s)
               </Text>
             </View>
 
             {loading ? (
               <ActivityIndicator style={{ marginVertical: 24 }} />
-            ) : dayAppointments.length === 0 ? (
+            ) : dayAppointments.length === 0 && dayBoosters.length === 0 ? (
               <View style={appointmentStyles.emptyState}>
                 <Text style={appointmentStyles.emptyEmoji}>😴</Text>
-                <Text style={appointmentStyles.emptyTitle}>
-                  Nenhuma consulta
-                </Text>
+                <Text style={appointmentStyles.emptyTitle}>Nenhuma consulta</Text>
                 <Text style={appointmentStyles.emptyText}>
                   Agende uma nova consulta para o dia selecionado.
                 </Text>
               </View>
             ) : (
               <View style={appointmentStyles.appointmentList}>
+                {dayBoosters.map((b) => (
+                  <View key={b.id} style={[appointmentStyles.appointmentCard, { borderLeftWidth: 4, borderLeftColor: "#D4623A" }]}>
+                    <View style={appointmentStyles.appointmentCardTop}>
+                      <View style={appointmentStyles.appointmentTitleBlock}>
+                        <Text style={appointmentStyles.appointmentTitle}>💉 Reforço: {b.name}</Text>
+                        <Text style={appointmentStyles.appointmentSubtitle}>{b.petName} • Vacina vence hoje</Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
                 {dayAppointments.map((a) => (
                   <View key={a.id} style={appointmentStyles.appointmentCard}>
                     <View style={appointmentStyles.appointmentCardTop}>
                       <View style={appointmentStyles.appointmentTitleBlock}>
-                        <Text style={appointmentStyles.appointmentTitle}>
-                          {a.title}
-                        </Text>
-                        <Text style={appointmentStyles.appointmentSubtitle}>
-                          {a.petName} • {a.time} • {a.location}
-                        </Text>
+                        <Text style={appointmentStyles.appointmentTitle}>{a.title}</Text>
+                        <Text style={appointmentStyles.appointmentSubtitle}>{a.petName} • {a.time} • {a.location}</Text>
                       </View>
-                      <TouchableOpacity
-                        onPress={() => confirmDelete(a)}
-                        accessibilityLabel={`Remover ${a.title}`}
-                        accessibilityRole="button"
-                      >
-                        <Text style={{ color: "#E24B4A", fontSize: 13 }}>
-                          Remover
-                        </Text>
-                      </TouchableOpacity>
+                      <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+                        <TouchableOpacity onPress={() => openEditModal(a)} accessibilityRole="button">
+                          <Text style={{ color: "#7B1E2E", fontSize: 13, fontWeight: "700" }}>Editar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => confirmDelete(a)} accessibilityRole="button">
+                          <Text style={{ color: "#E24B4A", fontSize: 13 }}>Remover</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 ))}
@@ -461,7 +533,9 @@ export default function AppointmentScreen() {
               contentContainerStyle={appointmentStyles.modalScrollContent}
             >
               <View style={appointmentStyles.modalHeader}>
-                <Text style={appointmentStyles.modalTitle}>Nova Consulta</Text>
+                <Text style={appointmentStyles.modalTitle}>
+                  {editingId ? "Editar Consulta" : "Nova Consulta"}
+                </Text>
                 <TouchableOpacity
                   style={appointmentStyles.modalCloseButton}
                   onPress={closeModal}
@@ -538,9 +612,9 @@ export default function AppointmentScreen() {
               <View style={appointmentStyles.modalSection}>
                 <Text style={appointmentStyles.modalSectionTitle}>Data *</Text>
                 <TextInput
-                  placeholder="AAAA-MM-DD"
+                  placeholder="DD/MM/AAAA"
                   value={form.date}
-                  onChangeText={(t) => setForm((s) => ({ ...s, date: t }))}
+                  onChangeText={(t) => setForm((s) => ({ ...s, date: formatDate(t) }))}
                   style={appointmentStyles.modalInput}
                   keyboardType="numeric"
                   maxLength={10}

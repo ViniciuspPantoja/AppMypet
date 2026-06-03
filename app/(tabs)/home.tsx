@@ -35,7 +35,7 @@ export default function HomeScreen() {
             <MaterialCommunityIcons
               name="bell-outline"
               size={18}
-              color="#F5ECD7"
+              color="#5A1520"
             />
           </Pressable>
         </View>
@@ -45,7 +45,7 @@ export default function HomeScreen() {
           <View style={homeStyles.heroIconWrapper}>
             <MaterialCommunityIcons
               name="map-marker-path"
-              size={24}
+              size={22}
               color="#F5ECD7"
             />
           </View>
@@ -69,65 +69,65 @@ export default function HomeScreen() {
 
           <View style={homeStyles.gridRow}>
             <Pressable
-              style={homeStyles.cardCream}
+              style={homeStyles.card}
               onPress={() => router.push("/petmap")}
             >
-              <View style={homeStyles.cardIconWrapperWine}>
+              <View style={homeStyles.cardIconWrapper}>
                 <MaterialCommunityIcons
                   name="map-search-outline"
                   size={22}
                   color="#F5ECD7"
                 />
               </View>
-              <Text style={homeStyles.cardLabelDark}>Pet Map</Text>
-              <Text style={homeStyles.cardDescDark}>Locais pet friendly</Text>
+              <Text style={homeStyles.cardLabel}>Pet Map</Text>
+              <Text style={homeStyles.cardDesc}>Locais pet friendly</Text>
             </Pressable>
 
             <Pressable
-              style={homeStyles.cardWine}
+              style={homeStyles.card}
               onPress={() => router.push("/my-pet")}
             >
-              <View style={homeStyles.cardIconWrapperTerracotta}>
+              <View style={homeStyles.cardIconWrapper}>
                 <MaterialCommunityIcons
                   name="paw-outline"
                   size={22}
                   color="#F5ECD7"
                 />
               </View>
-              <Text style={homeStyles.cardLabelLight}>Meu perfil</Text>
-              <Text style={homeStyles.cardDescLight}>Seu perfil e pets</Text>
+              <Text style={homeStyles.cardLabel}>Meu perfil</Text>
+              <Text style={homeStyles.cardDesc}>Seu perfil e pets</Text>
             </Pressable>
           </View>
 
           <View style={homeStyles.gridRow}>
             <Pressable
-              style={homeStyles.cardWine}
+              style={homeStyles.card}
               onPress={() => router.push("/vaccines")}
             >
-              <View style={homeStyles.cardIconWrapperDark}>
+              <View style={homeStyles.cardIconWrapper}>
                 <MaterialCommunityIcons
                   name="needle"
                   size={22}
                   color="#F5ECD7"
                 />
               </View>
-              <Text style={homeStyles.cardLabelLight}>Vacinas</Text>
-              <Text style={homeStyles.cardDescLight}>Carteirinha do pet</Text>
+              <Text style={homeStyles.cardLabel}>Vacinas</Text>
+              <Text style={homeStyles.cardDesc}>Carteirinha do pet</Text>
             </Pressable>
 
             <Pressable
-              style={homeStyles.cardTerracotta}
+              style={homeStyles.card}
               onPress={() => router.push("/partners")}
             >
-              <View style={homeStyles.cardIconWrapperTerracottaDark}>
+              <View style={homeStyles.cardIconWrapper}>
                 <MaterialCommunityIcons
                   name="handshake-outline"
                   size={22}
                   color="#F5ECD7"
                 />
               </View>
-              <Text style={homeStyles.cardLabelLight}>Parceiros</Text>
-              <Text style={homeStyles.cardDescLight}>Clínicas e shops</Text>
+              <Text style={homeStyles.cardLabel}>Parceiros</Text>
+              <Text style={homeStyles.cardDesc}>Clínicas e shops</Text>
             </Pressable>
           </View>
         </View>
@@ -152,11 +152,9 @@ export default function HomeScreen() {
               style={homeStyles.quickPill}
               onPress={() => router.push("/appointment")}
             >
-              <MaterialCommunityIcons
-                name="calendar-month-outline"
-                size={18}
-                color="#F5ECD7"
-              />
+              <View style={homeStyles.quickIconWrapper}>
+                <MaterialCommunityIcons name="calendar-month-outline" size={18} color="#F5ECD7" />
+              </View>
               <Text style={homeStyles.quickLabel}>Consulta</Text>
             </Pressable>
 
@@ -164,11 +162,9 @@ export default function HomeScreen() {
               style={homeStyles.quickPill}
               onPress={() => router.push("/plans")}
             >
-              <MaterialCommunityIcons
-                name="star-outline"
-                size={18}
-                color="#F5ECD7"
-              />
+              <View style={homeStyles.quickIconWrapper}>
+                <MaterialCommunityIcons name="star-outline" size={18} color="#F5ECD7" />
+              </View>
               <Text style={homeStyles.quickLabel}>Planos</Text>
             </Pressable>
 
@@ -176,11 +172,9 @@ export default function HomeScreen() {
               style={homeStyles.quickPill}
               onPress={() => router.push("/nearby")}
             >
-              <MaterialCommunityIcons
-                name="map-marker-outline"
-                size={18}
-                color="#F5ECD7"
-              />
+              <View style={homeStyles.quickIconWrapper}>
+                <MaterialCommunityIcons name="map-marker-outline" size={18} color="#F5ECD7" />
+              </View>
               <Text style={homeStyles.quickLabel}>Perto</Text>
             </Pressable>
 
@@ -188,11 +182,9 @@ export default function HomeScreen() {
               style={homeStyles.quickPill}
               onPress={() => router.push("/estoque")}
             >
-              <MaterialCommunityIcons
-                name="warehouse"
-                size={18}
-                color="#F5ECD7"
-              />
+              <View style={homeStyles.quickIconWrapper}>
+                <MaterialCommunityIcons name="warehouse" size={18} color="#F5ECD7" />
+              </View>
               <Text style={homeStyles.quickLabel}>Estoque</Text>
             </Pressable>
 
@@ -200,11 +192,9 @@ export default function HomeScreen() {
               style={homeStyles.quickPill}
               onPress={() => router.push("/settings")}
             >
-              <MaterialCommunityIcons
-                name="cog-outline"
-                size={18}
-                color="#F5ECD7"
-              />
+              <View style={homeStyles.quickIconWrapper}>
+                <MaterialCommunityIcons name="cog-outline" size={18} color="#F5ECD7" />
+              </View>
               <Text style={homeStyles.quickLabel}>Config.</Text>
             </Pressable>
           </View>
