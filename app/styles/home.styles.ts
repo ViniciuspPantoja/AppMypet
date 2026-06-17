@@ -73,8 +73,8 @@ export const homeStyles = StyleSheet.create({
   },
 
   heroIconWrapper: {
-    width: 58,
-    height: 58,
+    width: 48,
+    height: 48,
     borderRadius: radius.md,
     backgroundColor: colors.wine,
     alignItems: "center",
@@ -143,8 +143,7 @@ export const homeStyles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
 
-  // Card creme (Pet Map)
-  cardCream: {
+  card: {
     width: CARD_SIZE,
     backgroundColor: colors.cream,
     borderRadius: radius.lg,
@@ -155,31 +154,7 @@ export const homeStyles = StyleSheet.create({
     borderColor: colors.creamDark,
   },
 
-  // Card vinho (Meu Pet, Planos)
-  cardWine: {
-    width: CARD_SIZE,
-    backgroundColor: colors.cardBg,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    alignItems: "center",
-    gap: spacing.sm,
-    borderWidth: 2,
-    borderColor: colors.wineLight,
-  },
-
-  // Card terracota (Parceiros)
-  cardTerracotta: {
-    width: CARD_SIZE,
-    backgroundColor: colors.terracotta,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    alignItems: "center",
-    gap: spacing.sm,
-    borderWidth: 2,
-    borderColor: colors.terracottaDark,
-  },
-
-  cardIconWrapperWine: {
+  cardIconWrapper: {
     width: 48,
     height: 48,
     borderRadius: radius.md,
@@ -190,69 +165,17 @@ export const homeStyles = StyleSheet.create({
     borderColor: colors.wineDark,
   },
 
-  cardIconWrapperTerracotta: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.terracotta,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: colors.terracottaDark,
-  },
-
-  cardIconWrapperDark: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.wineDark,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: colors.wine,
-  },
-
-  cardIconWrapperTerracottaDark: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.terracottaDark,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: colors.terracotta,
-  },
-
-  cardIcon: {
-    fontSize: 22,
-  },
-
-  cardLabelDark: {
+  cardLabel: {
     ...typography.subtitle,
     color: colors.wineMedium,
     fontSize: 12,
     textAlign: "center",
   },
 
-  cardLabelLight: {
-    ...typography.subtitle,
-    color: colors.cream,
-    fontSize: 12,
-    textAlign: "center",
-  },
-
-  cardDescDark: {
+  cardDesc: {
     ...typography.caption,
-    color: colors.wineMedium,
-    opacity: 0.7,
-    textAlign: "center",
-    fontSize: 10,
-  },
-
-  cardDescLight: {
-    ...typography.caption,
-    color: colors.cream,
-    opacity: 0.7,
+    color: colors.creamTextSecondary,
+    opacity: 0.8,
     textAlign: "center",
     fontSize: 10,
   },
@@ -288,26 +211,33 @@ export const homeStyles = StyleSheet.create({
   quickPill: {
     flexGrow: 1,
     flexBasis: "31%",
-    backgroundColor: colors.cardBg,
-    borderRadius: radius.md,
-    minHeight: 78,
-    paddingVertical: spacing.sm,
+    backgroundColor: colors.cream,
+    borderRadius: radius.lg,
+    minHeight: 90,
+    paddingVertical: spacing.md,
     alignItems: "center",
     gap: spacing.xs,
     borderWidth: 2,
-    borderColor: colors.wineLight,
+    borderColor: colors.creamDark,
     justifyContent: "center",
   },
 
-  quickIcon: {
-    fontSize: 18,
-    textAlign: "center",
+  quickIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.wine,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: colors.wineDark,
   },
 
   quickLabel: {
     ...typography.label,
-    color: colors.cream,
-    fontSize: 8.5,
+    color: colors.wineMedium,
+    fontSize: 9,
     textAlign: "center",
+    marginTop: 2,
   },
 });
