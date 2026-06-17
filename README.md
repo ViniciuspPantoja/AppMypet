@@ -1,73 +1,247 @@
-# AppMyPet — Mobile (Expo)
+# 🐾 MyPetZone Mobile
 
-Este repositório contém o código fonte de uma aplicação construída com Expo e uma estrutura pensada para rodar tanto em web quanto em mobile.
+Aplicativo mobile desenvolvido com o objetivo de **centralizar todo o ecossistema pet em uma única plataforma**, proporcionando praticidade, organização e bem-estar para tutores e seus pets.
 
-Resumo rápido
+---
 
-- **Stack:** Expo (React Native), TypeScript, Router baseado em arquivos.
-- **Pasta principal do app:** [app](app/)
-- **Outros recursos e exemplos:** [AppMyPet/app](AppMyPet/app/) (variação do projeto)
+## 🚀 Sobre o Projeto
 
-Como este port para mobile está sendo feito
+O **MyPetZone Mobile** é uma aplicação que reúne funcionalidades essenciais para quem possui animais de estimação, integrando diversas soluções em um único ambiente digital.
 
-- O projeto usa **Expo** para facilitar a execução em Android/iOS e acelerar o port do web/React para mobile.
-- Componentes e utilitários compartilhados (em `components/`, `hooks/`, `constants/`) foram adaptados para React Native.
-- A navegação é feita pelo roteamento baseado em arquivos (pasta `app/`), aproveitando o layout e os arquivos de rota já criados.
-- Estilos foram convertidos para o sistema de estilos do projeto (arquivos em `app/styles/` e `AppMyPet/app/styles/`), com tokens em `tokens/tokens.ts`.
-- Para features nativas (ex.: permissões, camera, armazenamento) usamos as APIs do Expo (Documentação: https://docs.expo.dev).
+A proposta é simples: **facilitar a vida do tutor**, oferecendo controle, informação e serviços em poucos toques.
 
-Configuração do ambiente Android (emulação)
+---
 
-1. Instale o Android Studio e o Android SDK.
-   - Baixe em: https://developer.android.com/studio
-2. Pelo Android Studio, abra o `AVD Manager` e crie um `Virtual Device` (recomendo um Pixel 8 pro com API 27+).
-3. Verifique variáveis de ambiente (exemplo para Linux):
+## 📱 Preview do App
 
-   ```bash
-   export ANDROID_HOME=$HOME/Android/Sdk
-   export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools
-   ```
+> *(Adicione aqui prints do app)*
 
-4. Habilite aceleração de virtualização (Intel HAXM ou KVM) se necessário para acelerar o emulador.
+./assets/screenshot-home.png  
+./assets/screenshot-map.png  
+./assets/screenshot-calendar.png  
+./assets/screenshot-vaccine.png  
 
-Rodando o app no emulador Android
+---
 
-1. Instale dependências:
+## 🧠 Funcionalidades
 
-   ```bash
-   npm install
-   ```
+### 📍 Mapa Interativo
+- Exibe serviços pet próximos ao usuário
+- Integração com geolocalização em tempo real  
+- Categorias disponíveis:
+  - Pet shops
+  - Clínicas veterinárias
+  - Banho e tosa
+  - Outros serviços relacionados
 
-2. Inicie o Metro bundler do Expo:
+---
 
-   ```bash
-   npx expo start
-   ```
+### 📦 Sistema de Estoque Inteligente
+- Controle de suprimentos (ração, medicamentos, etc.)
+- Cálculo automático baseado no consumo
+- Previsão de quando o item irá acabar
 
-   - Na tela do Metro, pressione `a` para abrir o app no emulador Android.
-   - Alternativamente execute:
+---
 
-   ```bash
-   npx expo run:android
-   ```
+### 🔐 Sistema de Autenticação
+- Login persistente utilizando Firebase Authentication
+- Geração e gerenciamento de tokens
+- Sessões seguras e escaláveis
 
-   Esse comando instala um build de desenvolvimento no emulador conectado.
+---
 
-Dicas práticas e resolução de problemas
+### 📅 Calendário Pet
+- Registro de eventos importantes
+- Exemplos:
+  - Consultas
+  - Vacinas
+  - Banho e tosa  
+- Integração com notificações automáticas
 
-- Se o emulador não aparece ao executar `npx expo start`, verifique se o AVD está rodando (`$ANDROID_HOME/emulator/emulator -list-avds` e inicie manualmente).
-- Para problemas com adb, execute `adb devices` e veja se há conexão com o emulador.
-- Se alterações nativas não são refletidas, limpe cache e reinstale: `npx expo start -c` e reinicie o app no emulador.
+---
 
-Resumo de comandos úteis
+### 💉 Carteirinha de Vacinação
+- Armazenamento digital das vacinas do pet
+- Controle de datas e vencimentos
+- Notificações antes do vencimento
 
-- Instalar dependências: `npm install`
-- Iniciar Metro/Dev server: `npx expo start`
-- Abrir no emulador Android (pelo menu Metro): pressione `a` ou execute `npx expo run:android`
-- Rodar testes unitários: `npm test`
+---
 
-Onde procurar ajuda
+### 🔔 Notificações Inteligentes
+- Alertas automáticos para:
+  - Vacinas próximas do vencimento
+  - Eventos cadastrados
+  - Reposição de estoque
 
-- Código principal: [app](app/)
-- Exemplo/variante: [AppMyPet/app](AppMyPet/app/)
-- Documentação Expo: https://docs.expo.dev
+---
+## 🛠️ Tecnologias Utilizadas
+
+### 📱 Mobile
+- React Native com Expo
+
+### ☁️ Backend & Serviços
+- Firebase
+  - Authentication
+  - Firestore
+  - Cloud Messaging
+  - Storage
+
+---
+
+## ⚙️ Como Rodar o Projeto
+
+```bash
+# Baixe o app em caso de tenha um android para testes:
+https://expo.dev/artifacts/eas/v5hgn1frBh2LBRUmv34czzYdWkaPPDbWsh1-Sh4m-_8.apk
+
+# Clone o repositório
+git clone https://github.com/seu-usuario/mypetzone.git
+
+# Entre na pasta
+cd mypetzone
+
+# Instale as dependências
+npm install
+
+# Inicie o projeto
+npx expo start
+
+#Acesse o localhost:3000
+```
+## 📂 Estrutura do Projeto
+
+<details>
+  <summary><strong>Clique para expandir / ocultar</strong></summary>
+
+```bash
+.
+├── app
+│   ├── (auth)
+│   │   ├── _layout.tsx
+│   │   ├── login.tsx
+│   │   ├── signup-company.tsx
+│   │   ├── signup-type.tsx
+│   │   └── signup-user.tsx
+│   ├── (features)
+│   │   ├── appointment.tsx
+│   │   ├── estoque.tsx
+│   │   ├── nearby.tsx
+│   │   ├── notifications.tsx
+│   │   ├── partners.tsx
+│   │   ├── petmap.tsx
+│   │   ├── pet-shop.tsx
+│   │   ├── plans.tsx
+│   │   ├── settings.tsx
+│   │   └── vaccines.tsx
+│   ├── _layout.tsx
+│   ├── loading.tsx
+│   ├── modal.tsx
+│   ├── pet-shop.tsx
+│   ├── (profile)
+│   │   ├── my-pet.tsx
+│   │   ├── pet-details
+│   │   └── pet-register.tsx
+│   ├── services
+│   │   ├── appointment.service.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth-session.service.ts
+│   │   ├── estoque.service.ts
+│   │   ├── index.ts
+│   │   ├── notifications.service.ts
+│   │   └── profile.service.ts
+│   ├── styles
+│   │   ├── appointment.styles.ts
+│   │   ├── estoque.styles.ts
+│   │   ├── explore.styles.ts
+│   │   ├── form-input.styles.ts
+│   │   ├── home.styles.ts
+│   │   ├── loading.styles.ts
+│   │   ├── login.styles.ts
+│   │   ├── my-pet.styles.ts
+│   │   ├── notifications.styles.ts
+│   │   ├── partners.styles.ts
+│   │   ├── pet-details.styles.ts
+│   │   ├── petmap.styles.ts
+│   │   ├── plans.styles.ts
+│   │   ├── settings.styles.ts
+│   │   ├── signup.styles.company.ts
+│   │   ├── signup.styles.type.ts
+│   │   ├── signup.styles.user.ts
+│   │   ├── status-message.styles.ts
+│   │   ├── tokens
+│   │   └── vaccines.styles.ts
+│   ├── (tabs)
+│   │   ├── explore.tsx
+│   │   ├── home.tsx
+│   │   ├── index.tsx
+│   │   └── _layout.tsx
+│   └── teste.ts
+├── app.json
+├── assets
+│   ├── bot
+│   │   ├── botpress-chat-button.tsx
+│   │   ├── botpress-config.ts
+│   │   ├── botpress-html.ts
+│   │   ├── botpress-native.styles.ts
+│   │   ├── botpress-web.logic.ts
+│   │   ├── botpress-web.styles.ts
+│   │   └── botpress-web.view.tsx
+│   └── images
+│       ├── android-icon-background.png
+│       ├── android-icon-foreground.png
+│       ├── android-icon-monochrome.png
+│       ├── favicon.png
+│       ├── icon.png
+│       ├── partial-react-logo.png
+│       ├── react-logo@2x.png
+│       ├── react-logo@3x.png
+│       ├── react-logo.png
+│       └── splash-icon.png
+├── components
+│   ├── botpress-chat-button.tsx
+│   ├── botpress-html.ts
+│   ├── external-link.tsx
+│   ├── form-input.tsx
+│   ├── haptic-tab.tsx
+│   ├── hello-wave.tsx
+│   ├── parallax-scroll-view.tsx
+│   ├── route-feedback.tsx
+│   ├── status-message.tsx
+│   ├── styles
+│   │   ├── hello-wave.styles.ts
+│   │   ├── parallax-scroll-view.styles.ts
+│   │   └── route-feedback.styles.ts
+│   ├── themed-text.tsx
+│   ├── themed-view.tsx
+│   └── ui
+│       ├── collapsible.styles.ts
+│       ├── collapsible.tsx
+│       ├── icon-symbol.ios.tsx
+│       └── icon-symbol.tsx
+├── constants
+│   └── theme.ts
+├── database
+│   └── firebase
+│       ├── firebase-connection-test.ts
+│       └── firebase.ts
+├── eas.json
+├── eslint.config.js
+├── expo-env.d.ts
+├── hooks
+│   ├── use-color-scheme.ts
+│   ├── use-color-scheme.web.ts
+│   └── use-theme-color.ts
+├── package.json
+├── package-lock.json
+├── README.md
+├── scripts
+│   └── reset-project.js
+├── tsconfig.json
+├── types
+│   ├── appointment.types.ts
+│   ├── pet.types.ts
+│   └── signup.types.ts
+└── utils
+    ├── navigation.ts
+    └── validators.ts
+``
