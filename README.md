@@ -1,3 +1,17 @@
+## 🎓 Contexto Acadêmico
+
+Este projeto foi desenvolvido como parte das atividades acadêmicas do curso de análise e desenvolvimento de sistemas na instituição UniFacens (Faculdade de engenharia de Sorocaba.
+
+O objetivo do projeto era aplicar conceitos de desenvolvimento mobile, integração com serviços em nuvem e criação de soluções voltadas a problemas reais, neste caso, a organização e gestão do dia a dia de tutores de pets.
+
+Durante o desenvolvimento foram trabalhados temas como:
+
+- Arquitetura de aplicações mobile
+- Integração com Firebase
+- Autenticação e persistência de sessão
+- Notificações push
+- UX/UI focada no usuário final
+  
 # 🐾 MyPetZone Mobile
 
 Aplicativo mobile desenvolvido com o objetivo de **centralizar todo o ecossistema pet em uma única plataforma**, proporcionando praticidade, organização e bem-estar para tutores e seus pets.
